@@ -6,8 +6,9 @@ import loans.beans.response.ParkingLot;
 
 import java.util.List;
 
-public interface CustomLostRepository {
+public interface CustomLotsRepository {
     public List<ParkingLot> searchAllFields();
     public void freeOwnersParking(setUnusedRequest request);
     public void recallParking(parkingNumberRequest request);
+    public void reserve(parkingNumberRequest request);
 }

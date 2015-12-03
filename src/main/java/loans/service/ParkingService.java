@@ -26,4 +26,8 @@ public class ParkingService {
     public void recallParking(parkingNumberRequest request) {
         lotsRepository.recallParking(request);
     }
+
+    public void reserve(parkingNumberRequest request) {
+        lotsRepository.reserve(request);
+    }
 }
