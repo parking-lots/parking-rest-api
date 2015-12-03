@@ -23,7 +23,9 @@ public class LoanController extends BaseController {
     @RequestMapping(value = "/available", method = RequestMethod.GET)
     public List<ParkingLot> getAllAvailable() {
 
-        return parkingService.getAvailable();
+        List<ParkingLot> parkingLots = parkingService.getAvailable();
+
+        return parkingLots;
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
