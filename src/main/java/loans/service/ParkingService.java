@@ -1,5 +1,6 @@
 package loans.service;
 
+import loans.beans.request.setUnusedRequest;
 import loans.beans.response.ParkingLot;
 import loans.repositories.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,5 +16,9 @@ public class ParkingService {
 
     public List<ParkingLot> getAvailable() {
         return lotsRepository.searchAllFields();
+    }
+
+    public void freeOwnersParking(setUnusedRequest request) {
+        lotsRepository.freeOwnersParking(request);
     }
 }

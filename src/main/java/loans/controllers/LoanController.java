@@ -1,6 +1,7 @@
 package loans.controllers;
 
 import loans.beans.request.Customer;
+import loans.beans.request.setUnusedRequest;
 import loans.beans.response.Loan;
 import loans.beans.response.ParkingLot;
 import loans.exceptions.ExceedLoanLimitException;
@@ -32,9 +33,7 @@ public class LoanController extends BaseController {
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
-    public List<ParkingLot> freeParking() {
-        return null;
+    public void freeOwnersParking(@Valid @RequestBody setUnusedRequest request) {
+        parkingService.freeOwnersParking(request);
     }
-
-
 }
