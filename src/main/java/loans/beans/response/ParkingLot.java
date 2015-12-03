@@ -2,7 +2,7 @@ package loans.beans.response;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "lots")
 public class ParkingLot extends Response {
 
     private Integer number;
