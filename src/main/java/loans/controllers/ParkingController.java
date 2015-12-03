@@ -34,4 +34,9 @@ public class ParkingController extends BaseController {
     public void freeOwnersParking(@Valid @RequestBody setUnusedRequest request) {
         parkingService.freeOwnersParking(request);
     }
+
+    @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
+    public void freeOwnersParking(@Valid @RequestBody parkingNumberRequest request) {
+        parkingService.reserve(request);
+    }
 }

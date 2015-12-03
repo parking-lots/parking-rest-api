@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import java.util.Date;
 import java.util.List;
 
-public class LotsRepositoryImpl implements CustomLostRepository {
+public class LotsRepositoryImpl implements CustomLotsRepository {
 
     private final MongoOperations operations;
 
@@ -31,6 +31,7 @@ public class LotsRepositoryImpl implements CustomLostRepository {
 
         searchQuery.addCriteria(searchCriteria.where("freeTill").gte(currentDate));
         searchQuery.addCriteria(searchCriteria.where("freeFrom").lte(currentDate));
+        searchQuery.addCriteria(searchCriteria.where("currentlyUsed").ne(true));
 
         return operations.find(searchQuery, ParkingLot.class);
     }
@@ -51,5 +52,11 @@ public class LotsRepositoryImpl implements CustomLostRepository {
         updateFields.unset("freeTill");
         updateFields.unset("freeFrom");
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
+
+    @Override
+    public void reserve(parkingNumberRequest request) {
+        Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
+        operations.updateFirst(searchQuery, Update.update("currentlyUsed", true), ParkingLot.class);
     }
 }
