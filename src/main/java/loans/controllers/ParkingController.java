@@ -1,12 +1,8 @@
 package loans.controllers;
 
-import loans.beans.request.Customer;
+import loans.beans.request.parkingNumberRequest;
 import loans.beans.request.setUnusedRequest;
-import loans.beans.response.Loan;
 import loans.beans.response.ParkingLot;
-import loans.exceptions.ExceedLoanLimitException;
-import loans.exceptions.MonthlyPaymentException;
-import loans.service.LoanService;
 import loans.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/parking")
-public class LoanController extends BaseController {
+public class ParkingController extends BaseController {
 
     @Autowired
     private ParkingService parkingService;
@@ -28,8 +24,8 @@ public class LoanController extends BaseController {
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
-    public List<ParkingLot> recallParking() {
-        return null;
+    public void recallParking(@Valid @RequestBody parkingNumberRequest request) {
+        parkingService.recallParking(request);
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)

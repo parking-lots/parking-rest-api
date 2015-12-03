@@ -1,5 +1,6 @@
 package loans.service;
 
+import loans.beans.request.parkingNumberRequest;
 import loans.beans.request.setUnusedRequest;
 import loans.beans.response.ParkingLot;
 import loans.repositories.LotsRepository;
@@ -20,5 +21,9 @@ public class ParkingService {
 
     public void freeOwnersParking(setUnusedRequest request) {
         lotsRepository.freeOwnersParking(request);
+    }
+
+    public void recallParking(parkingNumberRequest request) {
+        lotsRepository.recallParking(request);
     }
 }

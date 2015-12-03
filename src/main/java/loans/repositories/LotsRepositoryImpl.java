@@ -1,5 +1,6 @@
 package loans.repositories;
 
+import loans.beans.request.parkingNumberRequest;
 import loans.beans.request.setUnusedRequest;
 import loans.beans.response.ParkingLot;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,15 @@ public class LotsRepositoryImpl implements CustomLostRepository {
         Update updateFields = new Update();
         updateFields.set("freeTill",request.getFreeTill());
         updateFields.set("freeFrom",request.getFreeFrom());
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
+
+    @Override
+    public void recallParking(parkingNumberRequest request) {
+        Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
+        Update updateFields = new Update();
+        updateFields.unset("freeTill");
+        updateFields.unset("freeFrom");
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 }
