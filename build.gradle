@@ -13,7 +13,7 @@ apply plugin: 'war'
 apply plugin: 'spring-boot'
 
 war {
-    baseName = 'lonas-api'
+    baseName = 'parking-api'
     version =  '0.1.0'
 }
 
@@ -29,6 +29,7 @@ targetCompatibility = 1.8
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile 'org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE'
+        providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
     compile 'org.springframework:spring-webmvc:4.1.7.RELEASE'
     compile 'org.springframework:spring-web:4.1.7.RELEASE'
@@ -40,6 +41,17 @@ dependencies {
 
     /* JSONDoc.org dependencies */
     compile 'org.jsondoc:spring-boot-starter-jsondoc:1.2.4'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
 }
 
 
