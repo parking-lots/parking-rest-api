@@ -7,9 +7,9 @@ import parking.beans.response.ParkingLot;
 import java.util.List;
 
 public interface CustomLotsRepository {
-    public List<ParkingLot> searchAllFields();
+    public List<ParkingLot> searchAllFields(String userName);
     public void freeOwnersParking(setUnusedRequest request);
     public void recallParking(parkingNumberRequest request);
-    public void reserve(parkingNumberRequest request);
+    public void reserve(parkingNumberRequest request, String userName);
     public Integer getParkingNumberByUser(String name);
 }

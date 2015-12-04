@@ -17,7 +17,7 @@ public class ParkingLot extends Response {
     private Date freeFrom;
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date freeTill;
-    private Boolean currentlyUsed;
+    private String currentlyUsed;
 
     public Integer getNumber() {
         return number;
@@ -67,11 +67,11 @@ public class ParkingLot extends Response {
         this.freeTill = freeTill;
     }
 
-    public Boolean getCurrentlyUsed() {
+    public String getCurrentlyUsed() {
         return currentlyUsed;
     }
 
-    public void setCurrentlyUsed(Boolean currentlyUsed) {
+    public void setCurrentlyUsed(String currentlyUsed) {
         this.currentlyUsed = currentlyUsed;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
 
@@ -23,16 +24,28 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public List<ParkingLot> searchAllFields() {
+    public List<ParkingLot> searchAllFields(final String userName) {
         Query searchQuery = new Query();
 
         Date currentDate = new Date();
 
         searchQuery.addCriteria(Criteria.where("freeTill").gte(currentDate));
         searchQuery.addCriteria(Criteria.where("freeFrom").gte(currentDate));
-        searchQuery.addCriteria(Criteria.where("currentlyUsed").ne(true));
+        searchQuery.addCriteria(new Criteria().orOperator(
+                Criteria.where("currentlyUsed").is(null),
+                Criteria.where("currentlyUsed").is(userName))
+        );
+        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
-        return operations.find(searchQuery, ParkingLot.class);
+        List<ParkingLot> filteredLots =  lots.stream()
+                .filter(val -> userName.equals(val.getCurrentlyUsed()))
+                .collect(Collectors.toList());
+
+        if (filteredLots.size() > 0) {
+            return filteredLots;
+        }
+
+        return lots;
     }
 
     @Override
@@ -54,9 +67,9 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void reserve(parkingNumberRequest request) {
+    public void reserve(parkingNumberRequest request, String userName) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
-        operations.updateFirst(searchQuery, Update.update("currentlyUsed", true), ParkingLot.class);
+        operations.updateFirst(searchQuery, Update.update("currentlyUsed", userName), ParkingLot.class);
     }
 
     @Override

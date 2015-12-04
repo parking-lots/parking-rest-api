@@ -18,7 +18,7 @@ public class ParkingService {
     private LotsRepository lotsRepository;
 
     public List<ParkingLot> getAvailable() {
-        return lotsRepository.searchAllFields();
+        return lotsRepository.searchAllFields(getCurrentUserName());
     }
 
     public void freeOwnersParking(setUnusedRequest request) {
@@ -30,12 +30,15 @@ public class ParkingService {
     }
 
     public void reserve(parkingNumberRequest request) {
-        lotsRepository.reserve(request);
+        lotsRepository.reserve(request, getCurrentUserName());
     }
 
-    private Integer getParkingNumberByUser(){
+    private Integer getParkingNumberByUser() {
+        return lotsRepository.getParkingNumberByUser(getCurrentUserName());
+    }
+
+    private String getCurrentUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String name = authentication.getName();
-        return lotsRepository.getParkingNumberByUser(name);
+        return authentication.getName();
     }
 }
