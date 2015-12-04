@@ -1,8 +1,8 @@
-package loans.repositories;
+package parking.repositories;
 
-import loans.beans.request.parkingNumberRequest;
-import loans.beans.request.setUnusedRequest;
-import loans.beans.response.ParkingLot;
+import parking.beans.request.parkingNumberRequest;
+import parking.beans.request.setUnusedRequest;
+import parking.beans.response.ParkingLot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;

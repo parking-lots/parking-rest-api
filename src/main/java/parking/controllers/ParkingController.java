@@ -1,9 +1,9 @@
-package loans.controllers;
+package parking.controllers;
 
-import loans.beans.request.parkingNumberRequest;
-import loans.beans.request.setUnusedRequest;
-import loans.beans.response.ParkingLot;
-import loans.service.ParkingService;
+import parking.beans.request.parkingNumberRequest;
+import parking.beans.request.setUnusedRequest;
+import parking.beans.response.ParkingLot;
+import parking.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package loans.beans.request;
+package parking.beans.request;
 
 import javax.validation.constraints.NotNull;
 

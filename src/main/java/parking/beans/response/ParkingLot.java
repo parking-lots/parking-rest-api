@@ -1,4 +1,4 @@
-package loans.beans.response;
+package parking.beans.response;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat.ISO;

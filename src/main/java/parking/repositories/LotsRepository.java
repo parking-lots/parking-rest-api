@@ -1,6 +1,6 @@
-package loans.repositories;
+package parking.repositories;
 
-import loans.beans.response.ParkingLot;
+import parking.beans.response.ParkingLot;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

@@ -1,8 +1,7 @@
-package loans;
+package parking;
 
-import loans.repositories.Account;
-import loans.repositories.AccountRepository;
-import loans.repositories.LotsRepository;
+import parking.repositories.Account;
+import parking.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

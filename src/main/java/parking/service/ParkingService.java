@@ -1,9 +1,9 @@
-package loans.service;
+package parking.service;
 
-import loans.beans.request.parkingNumberRequest;
-import loans.beans.request.setUnusedRequest;
-import loans.beans.response.ParkingLot;
-import loans.repositories.LotsRepository;
+import parking.beans.request.parkingNumberRequest;
+import parking.beans.request.setUnusedRequest;
+import parking.beans.response.ParkingLot;
+import parking.repositories.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

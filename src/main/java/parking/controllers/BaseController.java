@@ -1,9 +1,9 @@
-package loans.controllers;
+package parking.controllers;
 
-import loans.beans.response.FormFieldError;
-import loans.beans.response.FormFieldsErrorsWrapper;
-import loans.exceptions.ExceedLoanLimitException;
-import loans.exceptions.MonthlyPaymentException;
+import parking.beans.response.FormFieldError;
+import parking.beans.response.FormFieldsErrorsWrapper;
+import parking.exceptions.ExceedLoanLimitException;
+import parking.exceptions.MonthlyPaymentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

@@ -1,4 +1,4 @@
-package loans.beans.response;
+package parking.beans.response;
 
 import java.math.BigDecimal;
 

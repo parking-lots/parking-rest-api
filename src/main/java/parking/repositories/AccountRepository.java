@@ -1,4 +1,4 @@
-package loans.repositories;
+package parking.repositories;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
