@@ -10,6 +10,7 @@ public class Account {
     private String id;
     private String username;
     private String password;
+    private Integer parkingNumber;
 
     public Account(){}
 
@@ -35,5 +36,10 @@ public class Account {
     public void setPassword(String password) {
         this.password = password;
     }
-
+    public Integer getParkingNumber() {
+        return parkingNumber;
+    }
+    public void setParkingNumber(Integer parkingNumber) {
+        this.parkingNumber = parkingNumber;
+    }
 }
