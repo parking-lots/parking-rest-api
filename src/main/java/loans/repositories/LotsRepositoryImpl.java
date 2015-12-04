@@ -25,13 +25,12 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     @Override
     public List<ParkingLot> searchAllFields() {
         Query searchQuery = new Query();
-        Criteria searchCriteria = new Criteria();
 
         Date currentDate = new Date();
 
-        searchQuery.addCriteria(searchCriteria.where("freeTill").gte(currentDate));
-        searchQuery.addCriteria(searchCriteria.where("freeFrom").lte(currentDate));
-        searchQuery.addCriteria(searchCriteria.where("currentlyUsed").ne(true));
+        searchQuery.addCriteria(Criteria.where("freeTill").gte(currentDate));
+        searchQuery.addCriteria(Criteria.where("freeFrom").gte(currentDate));
+        searchQuery.addCriteria(Criteria.where("currentlyUsed").ne(true));
 
         return operations.find(searchQuery, ParkingLot.class);
     }
