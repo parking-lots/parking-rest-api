@@ -69,7 +69,12 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
     @Override
     public void reserve(parkingNumberRequest request, String userName) {
-        Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
+        Query searchQuery = new Query();
+        searchQuery.addCriteria(new Criteria()
+                .andOperator(
+                        Criteria.where("number").is(request.getNumber()),
+                        Criteria.where("currentlyUsed").is(null)
+                ));
         operations.updateFirst(searchQuery, Update.update("currentlyUsed", userName), ParkingLot.class);
     }
 
