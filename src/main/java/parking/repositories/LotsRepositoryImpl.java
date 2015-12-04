@@ -41,6 +41,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Update updateFields = new Update();
         updateFields.set("freeTill",request.getFreeTill());
         updateFields.set("freeFrom",request.getFreeFrom());
+        updateFields.unset("currentlyUsed");
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
@@ -57,10 +58,5 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public void reserve(parkingNumberRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         operations.updateFirst(searchQuery, Update.update("currentlyUsed", true), ParkingLot.class);
-    }
-
-    @Override
-    public Integer getParkingNumberByUser(String name) {
-        return null; //TODO implement
     }
 }

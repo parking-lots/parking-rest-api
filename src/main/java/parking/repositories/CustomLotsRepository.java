@@ -11,5 +11,4 @@ public interface CustomLotsRepository {
     public void freeOwnersParking(setUnusedRequest request);
     public void recallParking(parkingNumberRequest request);
     public void reserve(parkingNumberRequest request);
-    public Integer getParkingNumberByUser(String name);
 }
