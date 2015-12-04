@@ -30,7 +30,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Date currentDate = new Date();
 
         searchQuery.addCriteria(Criteria.where("freeTill").gte(currentDate));
-        searchQuery.addCriteria(Criteria.where("freeFrom").gte(currentDate));
+        searchQuery.addCriteria(Criteria.where("freeFrom").lte(currentDate));
         searchQuery.addCriteria(new Criteria().orOperator(
                 Criteria.where("currentlyUsed").is(null),
                 Criteria.where("currentlyUsed").is(userName))
