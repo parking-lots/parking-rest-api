@@ -3,6 +3,7 @@ package parking.service;
 import parking.beans.request.parkingNumberRequest;
 import parking.beans.request.setUnusedRequest;
 import parking.beans.response.ParkingLot;
+import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,16 +17,29 @@ public class ParkingService {
 
     @Autowired
     private LotsRepository lotsRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
     public List<ParkingLot> getAvailable() {
         return lotsRepository.searchAllFields(getCurrentUserName());
     }
 
-    public void freeOwnersParking(setUnusedRequest request) {
+    public void freeOwnersParking(setUnusedRequest request){
+        Integer parkingNumber = getParkingNumberByUser();
+        if(parkingNumber == null){
+            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
+        }
+        request.setNumber(parkingNumber);
         lotsRepository.freeOwnersParking(request);
     }
 
-    public void recallParking(parkingNumberRequest request) {
+    public void recallParking() {
+        Integer parkingNumber = getParkingNumberByUser();
+        if(parkingNumber == null){
+            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
+        }
+        parkingNumberRequest request = new parkingNumberRequest();
+        request.setNumber(parkingNumber);
         lotsRepository.recallParking(request);
     }
 
@@ -33,8 +47,8 @@ public class ParkingService {
         lotsRepository.reserve(request, getCurrentUserName());
     }
 
-    private Integer getParkingNumberByUser() {
-        return lotsRepository.getParkingNumberByUser(getCurrentUserName());
+    private Integer getParkingNumberByUser(){
+        return accountRepository.findByUsername(getCurrentUserName()).getParkingNumber();
     }
 
     private String getCurrentUserName() {

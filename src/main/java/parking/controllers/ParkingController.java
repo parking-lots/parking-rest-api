@@ -26,8 +26,8 @@ public class ParkingController extends BaseController {
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
-    public void recallParking(@Valid @RequestBody parkingNumberRequest request) {
-        parkingService.recallParking(request);
+    public void recallParking() {
+        parkingService.recallParking();
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
