@@ -72,4 +72,10 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         operations.updateFirst(searchQuery, Update.update("currentlyUsed", userName), ParkingLot.class);
     }
+
+    @Override
+    public void cancelReservation(String currentUserName) {
+        Query searchQuery = new Query(Criteria.where("currentlyUsed").is(currentUserName));
+        operations.updateFirst(searchQuery, new Update().unset("currentlyUsed"), ParkingLot.class);
+    }
 }

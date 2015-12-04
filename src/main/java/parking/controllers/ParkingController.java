@@ -39,4 +39,9 @@ public class ParkingController extends BaseController {
     public void freeOwnersParking(@Valid @RequestBody parkingNumberRequest request) {
         parkingService.reserve(request);
     }
+
+    @RequestMapping(value = "/reserved", method = RequestMethod.DELETE)
+    public void cancelRezervation() {
+        parkingService.cancelRezervation();
+    }
 }
