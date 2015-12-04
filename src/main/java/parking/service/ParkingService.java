@@ -55,4 +55,8 @@ public class ParkingService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
+
+    public void cancelRezervation() {
+        lotsRepository.cancelReservation(getCurrentUserName());
+    }
 }
