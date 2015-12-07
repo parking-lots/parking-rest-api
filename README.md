@@ -1,5 +1,4 @@
-# loan-api
-Simple application for loan calculation
+# parking-api
 
 <h2>To run</h2>
 <pre>
