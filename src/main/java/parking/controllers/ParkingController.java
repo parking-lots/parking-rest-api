@@ -43,6 +43,5 @@ public class ParkingController extends BaseController {
     @RequestMapping(value = "/reserved", method = RequestMethod.DELETE)
     public void cancelRezervation() {
         parkingService.cancelRezervation();
-        
     }
 }
