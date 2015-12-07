@@ -2,6 +2,7 @@ package parking.beans.request;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -11,6 +12,7 @@ public class setUnusedRequest {
     private Date freeFrom = new Date();
     @NotNull(message = "Must provide untill which date are you giving your parking away!")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Future
     private Date freeTill;
 
     public Integer getNumber() {
@@ -26,6 +28,9 @@ public class setUnusedRequest {
     }
 
     public void setFreeFrom(Date freeFrom) {
+        if (freeFrom == null){
+            return;
+        }
         this.freeFrom = freeFrom;
     }
 
