@@ -6,7 +6,7 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-public class setUnusedRequest {
+public class SetUnusedRequest {
     private Integer number;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom = new Date();

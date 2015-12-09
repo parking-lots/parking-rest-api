@@ -1,7 +1,7 @@
 package parking.service;
 
 import parking.beans.request.parkingNumberRequest;
-import parking.beans.request.setUnusedRequest;
+import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
@@ -24,7 +24,7 @@ public class ParkingService {
         return lotsRepository.searchAllFields(getCurrentUserName());
     }
 
-    public void freeOwnersParking(setUnusedRequest request){
+    public void freeOwnersParking(SetUnusedRequest request){
         Integer parkingNumber = getParkingNumberByUser();
         if(parkingNumber == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");

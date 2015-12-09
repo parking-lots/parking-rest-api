@@ -1,7 +1,7 @@
 package parking.repositories;
 
 import parking.beans.request.parkingNumberRequest;
-import parking.beans.request.setUnusedRequest;
+import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -49,7 +49,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void freeOwnersParking(setUnusedRequest request) {
+    public void freeOwnersParking(SetUnusedRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
         updateFields.set("freeTill",request.getFreeTill());

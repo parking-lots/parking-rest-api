@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -28,12 +27,6 @@ public class Application extends SpringBootServletInitializer{
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder applicaion) {
-        return applicaion.sources(Application.class);
-    }
-
 
 }
 

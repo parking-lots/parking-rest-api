@@ -1,7 +1,7 @@
 package parking.controllers;
 
 import parking.beans.request.parkingNumberRequest;
-import parking.beans.request.setUnusedRequest;
+import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import parking.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class ParkingController extends BaseController {
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
-    public void freeOwnersParking(@Valid @RequestBody setUnusedRequest request) {
+    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request) {
         parkingService.freeOwnersParking(request);
     }
 
