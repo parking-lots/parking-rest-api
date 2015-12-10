@@ -37,6 +37,7 @@ public class ParkingServiceTest {
 
     @Mock
     private SecurityContext mockSecurityContext;
+
     private Authentication authentication;
 
 
@@ -113,7 +114,7 @@ public class ParkingServiceTest {
         verify(lotsRepository).freeOwnersParking((SetUnusedRequest) captor.capture());
 
         SetUnusedRequest value = (SetUnusedRequest) captor.getValue();
-        assertEquals(value.getNumber(),account.getParkingNumber());
+        assertEquals(value.getNumber(), account.getParkingNumber());
 
 
     }

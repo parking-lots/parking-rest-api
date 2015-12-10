@@ -1,5 +1,6 @@
 package parking.service;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.request.parkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
@@ -7,7 +8,6 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
