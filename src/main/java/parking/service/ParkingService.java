@@ -1,7 +1,7 @@
 package parking.service;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import parking.beans.request.parkingNumberRequest;
+import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import parking.repositories.AccountRepository;
@@ -38,12 +38,12 @@ public class ParkingService {
         if(parkingNumber == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
-        parkingNumberRequest request = new parkingNumberRequest();
+        ParkingNumberRequest request = new ParkingNumberRequest();
         request.setNumber(parkingNumber);
         lotsRepository.recallParking(request);
     }
 
-    public void reserve(parkingNumberRequest request) {
+    public void reserve(ParkingNumberRequest request) {
         lotsRepository.reserve(request, getCurrentUserName());
     }
 

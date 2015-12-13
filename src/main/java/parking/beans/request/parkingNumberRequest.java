@@ -2,7 +2,7 @@ package parking.beans.request;
 
 import javax.validation.constraints.NotNull;
 
-public class parkingNumberRequest {
+public class ParkingNumberRequest {
     @NotNull(message = "Must provide parking number, stupid!")
     private Integer number;
 

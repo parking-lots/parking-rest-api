@@ -1,6 +1,6 @@
 package parking.controllers;
 
-import parking.beans.request.parkingNumberRequest;
+import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import parking.service.ParkingService;
@@ -36,7 +36,7 @@ public class ParkingController extends BaseController {
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
-    public void freeOwnersParking(@Valid @RequestBody parkingNumberRequest request) {
+    public void freeOwnersParking(@Valid @RequestBody ParkingNumberRequest request) {
         parkingService.reserve(request);
     }
 

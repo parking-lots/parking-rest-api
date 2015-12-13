@@ -1,6 +1,6 @@
 package parking.repositories;
 
-import parking.beans.request.parkingNumberRequest;
+import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void recallParking(parkingNumberRequest request) {
+    public void recallParking(ParkingNumberRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
         updateFields.unset("freeTill");
@@ -68,7 +68,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void reserve(parkingNumberRequest request, String userName) {
+    public void reserve(ParkingNumberRequest request, String userName) {
         Query searchQuery = new Query();
         searchQuery.addCriteria(new Criteria()
                 .andOperator(
