@@ -1,9 +1,8 @@
-package parking.controllers;
+package parking.handler;
 
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import parking.beans.response.FormFieldError;
 import parking.beans.response.FormFieldsErrorsWrapper;
-import parking.exceptions.ExceedLoanLimitException;
-import parking.exceptions.MonthlyPaymentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -11,11 +10,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import parking.exceptions.UserException;
+import parking.handler.wrapper.ErrorMessage;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class BaseController {
+@ControllerAdvice
+public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public ResponseEntity<FormFieldsErrorsWrapper> handleValidationException(MethodArgumentNotValidException e) {
@@ -31,23 +33,8 @@ public class BaseController {
         return new ResponseEntity<FormFieldsErrorsWrapper>(fieldErrorList, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MonthlyPaymentException.class)
-    @ResponseBody
-    public ResponseEntity<FormFieldsErrorsWrapper> handleMonthlyPaymentException(MonthlyPaymentException e) {
-
-        FormFieldsErrorsWrapper fieldErrorList = new FormFieldsErrorsWrapper();
-        fieldErrorList.addError(new FormFieldError("salary", "The monthly payment must not exceed 40% of the salary."));
-
-        return new ResponseEntity<FormFieldsErrorsWrapper>(fieldErrorList, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ExceedLoanLimitException.class)
-    @ResponseBody
-    public ResponseEntity<FormFieldsErrorsWrapper> handlleExceedLoanLimitException(ExceedLoanLimitException e) {
-
-        FormFieldsErrorsWrapper fieldErrorList = new FormFieldsErrorsWrapper();
-        fieldErrorList.addError(new FormFieldError("desiredSum", "Loan amount must not exceed total sum of 5 year salary income."));
-
-        return new ResponseEntity<FormFieldsErrorsWrapper>(fieldErrorList, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<ErrorMessage> handleOccupiedEmailException(UserException e){
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()),HttpStatus.BAD_REQUEST);
     }
 }

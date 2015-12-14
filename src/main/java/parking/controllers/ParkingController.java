@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/parking")
-public class ParkingController extends BaseController {
+public class ParkingController {
 
     @Autowired
     private ParkingService parkingService;

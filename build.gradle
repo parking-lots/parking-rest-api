@@ -33,6 +33,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
         providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
+
+    compile 'joda-time:joda-time'
     compile 'org.springframework:spring-webmvc:latest.release'
     compile 'org.springframework:spring-web:latest.release'
 
