@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import parking.security.DatabaseAuthenticationProvider;
+import parking.security.HttpAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -16,14 +17,24 @@ import parking.security.DatabaseAuthenticationProvider;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder builder, DatabaseAuthenticationProvider authenticationProvider) throws Exception {
+    private HttpAuthenticationEntryPoint authenticationEntryPoint;
+
+    @Autowired
+    private DatabaseAuthenticationProvider authenticationProvider;
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
         builder.authenticationProvider(authenticationProvider);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests()
+                .authenticationProvider(authenticationProvider)
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint);
+
+        http.authorizeRequests()
                 .antMatchers("/parking/**").hasRole("USER");
     }
 
@@ -31,7 +42,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-
-
 }

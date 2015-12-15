@@ -1,5 +1,6 @@
 package parking.controllers;
 
+import org.springframework.security.access.annotation.Secured;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
