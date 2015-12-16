@@ -1,5 +1,7 @@
 package parking.beans.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,9 +15,11 @@ public class ParkingLot extends Response {
     private String owner;
     private String floor;
     private  Boolean current;
-    @DateTimeFormat(iso = ISO.DATE_TIME)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = ISO.DATE)
     private Date freeFrom;
-    @DateTimeFormat(iso = ISO.DATE_TIME)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = ISO.DATE)
     private Date freeTill;
     private String currentlyUsed;
 

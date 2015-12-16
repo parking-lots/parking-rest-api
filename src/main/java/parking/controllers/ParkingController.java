@@ -1,5 +1,6 @@
 package parking.controllers;
 
+import org.springframework.security.access.annotation.Secured;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/parking")
-public class ParkingController extends BaseController {
+public class ParkingController {
 
     @Autowired
     private ParkingService parkingService;
