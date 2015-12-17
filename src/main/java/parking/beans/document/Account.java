@@ -1,8 +1,11 @@
-package parking.repositories;
+package parking.beans.document;
 
 import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Document(collection = "users")
 public class Account {
@@ -14,6 +17,8 @@ public class Account {
     private String password;
     private Integer parkingNumber;
     private Integer flor;
+    @DBRef
+    private List<Role> roles;
 
     public Account(){}
 
@@ -61,5 +66,11 @@ public class Account {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+    public List<Role> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

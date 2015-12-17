@@ -14,7 +14,7 @@ import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import parking.builders.LotsBuilder;
-import parking.repositories.Account;
+import parking.beans.document.Account;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 

@@ -9,7 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import parking.repositories.Account;
+import parking.beans.document.Account;
 import parking.repositories.AccountRepository;
 
 import java.util.LinkedList;
@@ -17,25 +17,13 @@ import java.util.List;
 
 
 @Component
-public class DatabaseAuthenticationProvider implements AuthenticationProvider {
-
-    @Autowired
-    private AccountRepository accountRepository;
+public class ParkingAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String name = authentication.getName();
-        String password = authentication.getCredentials().toString();
-
-        Account account = accountRepository.findByUsername(name);
-
-        if (name.equals(account.getUsername()) && password.equals(account.getPassword())) {
-            List<GrantedAuthority> grantedAuths = new LinkedList();
-            grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-
-            return new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
-        }
-        throw new AuthenticationCredentialsNotFoundException("Wrong credentials");
+        return new UsernamePasswordAuthenticationToken(
+                authentication.getName(), authentication.getCredentials(), authentication.getAuthorities()
+        );
     }
 
     @Override

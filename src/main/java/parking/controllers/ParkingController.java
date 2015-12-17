@@ -1,6 +1,7 @@
 package parking.controllers;
 
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
@@ -26,11 +27,13 @@ public class ParkingController {
         return parkingLots;
     }
 
+    @PreAuthorize("hasRole('ROLE_CAN_SHARE_PARKING')")
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
     public void recallParking() {
         parkingService.recallParking();
     }
 
+    @PreAuthorize("hasRole('CAN_SHARE_PARKING')")
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
     public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request) {
         parkingService.freeOwnersParking(request);

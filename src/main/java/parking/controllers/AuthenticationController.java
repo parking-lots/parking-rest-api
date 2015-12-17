@@ -3,6 +3,7 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import parking.beans.document.Account;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.UserException;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -39,6 +41,10 @@ public class AuthenticationController {
             throw new UserException("not_logged");
         }
         return userService.getCurrentUser();
+    }
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public void createUser() {
+        userService.createUser();
     }
 }
 

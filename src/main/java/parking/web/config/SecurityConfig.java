@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import parking.security.DatabaseAuthenticationProvider;
+import parking.security.ParkingAuthenticationProvider;
 import parking.security.HttpAuthenticationEntryPoint;
 
 @Configuration
@@ -20,7 +20,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private HttpAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private DatabaseAuthenticationProvider authenticationProvider;
+    private ParkingAuthenticationProvider authenticationProvider;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.authorizeRequests()
-                .antMatchers("/parking/**").hasRole("USER");
+                .antMatchers("/parking/**").hasAnyRole("CAN_ATTEND_PARKING", "CAN_SHARE_PARKING");
     }
 
     @Override
