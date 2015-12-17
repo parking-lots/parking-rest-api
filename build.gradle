@@ -1,9 +1,13 @@
+group = "parking-rest-api"
 buildscript {
     repositories {
+        maven { url "http://nexus.qmino.com/content/repositories/miredot" }
+        maven { url "http://nexus.qmino.com/content/repositories/miredot-snapshots" }
         maven { url "http://repo.spring.io/libs-snapshot" }
         mavenLocal()
     }
     dependencies {
+        classpath("com.qmino:miredot-plugin:1.6.2")
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE")
     }
 }
@@ -11,6 +15,25 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'spring-boot'
+apply plugin: 'miredot'
+
+apply plugin: GreetingPlugin
+
+greeting.message = 'Hi from Gradle'
+
+class GreetingPlugin implements Plugin<Project> {
+    void apply(Project project) {
+        project.extensions.create("greeting", GreetingPluginExtension)
+
+        project.task('hello') << {
+            println project.greeting.message
+        }
+    }
+}
+
+class GreetingPluginExtension {
+    def String message = 'Hello from GreetingPlugin'
+}
 
 war {
     baseName = 'parking-api'
@@ -53,6 +76,26 @@ sourceSets {
         resources {
             srcDir 'src/main/resources'
         }
+    }
+}
+
+miredot {
+    source = sourceSets.main.allJava
+    destination = sourceSets.main.output
+    output {
+        title = 'My Cool Project, version ' + version
+        formats {
+            'html' {
+                baseUrl = 'http://parking.devone.lt/api'
+            }
+        }
+    }
+    // enable for spring mvc support
+    license = "UHJvamVjdHxwYXJraW5nLXJlc3QtYXBpLnBhcmtpbmctcmVzdC1hcGl8MjAxNi0xMi0xNXx0cnVlI01Dd0NGRk9XYTJPNUNTZzFiVjBKeWF3NXpwWnR0SWxvQWhSZnRuVk9NNzR1MS9NLzZjc3dpREpkZDM5NkR3PT0="
+    restModel{
+      restFramework{
+        name = 'spring-mvc'
+      }
     }
 }
 
