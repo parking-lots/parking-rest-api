@@ -11,12 +11,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import parking.beans.request.LoginForm;
+import parking.beans.response.Profile;
 import parking.exceptions.UserException;
 import parking.repositories.Account;
 import parking.repositories.AccountRepository;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -35,6 +35,15 @@ public class UserService {
     private String getCurrentUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
+    }
+
+    public Profile getCurrentUser() throws UserException {
+        Optional<Account> currentUser = getLoggedUser();
+        if (!currentUser.isPresent()) {
+            throw new UserException("user_not_found");
+        }
+
+        return new Profile(getLoggedUser().get());
     }
 
     public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {

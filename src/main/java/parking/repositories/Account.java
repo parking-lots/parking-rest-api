@@ -1,5 +1,6 @@
 package parking.repositories;
 
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,9 +9,11 @@ public class Account {
 
     @Id
     private String id;
+    private String fullName;
     private String username;
     private String password;
     private Integer parkingNumber;
+    private Integer flor;
 
     public Account(){}
 
@@ -18,6 +21,7 @@ public class Account {
         this.username = username;
         this.password = password;
     }
+
     public String getId() {
         return id;
     }
@@ -41,5 +45,21 @@ public class Account {
     }
     public void setParkingNumber(Integer parkingNumber) {
         this.parkingNumber = parkingNumber;
+    }
+
+    public Integer getFlor() {
+        return flor;
+    }
+
+    public void setFlor(Integer flor) {
+        this.flor = flor;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

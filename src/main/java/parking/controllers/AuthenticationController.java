@@ -4,6 +4,7 @@ package parking.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.request.LoginForm;
+import parking.beans.response.Profile;
 import parking.exceptions.UserException;
 import parking.service.UserService;
 
@@ -30,6 +31,14 @@ public class AuthenticationController {
             throw new UserException("not_logged");
         }
         session.invalidate();
+    }
+
+    @RequestMapping(value = "/profile", method = RequestMethod.GET)
+    public Profile profile(HttpServletRequest session, Principal principal) throws UserException {
+        if (principal == null) {
+            throw new UserException("not_logged");
+        }
+        return userService.getCurrentUser();
     }
 }
 
