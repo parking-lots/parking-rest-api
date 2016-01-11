@@ -54,7 +54,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Update updateFields = new Update();
         updateFields.set("freeTill",request.getFreeTill());
         updateFields.set("freeFrom",request.getFreeFrom());
-        updateFields.unset("currentlyUsed");
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 

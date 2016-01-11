@@ -1,5 +1,7 @@
 package parking.handler;
 
+import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import parking.beans.response.FormFieldError;
 import parking.beans.response.FormFieldsErrorsWrapper;
@@ -36,5 +38,10 @@ public class ErrorHandler {
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ErrorMessage> handleOccupiedEmailException(UserException e){
         return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorMessage> handleNotReadableRequestException(HttpMessageNotReadableException e) {
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getMessage()),HttpStatus.BAD_REQUEST);
     }
 }
