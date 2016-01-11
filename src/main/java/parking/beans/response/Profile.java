@@ -1,7 +1,7 @@
 package parking.beans.response;
 
 
-import parking.repositories.Account;
+import parking.beans.document.Account;
 
 import java.util.Optional;
 

@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "users")
@@ -18,7 +19,7 @@ public class Account {
     private Integer parkingNumber;
     private Integer flor;
     @DBRef
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<Role>();;
 
     public Account(){}
 
@@ -71,6 +72,8 @@ public class Account {
         return roles;
     }
     public void setRoles(List<Role> roles) {
-        this.roles = roles;
+        if (roles != null) {
+            this.roles = roles;
+        }
     }
 }
