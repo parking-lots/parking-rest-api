@@ -2,13 +2,14 @@ package parking.web.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import parking.security.DatabaseAuthenticationProvider;
+import parking.security.ParkingAuthenticationProvider;
 import parking.security.HttpAuthenticationEntryPoint;
 
 @Configuration
@@ -20,7 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private HttpAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private DatabaseAuthenticationProvider authenticationProvider;
+    private ParkingAuthenticationProvider authenticationProvider;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
@@ -35,7 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.authorizeRequests()
-                .antMatchers("/parking/**").hasRole("USER");
+                .antMatchers(HttpMethod.PUT, "/parking/available").hasRole("CAN_SHARE_PARKING")
+                .antMatchers(HttpMethod.PUT, "/parking/reserved").hasRole("CAN_ATTEND_PARKING")
+                .antMatchers(HttpMethod.GET, "/parking/available").hasAnyRole("CAN_ATTEND_PARKING", "CAN_SHARE_PARKING");
     }
 
     @Override
