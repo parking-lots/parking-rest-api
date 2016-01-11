@@ -85,7 +85,7 @@ public class UserService {
         Account account = accountRepository.findByUsername(loginForm.getUsername());
 
         if (account == null || !loginForm.getPassword().equals(account.getPassword())) {
-            throw new AuthenticationCredentialsNotFoundException("Wrong credentials");
+            throw new UserException("Wrong credentials");
         }
 
         return account;
