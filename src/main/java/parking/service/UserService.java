@@ -14,12 +14,13 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Service;
 import parking.beans.document.Permission;
 import parking.beans.document.Role;
+import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.UserException;
 import parking.beans.document.Account;
+import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
-import parking.repositories.PermissionRepository;
 import parking.repositories.RoleRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -85,11 +86,19 @@ public class UserService {
 
         Account account = accountRepository.findByUsername(loginForm.getUsername());
 
-        if (account == null || !loginForm.getPassword().equals(account.getPassword())) {
+        if (account == null || !ProfileHelper.checkPassword(loginForm.getPassword(), account.getPassword())) {
             throw new UserException("Wrong credentials");
         }
 
         return account;
+    }
+
+    public void changePassword(ChangePassword password) throws UserException {
+        Account account = getCurrentUser();
+
+        account.setPassword(ProfileHelper.encryptPassword(password.getNewPassword()));
+
+        accountRepository.save(account);
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
@@ -128,6 +137,5 @@ public class UserService {
         List<Account> users = accountRepository.findAll();
 
         System.out.print(user);
-
     }
 }
