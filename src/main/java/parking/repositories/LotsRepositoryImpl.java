@@ -39,15 +39,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         );
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
-        // Check if current user using one of parking
-        List<ParkingLot> filteredLots =  lots.stream()
-                .filter(val -> user.equals(val.getUser()))
-                .collect(Collectors.toList());
-
-        if (filteredLots.size() > 0) {
-            return filteredLots;
-        }
-
         return lots;
     }
 

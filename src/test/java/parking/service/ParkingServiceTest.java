@@ -10,7 +10,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
@@ -23,6 +22,7 @@ import parking.repositories.LotsRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -57,6 +57,7 @@ public class ParkingServiceTest {
 
         mockedAccount= new Account();
         mockedAccount.setParkingNumber(105);
+        mockedAccount.setUsername("username");
         when(userService.getCurrentUser()).thenReturn(mockedAccount);
 
         mockedParkingLotList.add(new LotsBuilder().number(100).owner("Name Surname").build());
@@ -70,6 +71,17 @@ public class ParkingServiceTest {
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(mockedParkingLotList);
 
         assert(service.getAvailable()).containsAll(mockedParkingLotList);
+    }
+
+    @Test
+    public void whenUserPlacedReturnOnlyPlacedParking() throws UserException {
+        List<ParkingLot> placedParking = mockedParkingLotList;
+        placedParking.add(new LotsBuilder().number(100).owner("Name Surname").user(mockedAccount).build());
+
+        given(lotsRepository.searchAllFields(mockedAccount)).willReturn(placedParking);
+
+        assertTrue(service.getAvailable().size() == 1
+            && service.getAvailable().get(0).equals(placedParking.get(4)));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package parking.builders;
 
+import parking.beans.document.Account;
 import parking.beans.response.ParkingLot;
 
 import java.util.Date;
@@ -34,8 +35,8 @@ public class LotsBuilder {
         return this;
     }
 
-    public LotsBuilder currentUsed(String current) {
-        this.lot.setCurrentlyUsed(current);
+    public LotsBuilder user(Account current) {
+        this.lot.setUser(current);
         return this;
     }
 

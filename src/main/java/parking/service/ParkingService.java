@@ -1,6 +1,7 @@
 package parking.service;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import parking.beans.document.Account;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ParkingService {
@@ -24,7 +26,19 @@ public class ParkingService {
     private UserService userService;
 
     public List<ParkingLot> getAvailable() throws UserException {
-        return lotsRepository.searchAllFields(userService.getCurrentUser());
+        Account currentUser = userService.getCurrentUser();
+        List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
+
+        // Check if current user using one of parking
+        List<ParkingLot> filteredLots =  parkingLots.stream()
+                .filter(val -> val.getUser() != null && currentUser.getUsername().equals(val.getUser().getUsername()))
+                .collect(Collectors.toList());
+
+        if (filteredLots.size() > 0) {
+            return filteredLots;
+        }
+
+        return parkingLots;
     }
 
     public void freeOwnersParking(SetUnusedRequest request) {
