@@ -34,9 +34,6 @@ public class UserService {
     private AccountRepository accountRepository;
 
     @Autowired
-    private PermissionRepository permissionRepository;
-
-    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -51,13 +48,17 @@ public class UserService {
         return authentication.getName();
     }
 
-    public Profile getCurrentUser() throws UserException {
+    public Profile getCurrentUserProfile() throws UserException {
+        return new Profile(getLoggedUser().get(), true);
+    }
+
+    public Account getCurrentUser() throws UserException {
         Optional<Account> currentUser = getLoggedUser();
         if (!currentUser.isPresent()) {
             throw new UserException("user_not_found");
         }
 
-        return new Profile(getLoggedUser().get());
+        return getLoggedUser().get();
     }
 
     public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
@@ -117,6 +118,7 @@ public class UserService {
         return authorities;
     }
 
+    //TODO: remove when registration will be done
     public void createUser() {
         Account user = new Account();
         List<Role> roleList = new ArrayList<Role>();

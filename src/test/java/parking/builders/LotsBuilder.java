@@ -1,6 +1,7 @@
 package parking.builders;
 
-import parking.beans.response.ParkingLot;
+import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public class LotsBuilder {
         return this;
     }
 
-    public LotsBuilder owner(String owner) {
+    public LotsBuilder owner(Account owner) {
         this.lot.setOwner(owner);
         return this;
     }
@@ -34,8 +35,8 @@ public class LotsBuilder {
         return this;
     }
 
-    public LotsBuilder currentUsed(String current) {
-        this.lot.setCurrentlyUsed(current);
+    public LotsBuilder user(Account current) {
+        this.lot.setUser(current);
         return this;
     }
 

@@ -9,9 +9,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import parking.beans.document.Account;
 import parking.beans.response.Profile;
 import parking.exceptions.UserException;
-import parking.repositories.Account;
 import parking.repositories.AccountRepository;
 
 import static org.mockito.BDDMockito.given;
@@ -56,7 +56,7 @@ public class UserServiceTest {
 
     @Test
     public void whenGetingCurrentUser() throws UserException{
-        Profile profile = service.getCurrentUser();
+        Profile profile = service.getCurrentUserProfile();
         assertEquals(profile.toString(), new Profile(mockedUser).toString());
     }
 }
