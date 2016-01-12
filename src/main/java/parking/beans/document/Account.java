@@ -1,10 +1,8 @@
 package parking.beans.document;
 
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import parking.beans.response.ParkingLot;
 
 import java.util.ArrayList;
 import java.util.List;

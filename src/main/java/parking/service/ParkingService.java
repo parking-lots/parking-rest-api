@@ -4,7 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.response.ParkingLot;
+import parking.beans.document.ParkingLot;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;

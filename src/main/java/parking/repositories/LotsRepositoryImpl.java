@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 import parking.beans.document.Account;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.response.ParkingLot;
+import parking.beans.document.ParkingLot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
 

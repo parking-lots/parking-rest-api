@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.response.Parking;
-import parking.beans.response.ParkingLot;
+import parking.beans.document.ParkingLot;
 import parking.builders.LotsBuilder;
 import parking.exceptions.UserException;
 import parking.service.ParkingService;
@@ -37,12 +37,12 @@ public class ParkingControllerTest {
 
     @Before
     public void initMockData() {
-        mockedParkingLotList.add(new LotsBuilder().number(100).owner("Name Surname").build());
-        mockedParkingLotList.add(new LotsBuilder().number(101).owner("Name Surname2").build());
-        mockedParkingLotList.add(new LotsBuilder().number(103).owner("Name Surname3").build());
-        mockedParkingLotList.add(new LotsBuilder().number(104).owner("Name Surname4").build());
+        mockedParkingLotList.add(new LotsBuilder().number(100).build());
+        mockedParkingLotList.add(new LotsBuilder().number(101).build());
+        mockedParkingLotList.add(new LotsBuilder().number(103).build());
+        mockedParkingLotList.add(new LotsBuilder().number(104).build());
 
-        Function<ParkingLot, Parking> mapper = lot -> new Parking(lot);
+        Function<ParkingLot, Parking> mapper = lot -> new Parking(lot, true);
         mockedParkingList =  mockedParkingLotList.stream()
                 .map(mapper)
                 .collect(Collectors.<Parking> toList());

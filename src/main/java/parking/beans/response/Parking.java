@@ -1,14 +1,14 @@
 package parking.beans.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import parking.beans.document.ParkingLot;
 
 import java.util.Date;
 
 public class Parking extends Response {
     private Integer number;
-    private String owner;
+    private Profile owner;
     private String floor;
-    private  Boolean current;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date freeFrom;
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -17,13 +17,16 @@ public class Parking extends Response {
     private Date reserved;
     private Profile user;
 
-    public Parking(ParkingLot lot) {
+    public Parking(ParkingLot lot, Boolean owner) {
         this.number = lot.getNumber();
         this.floor = lot.getFloor();
         this.freeFrom = lot.getFreeFrom();
         this.freeTill = lot.getFreeTill();
         this.reserved = lot.getReserved();
-        this.user = (lot.getUser() != null)? new Profile(lot.getUser()): null;
+        this.user = (lot.getUser() != null)? new Profile(lot.getUser(), true): null;
+        if (owner) {
+            this.owner = (lot.getOwner() != null)? new Profile(lot.getOwner(), false): null;
+        }
     }
 
     public Integer getNumber() {
@@ -34,11 +37,11 @@ public class Parking extends Response {
         this.number = number;
     }
 
-    public String getOwner() {
+    public Profile getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(Profile owner) {
         this.owner = owner;
     }
 
@@ -50,13 +53,6 @@ public class Parking extends Response {
         this.floor = floor;
     }
 
-    public Boolean getCurrent() {
-        return current;
-    }
-
-    public void setCurrent(Boolean current) {
-        this.current = current;
-    }
 
     public Date getFreeFrom() {
         return freeFrom;

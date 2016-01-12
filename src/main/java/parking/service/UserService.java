@@ -49,7 +49,7 @@ public class UserService {
     }
 
     public Profile getCurrentUserProfile() throws UserException {
-        return new Profile(getLoggedUser().get());
+        return new Profile(getLoggedUser().get(), true);
     }
 
     public Account getCurrentUser() throws UserException {

@@ -12,7 +12,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.response.ParkingLot;
+import parking.beans.document.ParkingLot;
 import parking.builders.LotsBuilder;
 import parking.beans.document.Account;
 import parking.exceptions.UserException;
@@ -60,10 +60,10 @@ public class ParkingServiceTest {
         mockedAccount.setUsername("username");
         when(userService.getCurrentUser()).thenReturn(mockedAccount);
 
-        mockedParkingLotList.add(new LotsBuilder().number(100).owner("Name Surname").build());
-        mockedParkingLotList.add(new LotsBuilder().number(101).owner("Name Surname2").build());
-        mockedParkingLotList.add(new LotsBuilder().number(103).owner("Name Surname3").build());
-        mockedParkingLotList.add(new LotsBuilder().number(104).owner("Name Surname4").build());
+        mockedParkingLotList.add(new LotsBuilder().number(100).build());
+        mockedParkingLotList.add(new LotsBuilder().number(101).build());
+        mockedParkingLotList.add(new LotsBuilder().number(103).build());
+        mockedParkingLotList.add(new LotsBuilder().number(104).build());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class ParkingServiceTest {
     @Test
     public void whenUserPlacedReturnOnlyPlacedParking() throws UserException {
         List<ParkingLot> placedParking = mockedParkingLotList;
-        placedParking.add(new LotsBuilder().number(100).owner("Name Surname").user(mockedAccount).build());
+        placedParking.add(new LotsBuilder().number(100).user(mockedAccount).build());
 
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(placedParking);
 

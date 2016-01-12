@@ -3,7 +3,7 @@ package parking.repositories;
 import parking.beans.document.Account;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.response.ParkingLot;
+import parking.beans.document.ParkingLot;
 
 import java.util.List;
 

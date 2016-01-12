@@ -2,8 +2,7 @@ package parking.beans.response;
 
 
 import parking.beans.document.Account;
-
-import java.util.Optional;
+import parking.beans.document.ParkingLot;
 
 public class Profile extends Response {
 
@@ -11,14 +10,24 @@ public class Profile extends Response {
     private String username;
     private Integer parkingNumber;
     private Integer flor;
-    private ParkingLot parking;
+    private Profile owner;
+    private Parking parking;
 
     public Profile(Account account) {
         fullName = account.getFullName();
         username = account.getUsername();
         parkingNumber = account.getParkingNumber();
         flor = account.getFlor();
-        parking = account.getParking();
+    }
+
+    public Profile(Account account, Boolean parkingLot) {
+        fullName = account.getFullName();
+        username = account.getUsername();
+        parkingNumber = account.getParkingNumber();
+        flor = account.getFlor();
+        if (parkingLot) {
+            parking = (account.getParking() !=null)? new Parking(account.getParking(), false): null;
+        }
     }
 
     public String getFullName() {
@@ -53,11 +62,11 @@ public class Profile extends Response {
         this.flor = flor;
     }
 
-    public ParkingLot getParking() {
+    public Parking getParking() {
         return parking;
     }
 
-    public void setParking(ParkingLot parking) {
+    public void setParking(Parking parking) {
         this.parking = parking;
     }
 
