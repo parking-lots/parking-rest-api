@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import parking.helper.ToolHelper;
 
 
 import java.util.Date;
@@ -28,7 +29,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public List<ParkingLot> searchAllFields(final Account user) {
         Query searchQuery = new Query();
 
-        Date currentDate = new Date();
+        Date currentDate = ToolHelper.getCurrentDate();
 
         searchQuery.addCriteria(Criteria.where("freeTill").gte(currentDate));
         searchQuery.addCriteria(Criteria.where("freeFrom").lte(currentDate));
