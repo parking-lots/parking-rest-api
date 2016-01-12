@@ -1,5 +1,7 @@
 package parking.repositories;
 
+import org.bson.types.ObjectId;
+import parking.beans.document.Account;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
@@ -24,7 +26,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public List<ParkingLot> searchAllFields(final String userName) {
+    public List<ParkingLot> searchAllFields(final Account user) {
         Query searchQuery = new Query();
 
         Date currentDate = new Date();
@@ -32,13 +34,14 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         searchQuery.addCriteria(Criteria.where("freeTill").gte(currentDate));
         searchQuery.addCriteria(Criteria.where("freeFrom").lte(currentDate));
         searchQuery.addCriteria(new Criteria().orOperator(
-                Criteria.where("currentlyUsed").is(null),
-                Criteria.where("currentlyUsed").is(userName))
+                Criteria.where("reserved").is(null),
+                Criteria.where("user.$id").is(new ObjectId(user.getId())))
         );
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
+        // Check if current user using one of parking
         List<ParkingLot> filteredLots =  lots.stream()
-                .filter(val -> userName.equals(val.getCurrentlyUsed()))
+                .filter(val -> user.equals(val.getUser()))
                 .collect(Collectors.toList());
 
         if (filteredLots.size() > 0) {
@@ -67,19 +70,26 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void reserve(ParkingNumberRequest request, String userName) {
+    public void reserve(ParkingNumberRequest request, Account user) {
         Query searchQuery = new Query();
+        Date currentDate = new Date();
         searchQuery.addCriteria(new Criteria()
                 .andOperator(
                         Criteria.where("number").is(request.getNumber()),
-                        Criteria.where("currentlyUsed").is(null)
+                        Criteria.where("reserved").is(null)
                 ));
-        operations.updateFirst(searchQuery, Update.update("currentlyUsed", userName), ParkingLot.class);
+        Update updateFields = new Update();
+        updateFields.set("user", user);
+        updateFields.set("reserved", currentDate);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
     @Override
-    public void cancelReservation(String currentUserName) {
-        Query searchQuery = new Query(Criteria.where("currentlyUsed").is(currentUserName));
-        operations.updateFirst(searchQuery, new Update().unset("currentlyUsed"), ParkingLot.class);
+    public void cancelReservation(Account user) {
+        Query searchQuery = new Query(Criteria.where("user.$id").is(new ObjectId(user.getId())));
+        Update updateFields = new Update();
+        updateFields.unset("user");
+        updateFields.unset("reserved");
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 }

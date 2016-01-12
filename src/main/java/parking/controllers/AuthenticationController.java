@@ -40,7 +40,7 @@ public class AuthenticationController {
         if (principal == null) {
             throw new UserException("not_logged");
         }
-        return userService.getCurrentUser();
+        return userService.getCurrentUserProfile();
     }
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void createUser() {

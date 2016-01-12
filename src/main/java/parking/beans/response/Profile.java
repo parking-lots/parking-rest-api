@@ -11,12 +11,14 @@ public class Profile extends Response {
     private String username;
     private Integer parkingNumber;
     private Integer flor;
+    private ParkingLot parking;
 
     public Profile(Account account) {
         fullName = account.getFullName();
         username = account.getUsername();
         parkingNumber = account.getParkingNumber();
         flor = account.getFlor();
+        parking = account.getParking();
     }
 
     public String getFullName() {
@@ -49,6 +51,14 @@ public class Profile extends Response {
 
     public void setFlor(Integer flor) {
         this.flor = flor;
+    }
+
+    public ParkingLot getParking() {
+        return parking;
+    }
+
+    public void setParking(ParkingLot parking) {
+        this.parking = parking;
     }
 
     @Override

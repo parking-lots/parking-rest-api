@@ -4,6 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
+import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,14 @@ public class ParkingService {
     private LotsRepository lotsRepository;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private UserService userService;
 
-    public List<ParkingLot> getAvailable() {
-        return lotsRepository.searchAllFields(getCurrentUserName());
+    public List<ParkingLot> getAvailable() throws UserException {
+        return lotsRepository.searchAllFields(userService.getCurrentUser());
     }
 
-    public void freeOwnersParking(SetUnusedRequest request){
+    public void freeOwnersParking(SetUnusedRequest request) {
         Integer parkingNumber = getParkingNumberByUser();
         if(parkingNumber == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
@@ -43,8 +46,8 @@ public class ParkingService {
         lotsRepository.recallParking(request);
     }
 
-    public void reserve(ParkingNumberRequest request) {
-        lotsRepository.reserve(request, getCurrentUserName());
+    public void reserve(ParkingNumberRequest request) throws UserException {
+        lotsRepository.reserve(request, userService.getCurrentUser());
     }
 
     private Integer getParkingNumberByUser(){
@@ -56,7 +59,7 @@ public class ParkingService {
         return authentication.getName();
     }
 
-    public void cancelRezervation() {
-        lotsRepository.cancelReservation(getCurrentUserName());
+    public void cancelRezervation() throws UserException {
+        lotsRepository.cancelReservation(userService.getCurrentUser());
     }
 }

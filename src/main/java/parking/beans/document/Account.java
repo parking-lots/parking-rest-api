@@ -4,6 +4,7 @@ import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import parking.beans.response.ParkingLot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,9 @@ public class Account {
     private Integer parkingNumber;
     private Integer flor;
     @DBRef
-    private List<Role> roles = new ArrayList<Role>();;
+    private List<Role> roles = new ArrayList<Role>();
+    @DBRef
+    private ParkingLot parking;
 
     public Account(){}
 
@@ -75,5 +78,11 @@ public class Account {
         if (roles != null) {
             this.roles = roles;
         }
+    }
+    public ParkingLot getParking() {
+        return parking;
+    }
+    public void setParking(ParkingLot parking) {
+        this.parking = parking;
     }
 }
