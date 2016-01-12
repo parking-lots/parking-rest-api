@@ -6,12 +6,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import parking.beans.response.Parking;
 import parking.beans.response.ParkingLot;
 import parking.builders.LotsBuilder;
+import parking.exceptions.UserException;
 import parking.service.ParkingService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.*;
 
 import static org.mockito.BDDMockito.*;
 
@@ -26,6 +33,7 @@ public class ParkingControllerTest {
     private ParkingService service;
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
+    private List<Parking> mockedParkingList = new ArrayList<Parking>();
 
     @Before
     public void initMockData() {
@@ -33,12 +41,17 @@ public class ParkingControllerTest {
         mockedParkingLotList.add(new LotsBuilder().number(101).owner("Name Surname2").build());
         mockedParkingLotList.add(new LotsBuilder().number(103).owner("Name Surname3").build());
         mockedParkingLotList.add(new LotsBuilder().number(104).owner("Name Surname4").build());
+
+        Function<ParkingLot, Parking> mapper = lot -> new Parking(lot);
+        mockedParkingList =  mockedParkingLotList.stream()
+                .map(mapper)
+                .collect(Collectors.<Parking> toList());
     }
 
     @Test
-    public void whenAvailableShouldReturnAvailableItems() {
+    public void whenAvailableShouldReturnAvailableItems() throws UserException {
         given(service.getAvailable()).willReturn(mockedParkingLotList);
 
-        assert(controller.getAllAvailable()).containsAll(mockedParkingLotList);
+        assertThat(controller.getAllAvailable().get(0), instanceOf(Parking.class));
     }
 }

@@ -10,11 +10,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.ParkingLot;
 import parking.builders.LotsBuilder;
 import parking.beans.document.Account;
+import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 
@@ -39,6 +41,8 @@ public class ParkingServiceTest {
 
     @Mock
     private Authentication authentication;
+    @Mock
+    private UserService userService;
 
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
@@ -46,13 +50,14 @@ public class ParkingServiceTest {
     private static final String CURRENT_USER_NAME = "name";
 
     @Before
-    public void initMock() {
+    public void initMock() throws UserException {
         when(authentication.getName()).thenReturn(CURRENT_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedAccount= new Account();
         mockedAccount.setParkingNumber(105);
+        when(userService.getCurrentUser()).thenReturn(mockedAccount);
 
         mockedParkingLotList.add(new LotsBuilder().number(100).owner("Name Surname").build());
         mockedParkingLotList.add(new LotsBuilder().number(101).owner("Name Surname2").build());
@@ -61,8 +66,8 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whereGetAvailableReturnAllAvailableItems() {
-        given(lotsRepository.searchAllFields(CURRENT_USER_NAME)).willReturn(mockedParkingLotList);
+    public void whereGetAvailableReturnAllAvailableItems() throws UserException {
+        given(lotsRepository.searchAllFields(mockedAccount)).willReturn(mockedParkingLotList);
 
         assert(service.getAvailable()).containsAll(mockedParkingLotList);
     }
@@ -117,16 +122,16 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenUserReserveParkingLot() {
+    public void whenUserReserveParkingLot() throws UserException {
         ParkingNumberRequest request = new ParkingNumberRequest();
 
         service.reserve(request);
-        verify(lotsRepository).reserve(request, CURRENT_USER_NAME);
+        verify(lotsRepository).reserve(request, mockedAccount);
     }
 
     @Test
-    public void whenCancelReservation() {
+    public void whenCancelReservation() throws UserException {
        service.cancelRezervation();
-       verify(lotsRepository).cancelReservation(CURRENT_USER_NAME);
+       verify(lotsRepository).cancelReservation(mockedAccount);
     }
 }
