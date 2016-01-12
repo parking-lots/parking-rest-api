@@ -2,6 +2,8 @@ package parking.beans.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -14,6 +16,8 @@ import java.util.Date;
 @Document(collection = "lots")
 public class ParkingLot extends Response {
 
+    @Id
+    private ObjectId id;
     private Integer number;
     private String floor;
     private  Boolean current;

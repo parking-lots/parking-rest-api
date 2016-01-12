@@ -37,6 +37,7 @@ dependencies {
     compile 'joda-time:joda-time'
     compile 'org.springframework:spring-webmvc:latest.release'
     compile 'org.springframework:spring-web:latest.release'
+    compile 'org.jasypt:jasypt:1.9.2'
 
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
