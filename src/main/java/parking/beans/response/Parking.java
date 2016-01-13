@@ -23,7 +23,7 @@ public class Parking extends Response {
         this.freeFrom = lot.getFreeFrom();
         this.freeTill = lot.getFreeTill();
         this.reserved = lot.getReserved();
-        this.user = (lot.getUser() != null)? new Profile(lot.getUser(), true): null;
+        this.user = (lot.getUser() != null)? new Profile(lot.getUser(), false): null;
         if (owner) {
             this.owner = (lot.getOwner() != null)? new Profile(lot.getOwner(), false): null;
         }
