@@ -1,14 +1,12 @@
 package parking.beans.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.format.annotation.DateTimeFormat;
-import parking.beans.document.Account;
 import parking.beans.response.Response;
 
 import java.util.Date;
@@ -24,11 +22,11 @@ public class ParkingLot extends Response {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(iso = ISO.DATE)
     private Date freeFrom;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "CET")
     @DateTimeFormat(iso = ISO.DATE)
     private Date freeTill;
-    @JsonFormat(pattern = "yyy-MM-dd")
-    @DateTimeFormat(iso = ISO.DATE)
+
+
     private Date reserved;
     @DBRef
     private Account user;

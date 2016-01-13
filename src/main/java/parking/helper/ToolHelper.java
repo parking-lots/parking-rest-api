@@ -9,13 +9,22 @@ import java.util.Date;
 public class ToolHelper {
 
     public static Date getCurrentDate(){
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date today = new Date();
+        return format(today);
+    }
+
+    public static Date formatDate(Date date) {
+        return format(date);
+    }
+
+
+    private static Date format(Date date) {
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
         try {
-            today = formatter.parse(formatter.format(today));
+            date = formatter.parse(formatter.format(date));
         } catch (ParseException e) {}
 
-        return today;
+        return date;
     }
 }

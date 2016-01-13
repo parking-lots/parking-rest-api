@@ -1,5 +1,6 @@
 package parking.beans.document;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,7 +12,7 @@ import java.util.List;
 public class Account {
 
     @Id
-    private String id;
+    private ObjectId id;
     private String fullName;
     private String username;
     private String password;
@@ -29,10 +30,10 @@ public class Account {
         this.password = password;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
     public String getUsername() {

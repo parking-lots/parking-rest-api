@@ -35,7 +35,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         searchQuery.addCriteria(Criteria.where("freeFrom").lte(currentDate));
         searchQuery.addCriteria(new Criteria().orOperator(
                 Criteria.where("reserved").is(null),
-                Criteria.where("user.$id").is(new ObjectId(user.getId())))
+                Criteria.where("user.$id").is(user.getId()))
         );
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
@@ -46,8 +46,8 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public void freeOwnersParking(SetUnusedRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
-        updateFields.set("freeTill",request.getFreeTill());
-        updateFields.set("freeFrom",request.getFreeFrom());
+        updateFields.set("freeTill",ToolHelper.formatDate(request.getFreeTill()));
+        updateFields.set("freeFrom",ToolHelper.formatDate(request.getFreeFrom()));
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
@@ -63,7 +63,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     @Override
     public void reserve(ParkingNumberRequest request, Account user) {
         Query searchQuery = new Query();
-        Date currentDate = new Date();
+        Date currentDate = ToolHelper.getCurrentDate();
         searchQuery.addCriteria(new Criteria()
                 .andOperator(
                         Criteria.where("number").is(request.getNumber()),
@@ -77,7 +77,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
     @Override
     public void cancelReservation(Account user) {
-        Query searchQuery = new Query(Criteria.where("user.$id").is(new ObjectId(user.getId())));
+        Query searchQuery = new Query(Criteria.where("user.$id").is(user.getId()));
         Update updateFields = new Update();
         updateFields.unset("user");
         updateFields.unset("reserved");

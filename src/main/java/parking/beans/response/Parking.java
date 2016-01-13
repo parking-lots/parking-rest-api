@@ -2,18 +2,17 @@ package parking.beans.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import parking.beans.document.ParkingLot;
-
 import java.util.Date;
 
 public class Parking extends Response {
     private Integer number;
     private Profile owner;
     private String floor;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeFrom;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeTill;
-    @JsonFormat(pattern = "yyy-MM-dd")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date reserved;
     private Profile user;
 
