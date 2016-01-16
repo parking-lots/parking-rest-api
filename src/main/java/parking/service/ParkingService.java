@@ -42,21 +42,21 @@ public class ParkingService {
     }
 
     public void freeOwnersParking(SetUnusedRequest request) {
-        Integer parkingNumber = getParkingNumberByUser();
-        if(parkingNumber == null){
+        ParkingLot parking = getParkingNumberByUser();
+        if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
-        request.setNumber(parkingNumber);
+        request.setNumber(parking.getNumber());
         lotsRepository.freeOwnersParking(request);
     }
 
     public void recallParking() {
-        Integer parkingNumber = getParkingNumberByUser();
-        if(parkingNumber == null){
+        ParkingLot parking = getParkingNumberByUser();
+        if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
         ParkingNumberRequest request = new ParkingNumberRequest();
-        request.setNumber(parkingNumber);
+        request.setNumber(parking.getNumber());
         lotsRepository.recallParking(request);
     }
 
@@ -64,8 +64,8 @@ public class ParkingService {
         lotsRepository.reserve(request, userService.getCurrentUser());
     }
 
-    private Integer getParkingNumberByUser(){
-        return accountRepository.findByUsername(getCurrentUserName()).getParkingNumber();
+    private ParkingLot getParkingNumberByUser() {
+        return accountRepository.findByUsername(getCurrentUserName()).getParking();
     }
 
     private String getCurrentUserName() {

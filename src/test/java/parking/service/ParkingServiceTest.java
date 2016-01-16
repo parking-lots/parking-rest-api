@@ -55,8 +55,8 @@ public class ParkingServiceTest {
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedAccount= new Account();
-        mockedAccount.setParkingNumber(105);
         mockedAccount.setUsername("username");
+        mockedAccount.setParking(new ParkingLot(100, -1));
         when(userService.getCurrentUser()).thenReturn(mockedAccount);
 
         mockedParkingLotList.add(new LotsBuilder().number(100).build());
@@ -94,12 +94,12 @@ public class ParkingServiceTest {
         verify(lotsRepository).freeOwnersParking((SetUnusedRequest) captor.capture());
 
         SetUnusedRequest value = (SetUnusedRequest) captor.getValue();
-        assertEquals(value.getNumber(), mockedAccount.getParkingNumber());
+        assertEquals(value.getNumber(), mockedAccount.getParking().getNumber());
     }
 
     @Test
     public void whenCustomerDoesNotHaveParkingAssigned() {
-        mockedAccount.setParkingNumber(null);
+        mockedAccount.setParking(null);
         SetUnusedRequest request = new SetUnusedRequest();
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
@@ -118,14 +118,14 @@ public class ParkingServiceTest {
         verify(lotsRepository).recallParking((ParkingNumberRequest) captor.capture());
 
         ParkingNumberRequest value = (ParkingNumberRequest) captor.getValue();
-        assertEquals(value.getNumber(), mockedAccount.getParkingNumber());
+        assertEquals(value.getNumber(), mockedAccount.getParking().getNumber());
     }
 
     @Test
     public void whenCustomerDoesNotHaveParkingAssignedAndTryRecall() {
 
         ArgumentCaptor captor = ArgumentCaptor.forClass(ParkingNumberRequest.class);
-        mockedAccount.setParkingNumber(null);
+        mockedAccount.setParking(null);
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
         service.recallParking();

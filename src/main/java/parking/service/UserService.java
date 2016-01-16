@@ -1,6 +1,7 @@
 package parking.service;
 
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ import parking.exceptions.UserException;
 import parking.beans.document.Account;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
+import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,9 @@ public class UserService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private LotsRepository lotsRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -101,6 +106,13 @@ public class UserService {
         accountRepository.save(account);
     }
 
+
+    private Optional<Account> getUserByUsername(String username) {
+        Account userName = accountRepository.findByUsername(username);
+
+        return Optional.ofNullable(userName);
+    }
+
     private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
         return getGrantedAuthorities(getPrivileges(roles));
     }
@@ -127,15 +139,16 @@ public class UserService {
         return authorities;
     }
 
-    //TODO: remove when registration will be done
-    public void createUser() {
-        Account user = new Account();
-        List<Role> roleList = new ArrayList<Role>();
-        roleList.add(roleRepository.findByName("ROLE_OWNER"));
-        roleList.add(roleRepository.findByName("ROLE_USER"));
+    public Account createUser(Account newAccount) throws UserException {
 
-        List<Account> users = accountRepository.findAll();
+        if (getUserByUsername(newAccount.getUsername()).isPresent()) {
+            throw new UserException("User already exist");
+        }
 
-        System.out.print(user);
+        newAccount.setId(new ObjectId());
+        newAccount.setPassword(ProfileHelper.encryptPassword(newAccount.getPassword()));
+        newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
+
+        return accountRepository.insert(newAccount);
     }
 }
