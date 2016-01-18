@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.request.RegistrationForm;
+import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.service.RegistrationService;
@@ -39,7 +40,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenRegisterUserShouldCallService() throws UserException {
+    public void whenRegisterUserShouldCallService() throws UserException, ParkingException {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
         form.setParking(null);

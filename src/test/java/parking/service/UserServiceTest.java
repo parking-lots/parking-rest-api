@@ -12,9 +12,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
 import parking.beans.request.ChangePassword;
 import parking.beans.response.Profile;
+import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
@@ -27,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 
@@ -51,7 +54,11 @@ public class UserServiceTest {
     @Mock
     private Authentication authentication;
 
+    @Mock
+    private ParkingService parkingService;
+
     private Account mockedUser;
+    private ParkingLot mockedParking;
 
     private HashMap<String, Role> mockedRoles = new HashMap<String, Role>();
 
@@ -64,6 +71,7 @@ public class UserServiceTest {
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedUser = new Account("Name Surname", "nickname", "****");
+        mockedParking = new ParkingLot(161, -1);
         mockedRoles.put(Role.ROLE_USER, new Role(Role.ROLE_USER));
 
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(mockedUser);
@@ -149,5 +157,49 @@ public class UserServiceTest {
         assertTrue(captor.getValue().getRoles().size() > 0);
         assertEquals(mockedRoles.get(Role.ROLE_USER).getName(), captor.getValue().getRoles().get(0).getName());
     }
+
+    @Test
+    public void attachParkingMethodShouldBeDefined() throws NoSuchMethodException {
+        assertEquals(UserService.class.getMethod("attachParking", Account.class, Integer.class).getName(), "attachParking");
+    }
+
+    @Test
+    public void whenAttachParkingToUserSuccessShouldCallUdpdateServiceMethod() throws ParkingException {
+        given(parkingService.getParkingByNumber(161)).willReturn(mockedParking);
+        service.attachParking(mockedUser, 161);
+
+        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
+
+        verify(accountRepository).save(captor.capture());
+
+        assertTrue(captor.getValue().getParking().getNumber() == 161);
+    }
+
+    @Test(expected = ParkingException.class)
+    public void whenAttachParkingWhichOwnedByAnotherUserShouldThrowException() throws ParkingException {
+        mockedParking.setOwner(new Account("Name surname", "name.surname", "******"));
+        given(parkingService.getParkingByNumber(161)).willReturn(mockedParking);
+        service.attachParking(mockedUser, 161);
+    }
+
+    @Test(expected = ParkingException.class)
+    public void whenAttachParkingWhichDidNotExistShouldThrowException() throws ParkingException {
+        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161);
+        service.attachParking(mockedUser, 161);
+    }
+
+    @Test
+    public void whenAttachParkinShoulAddOwnerRole() throws ParkingException {
+        given(parkingService.getParkingByNumber(161)).willReturn(mockedParking);
+        given(roleRepository.findByName(Role.ROLE_OWNER)).willReturn(new Role(Role.ROLE_OWNER));
+
+        service.attachParking(mockedUser, 161);
+
+        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
+        verify(accountRepository).save(captor.capture());
+
+        assertEquals(captor.getValue().getRoles().get(0).getName(), Role.ROLE_OWNER);
+    }
+
 
 }

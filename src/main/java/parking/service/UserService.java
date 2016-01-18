@@ -13,16 +13,17 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
+import parking.beans.document.ParkingLot;
 import parking.beans.document.Permission;
 import parking.beans.document.Role;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
+import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.beans.document.Account;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
-import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,13 +38,13 @@ public class UserService {
     private AccountRepository accountRepository;
 
     @Autowired
-    private LotsRepository lotsRepository;
-
-    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private ParkingService parkingService;
 
     public Optional<Account> getLoggedUser() throws UserException {
         return Optional.ofNullable(accountRepository.findByUsername(getCurrentUserName()));
@@ -150,5 +151,16 @@ public class UserService {
         newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
 
         return accountRepository.insert(newAccount);
+    }
+
+    public void attachParking(Account user, Integer number) throws ParkingException {
+        Optional<ParkingLot> parking = Optional.ofNullable(parkingService.getParkingByNumber(number));
+        if(Optional.ofNullable(parking.get().getOwner()).isPresent()) {
+            throw new ParkingException("Parking owned by another user");
+        }
+        user.addRole(roleRepository.findByName(Role.ROLE_OWNER));
+        user.setParking(parking.get());
+
+        accountRepository.save(user);
     }
 }

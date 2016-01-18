@@ -1,5 +1,6 @@
 package parking.service;
 
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,19 +11,22 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.document.ParkingLot;
 import parking.builders.LotsBuilder;
-import parking.beans.document.Account;
+import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,6 +51,7 @@ public class ParkingServiceTest {
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private Account mockedAccount;
     private static final String CURRENT_USER_NAME = "name";
+    private ParkingLot mockedParkingLot;
 
     @Before
     public void initMock() throws UserException {
@@ -63,6 +68,8 @@ public class ParkingServiceTest {
         mockedParkingLotList.add(new LotsBuilder().number(101).build());
         mockedParkingLotList.add(new LotsBuilder().number(103).build());
         mockedParkingLotList.add(new LotsBuilder().number(104).build());
+
+        mockedParkingLot = new ParkingLot(161, -2);
     }
 
     @Test
@@ -145,4 +152,66 @@ public class ParkingServiceTest {
        service.cancelRezervation();
        verify(lotsRepository).cancelReservation(mockedAccount);
     }
+
+    @Test
+    public void creataLotShouldBeDefined() throws NoSuchMethodException             {
+        assertEquals(ParkingService.class.getMethod("createLot", ParkingLot.class).getName(), "createLot");
+    }
+
+    @Test
+    public void whenCreateLotShouldReturnParkingLotInstance() throws ParkingException {
+        given(lotsRepository.insert(mockedParkingLot)).willReturn(mockedParkingLot);
+        given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
+
+        ParkingLot newParking = service.createLot(mockedParkingLot);
+        assertTrue(ParkingLot.class.isInstance(newParking));
+    }
+
+    @Test
+    public void whenCreateLotShouldCallRepository() throws ParkingException {
+        service.createLot(mockedParkingLot);
+
+        verify(lotsRepository).insert(mockedParkingLot);
+    }
+
+    @Test
+    public void whenCreateParkingShouldGenerateId() throws ParkingException {
+        service.createLot(mockedParkingLot);
+
+        ArgumentCaptor<ParkingLot> captor = ArgumentCaptor.forClass(ParkingLot.class);
+        verify(lotsRepository).insert(captor.capture());
+
+        Optional<ObjectId> objectId = Optional.ofNullable(captor.getValue().getId());
+
+        assertTrue(objectId.isPresent());
+    }
+
+    @Test(expected = ParkingException.class)
+    public void whenCreateAlreadyExistLotShoudThrowException() throws ParkingException {
+        given(lotsRepository.findByNumber(161)).willReturn(mockedParkingLot);
+
+        service.createLot(mockedParkingLot);
+    }
+
+    @Test
+    public void getParkingByNumberShouldBeDefined() throws NoSuchMethodException {
+        assertEquals(ParkingService.class.getMethod("getParkingByNumber", Integer.class).getName(), "getParkingByNumber");
+    }
+
+    @Test(expected = ParkingException.class)
+    public void whenGetNotExistParkingByNumberShouldThrowException() throws ParkingException {
+        given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
+        service.getParkingByNumber(mockedParkingLot.getNumber());
+    }
+
+    @Test
+    public void whenSetOwnerSuccessShouldCallRepository() {
+        service.setOwner(mockedAccount, mockedParkingLot);
+
+        ArgumentCaptor<ParkingLot> captor = ArgumentCaptor.forClass(ParkingLot.class);
+        verify(lotsRepository).save(captor.capture());
+
+        assertEquals(captor.getValue().getOwner().getUsername(), mockedAccount.getUsername());
+    }
+
 }
