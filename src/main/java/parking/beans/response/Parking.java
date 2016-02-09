@@ -7,7 +7,7 @@ import java.util.Date;
 public class Parking extends Response {
     private Integer number;
     private Profile owner;
-    private String floor;
+    private Integer floor;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeFrom;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
@@ -44,11 +44,11 @@ public class Parking extends Response {
         this.owner = owner;
     }
 
-    public String getFloor() {
+    public Integer getFloor() {
         return floor;
     }
 
-    public void setFloor(String floor) {
+    public void setFloor(Integer floor) {
         this.floor = floor;
     }
 

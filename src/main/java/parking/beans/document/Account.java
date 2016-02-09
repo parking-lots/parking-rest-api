@@ -4,7 +4,11 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import parking.helper.ProfileHelper;
+import parking.helper.ToolHelper;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +17,12 @@ public class Account {
 
     @Id
     private ObjectId id;
+    @NotNull
     private String fullName;
+    @NotNull
     private String username;
+    @Size(min = 6, max = 10)
     private String password;
-    private Integer parkingNumber;
-    private Integer flor;
     @DBRef
     private List<Role> roles = new ArrayList<Role>();
     @DBRef
@@ -25,42 +30,34 @@ public class Account {
 
     public Account(){}
 
-    public Account(String username, String password) {
+    public Account(String fullName, String username, String password) {
+        this.fullName = fullName;
         this.username = username;
-        this.password = password;
+        this.password = ProfileHelper.encryptPassword(password);
     }
 
     public ObjectId getId() {
         return id;
     }
+
     public void setId(ObjectId id) {
         this.id = id;
     }
+
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
-    }
-    public Integer getParkingNumber() {
-        return parkingNumber;
-    }
-    public void setParkingNumber(Integer parkingNumber) {
-        this.parkingNumber = parkingNumber;
-    }
-
-    public Integer getFlor() {
-        return flor;
-    }
-
-    public void setFlor(Integer flor) {
-        this.flor = flor;
     }
 
     public String getFullName() {
@@ -78,6 +75,11 @@ public class Account {
             this.roles = roles;
         }
     }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
     public ParkingLot getParking() {
         return parking;
     }

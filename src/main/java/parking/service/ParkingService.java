@@ -1,18 +1,21 @@
 package parking.service;
 
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.document.ParkingLot;
+import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,21 +45,22 @@ public class ParkingService {
     }
 
     public void freeOwnersParking(SetUnusedRequest request) {
-        Integer parkingNumber = getParkingNumberByUser();
-        if(parkingNumber == null){
+
+        ParkingLot parking = getParkingNumberByUser();
+        if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
-        request.setNumber(parkingNumber);
+        request.setNumber(parking.getNumber());
         lotsRepository.freeOwnersParking(request);
     }
 
     public void recallParking() {
-        Integer parkingNumber = getParkingNumberByUser();
-        if(parkingNumber == null){
+        ParkingLot parking = getParkingNumberByUser();
+        if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
         ParkingNumberRequest request = new ParkingNumberRequest();
-        request.setNumber(parkingNumber);
+        request.setNumber(parking.getNumber());
         lotsRepository.recallParking(request);
     }
 
@@ -64,16 +68,43 @@ public class ParkingService {
         lotsRepository.reserve(request, userService.getCurrentUser());
     }
 
-    private Integer getParkingNumberByUser(){
-        return accountRepository.findByUsername(getCurrentUserName()).getParkingNumber();
+    public ParkingLot createLot(ParkingLot parkingLot) throws ParkingException {
+        ParkingLot existParkingLot;
+        try {
+            existParkingLot =  getParkingByNumber(parkingLot.getNumber());
+        } catch (ParkingException e) {
+            existParkingLot = null;
+        }
+        if(Optional.ofNullable(existParkingLot).isPresent()) {
+            throw new ParkingException("Parking already exist");
+        }
+        parkingLot.setId(new ObjectId());
+        return lotsRepository.insert(parkingLot);
+    }
+
+    public ParkingLot getParkingByNumber(Integer number) throws ParkingException {
+        Optional<ParkingLot> parkingLot = Optional.ofNullable(lotsRepository.findByNumber(number));
+        if (!parkingLot.isPresent()) {
+            throw new ParkingException("Parking did't exist");
+        }
+        return parkingLot.get();
+    }
+
+    public void cancelRezervation() throws UserException {
+        lotsRepository.cancelReservation(userService.getCurrentUser());
+    }
+
+    public ParkingLot setOwner(Account account, ParkingLot parkingLot) {
+        parkingLot.setOwner(account);
+        return lotsRepository.save(parkingLot);
+    }
+
+    private ParkingLot getParkingNumberByUser() {
+        return accountRepository.findByUsername(getCurrentUserName()).getParking();
     }
 
     private String getCurrentUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
-    }
-
-    public void cancelRezervation() throws UserException {
-        lotsRepository.cancelReservation(userService.getCurrentUser());
     }
 }
