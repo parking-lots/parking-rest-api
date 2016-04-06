@@ -1,15 +1,8 @@
 package parking.exceptions;
 
-public class UserException extends Exception {
+public class UserException extends ApplicationException {
 
-    private String errorCause;
-
-    public String getErrorCause() {
-        return errorCause;
+    public UserException(String errorCause) {
+        super(errorCause);
     }
-
-    public UserException(String errorCause){
-        this.errorCause = errorCause;
-    }
-
 }

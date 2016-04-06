@@ -13,21 +13,23 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Permission;
 import parking.beans.document.Role;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
-import parking.exceptions.ParkingException;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
-import parking.beans.document.Account;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.RoleRepository;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import java.util.*;
 
 
@@ -46,6 +48,10 @@ public class UserService {
     @Autowired
     private ParkingService parkingService;
 
+    @Autowired
+    private ExceptionHandler exceptionHandler;
+
+
     public Optional<Account> getLoggedUser() throws UserException {
         return Optional.ofNullable(accountRepository.findByUsername(getCurrentUserName()));
     }
@@ -59,17 +65,23 @@ public class UserService {
         return new Profile(getLoggedUser().get(), true);
     }
 
-    public Account getCurrentUser() throws UserException {
+    public Account getCurrentUser(HttpServletRequest request) throws ApplicationException {
         Optional<Account> currentUser = getLoggedUser();
         if (!currentUser.isPresent()) {
-            throw new UserException("user_not_found");
+            //throw new UserException("user_not_found");
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         }
 
         return getLoggedUser().get();
     }
 
-    public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
-        Account userAccount = validateUser(user);
+    public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
+
+        LoginForm userToValidate = new LoginForm();
+        userToValidate.setPassword(user.getPassword());
+        userToValidate.setUsername(user.getUsername().toLowerCase());
+
+        Account userAccount = validateUser(userToValidate, request);
 
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(
@@ -78,29 +90,31 @@ public class UserService {
                                 userAccount.getUsername(),
                                 userAccount.getPassword(),
                                 getAuthorities(userAccount.getRoles())
-                                )
+                        )
                 )
         );
-
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
+//        RequestContextUtils.getLocaleResolver(request)
+       // new SessionLocaleResolver().setLocale(request, null, Locale.FRENCH);
     }
 
-    public Account validateUser(LoginForm loginForm) throws AuthenticationCredentialsNotFoundException, UserException {
+    public Account validateUser(LoginForm loginForm, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
         if (getLoggedUser().isPresent()) {
-            throw new UserException("User already logged");
+            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
         }
 
         Account account = accountRepository.findByUsername(loginForm.getUsername());
 
         if (account == null || !ProfileHelper.checkPassword(loginForm.getPassword(), account.getPassword())) {
-            throw new UserException("Wrong credentials");
+            throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
         }
 
         return account;
     }
 
-    public void changePassword(ChangePassword password) throws UserException {
-        Account account = getCurrentUser();
+    public void changePassword(ChangePassword password, HttpServletRequest request) throws ApplicationException {
+        Account account = getCurrentUser(request);
 
         account.setPassword(ProfileHelper.encryptPassword(password.getNewPassword()));
 
@@ -140,10 +154,19 @@ public class UserService {
         return authorities;
     }
 
-    public Account createUser(Account newAccount) throws UserException {
+    public Account createUser(Account newAccount, HttpServletRequest request) throws ApplicationException {
+
+       /* Account userToCreate = new Account();
+        userToCreate.setUsername(newAccount.getUsername().toLowerCase());
+        userToCreate.setFullName(newAccount.getFullName());
+        userToCreate.setParking(newAccount.getParking());
+        */
+        newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
-            throw new UserException("User already exist");
+            String msg;
+
+            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
         }
 
         newAccount.setId(new ObjectId());
@@ -153,14 +176,16 @@ public class UserService {
         return accountRepository.insert(newAccount);
     }
 
-    public void attachParking(Account user, Integer number) throws ParkingException {
-        Optional<ParkingLot> parking = Optional.ofNullable(parkingService.getParkingByNumber(number));
-        if(Optional.ofNullable(parking.get().getOwner()).isPresent()) {
-            throw new ParkingException("Parking owned by another user");
+    public void attachParking(Account user, Integer number, HttpServletRequest request) throws ApplicationException {
+        Optional<ParkingLot> parking = Optional.ofNullable(parkingService.getParkingByNumber(number, request));
+        if (Optional.ofNullable(parking.get().getOwner()).isPresent()) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, request);
+
         }
         user.addRole(roleRepository.findByName(Role.ROLE_OWNER));
         user.setParking(parking.get());
 
         accountRepository.save(user);
     }
+
 }

@@ -9,11 +9,14 @@ import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
-import parking.exceptions.UserException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,9 +30,14 @@ public class ParkingService {
     private AccountRepository accountRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ExceptionHandler exceptionHandler;
 
-    public List<ParkingLot> getAvailable() throws UserException {
-        Account currentUser = userService.getCurrentUser();
+
+    public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
+
+        //throw new UserException("test");
+        Account currentUser = userService.getCurrentUser(request);
         List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
 
         // Check if current user using one of parking
@@ -64,34 +72,34 @@ public class ParkingService {
         lotsRepository.recallParking(request);
     }
 
-    public void reserve(ParkingNumberRequest request) throws UserException {
-        lotsRepository.reserve(request, userService.getCurrentUser());
+    public void reserve(ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+        lotsRepository.reserve(request, userService.getCurrentUser(httpRequest));
     }
 
-    public ParkingLot createLot(ParkingLot parkingLot) throws ParkingException {
+    public ParkingLot createLot(ParkingLot parkingLot, HttpServletRequest request) throws ApplicationException {
         ParkingLot existParkingLot;
         try {
-            existParkingLot =  getParkingByNumber(parkingLot.getNumber());
+            existParkingLot =  getParkingByNumber(parkingLot.getNumber(), request);
         } catch (ParkingException e) {
             existParkingLot = null;
         }
         if(Optional.ofNullable(existParkingLot).isPresent()) {
-            throw new ParkingException("Parking already exist");
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, request);
         }
         parkingLot.setId(new ObjectId());
         return lotsRepository.insert(parkingLot);
     }
 
-    public ParkingLot getParkingByNumber(Integer number) throws ParkingException {
+    public ParkingLot getParkingByNumber(Integer number, HttpServletRequest request) throws ApplicationException {
         Optional<ParkingLot> parkingLot = Optional.ofNullable(lotsRepository.findByNumber(number));
         if (!parkingLot.isPresent()) {
-            throw new ParkingException("Parking did't exist");
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DID_NOT_EXIST, request);
         }
         return parkingLot.get();
     }
 
-    public void cancelRezervation() throws UserException {
-        lotsRepository.cancelReservation(userService.getCurrentUser());
+    public void cancelRezervation(HttpServletRequest request) throws ApplicationException {
+        lotsRepository.cancelReservation(userService.getCurrentUser(request));
     }
 
     public ParkingLot setOwner(Account account, ParkingLot parkingLot) {

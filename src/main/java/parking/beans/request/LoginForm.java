@@ -2,8 +2,8 @@ package parking.beans.request;
 
 import javax.validation.constraints.NotNull;
 
-public class LoginForm {
 
+public class LoginForm {
     @NotNull(message = "Username is required!")
     private String username;
     @NotNull(message = "Password is required!")

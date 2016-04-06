@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
-import parking.exceptions.ParkingException;
-import parking.exceptions.UserException;
+import parking.exceptions.ApplicationException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Service
@@ -19,12 +19,12 @@ public class RegistrationService {
     @Autowired
     private ParkingService parkingService;
 
-    public Account registerUser(Account user, ParkingLot parking) throws UserException, ParkingException {
-        Account createdAccount = userService.createUser(user);
+    public Account registerUser(Account user, ParkingLot parking, HttpServletRequest request) throws ApplicationException {
+        Account createdAccount = userService.createUser(user, request);
 
         if(Optional.ofNullable(parking).isPresent()) {
-            ParkingLot createdParking = parkingService.createLot(parking);
-            userService.attachParking(createdAccount, createdParking.getNumber());
+            ParkingLot createdParking = parkingService.createLot(parking, request);
+            userService.attachParking(createdAccount, createdParking.getNumber(), request);
             parkingService.setOwner(createdAccount, createdParking);
         }
 

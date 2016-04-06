@@ -9,9 +9,11 @@ import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
 import parking.service.ParkingService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.function.Function;
@@ -25,9 +27,9 @@ public class ParkingController {
     private ParkingService parkingService;
 
     @RequestMapping(value = "/available", method = RequestMethod.GET)
-    public List<Parking> getAllAvailable() throws UserException {
+    public List<Parking> getAllAvailable(HttpServletRequest request) throws ApplicationException {
         Function<ParkingLot, Parking> mapper = lot -> new Parking(lot, true);
-        return parkingService.getAvailable().stream()
+        return parkingService.getAvailable(request).stream()
                 .map(mapper)
                 .collect(Collectors.<Parking> toList());
 
@@ -44,12 +46,12 @@ public class ParkingController {
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
-    public void freeOwnersParking(@Valid @RequestBody ParkingNumberRequest request) throws UserException {
-        parkingService.reserve(request);
+    public void freeOwnersParking(@Valid @RequestBody ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+        parkingService.reserve(request, httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.DELETE)
-    public void cancelRezervation() throws UserException {
-        parkingService.cancelRezervation();
+    public void cancelRezervation(HttpServletRequest request) throws ApplicationException {
+        parkingService.cancelRezervation(request);
     }
 }

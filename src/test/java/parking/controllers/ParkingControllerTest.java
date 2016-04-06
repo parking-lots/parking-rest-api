@@ -9,9 +9,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.response.Parking;
 import parking.beans.document.ParkingLot;
 import parking.builders.LotsBuilder;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
 import parking.service.ParkingService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -32,6 +34,9 @@ public class ParkingControllerTest {
     @Mock
     private ParkingService service;
 
+    @Mock
+    private HttpServletRequest httpRequest;
+
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private List<Parking> mockedParkingList = new ArrayList<Parking>();
 
@@ -49,9 +54,9 @@ public class ParkingControllerTest {
     }
 
     @Test
-    public void whenAvailableShouldReturnAvailableItems() throws UserException {
-        given(service.getAvailable()).willReturn(mockedParkingLotList);
+    public void whenAvailableShouldReturnAvailableItems() throws ApplicationException {
+        given(service.getAvailable(httpRequest)).willReturn(mockedParkingLotList);
 
-        assertThat(controller.getAllAvailable().get(0), instanceOf(Parking.class));
+        assertThat(controller.getAllAvailable(httpRequest).get(0), instanceOf(Parking.class));
     }
 }

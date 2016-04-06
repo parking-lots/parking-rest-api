@@ -16,11 +16,13 @@ import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.builders.LotsBuilder;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +49,9 @@ public class ParkingServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    HttpServletRequest httpRequest;
+
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private Account mockedAccount;
@@ -54,7 +59,7 @@ public class ParkingServiceTest {
     private ParkingLot mockedParkingLot;
 
     @Before
-    public void initMock() throws UserException {
+    public void initMock() throws ApplicationException {
         when(authentication.getName()).thenReturn(CURRENT_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(mockSecurityContext);
@@ -62,7 +67,7 @@ public class ParkingServiceTest {
         mockedAccount= new Account();
         mockedAccount.setUsername("username");
         mockedAccount.setParking(new ParkingLot(100, -1));
-        when(userService.getCurrentUser()).thenReturn(mockedAccount);
+        when(userService.getCurrentUser(httpRequest)).thenReturn(mockedAccount);
 
         mockedParkingLotList.add(new LotsBuilder().number(100).build());
         mockedParkingLotList.add(new LotsBuilder().number(101).build());
@@ -73,21 +78,21 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whereGetAvailableReturnAllAvailableItems() throws UserException {
+    public void whereGetAvailableReturnAllAvailableItems() throws ApplicationException {
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(mockedParkingLotList);
 
-        assert(service.getAvailable()).containsAll(mockedParkingLotList);
+        assert(service.getAvailable(httpRequest)).containsAll(mockedParkingLotList);
     }
 
     @Test
-    public void whenUserPlacedReturnOnlyPlacedParking() throws UserException {
+    public void whenUserPlacedReturnOnlyPlacedParking() throws ApplicationException {
         List<ParkingLot> placedParking = mockedParkingLotList;
         placedParking.add(new LotsBuilder().number(100).user(mockedAccount).build());
 
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(placedParking);
 
-        assertTrue(service.getAvailable().size() == 1
-            && service.getAvailable().get(0).equals(placedParking.get(4)));
+        assertTrue(service.getAvailable(httpRequest).size() == 1
+            && service.getAvailable(httpRequest).get(0).equals(placedParking.get(4)));
     }
 
     @Test
@@ -140,16 +145,16 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenUserReserveParkingLot() throws UserException {
+    public void whenUserReserveParkingLot() throws ApplicationException {
         ParkingNumberRequest request = new ParkingNumberRequest();
 
-        service.reserve(request);
+        service.reserve(request, httpRequest);
         verify(lotsRepository).reserve(request, mockedAccount);
     }
 
     @Test
-    public void whenCancelReservation() throws UserException {
-       service.cancelRezervation();
+    public void whenCancelReservation() throws ApplicationException {
+       service.cancelRezervation(httpRequest);
        verify(lotsRepository).cancelReservation(mockedAccount);
     }
 
@@ -159,24 +164,24 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenCreateLotShouldReturnParkingLotInstance() throws ParkingException {
+    public void whenCreateLotShouldReturnParkingLotInstance() throws ApplicationException {
         given(lotsRepository.insert(mockedParkingLot)).willReturn(mockedParkingLot);
         given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
 
-        ParkingLot newParking = service.createLot(mockedParkingLot);
+        ParkingLot newParking = service.createLot(mockedParkingLot, httpRequest);
         assertTrue(ParkingLot.class.isInstance(newParking));
     }
 
     @Test
-    public void whenCreateLotShouldCallRepository() throws ParkingException {
-        service.createLot(mockedParkingLot);
+    public void whenCreateLotShouldCallRepository() throws ApplicationException {
+        service.createLot(mockedParkingLot, httpRequest);
 
         verify(lotsRepository).insert(mockedParkingLot);
     }
 
     @Test
-    public void whenCreateParkingShouldGenerateId() throws ParkingException {
-        service.createLot(mockedParkingLot);
+    public void whenCreateParkingShouldGenerateId() throws ApplicationException {
+        service.createLot(mockedParkingLot, httpRequest);
 
         ArgumentCaptor<ParkingLot> captor = ArgumentCaptor.forClass(ParkingLot.class);
         verify(lotsRepository).insert(captor.capture());
@@ -187,10 +192,10 @@ public class ParkingServiceTest {
     }
 
     @Test(expected = ParkingException.class)
-    public void whenCreateAlreadyExistLotShoudThrowException() throws ParkingException {
+    public void whenCreateAlreadyExistLotShoudThrowException() throws ApplicationException {
         given(lotsRepository.findByNumber(161)).willReturn(mockedParkingLot);
 
-        service.createLot(mockedParkingLot);
+        service.createLot(mockedParkingLot, httpRequest);
     }
 
     @Test
@@ -199,9 +204,9 @@ public class ParkingServiceTest {
     }
 
     @Test(expected = ParkingException.class)
-    public void whenGetNotExistParkingByNumberShouldThrowException() throws ParkingException {
+    public void whenGetNotExistParkingByNumberShouldThrowException() throws ApplicationException {
         given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
-        service.getParkingByNumber(mockedParkingLot.getNumber());
+        service.getParkingByNumber(mockedParkingLot.getNumber(), httpRequest);
     }
 
     @Test

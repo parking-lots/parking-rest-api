@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.request.ChangePassword;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
 import parking.service.UserService;
 
@@ -44,10 +45,10 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenChangePasswordShouldCallServiceMethod() throws UserException {
+    public void whenChangePasswordShouldCallServiceMethod() throws ApplicationException {
         ChangePassword changePassword = new ChangePassword();
-        controller.changePassword(changePassword);
+        controller.changePassword(changePassword, servletRequest);
 
-        verify(userService, times(1)).changePassword(changePassword);
+        verify(userService, times(1)).changePassword(changePassword, servletRequest);
     }
 }
