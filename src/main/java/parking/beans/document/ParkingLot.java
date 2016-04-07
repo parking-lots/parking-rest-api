@@ -14,6 +14,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Date;
+import java.util.LinkedList;
 
 @Document(collection = "lots")
 public class ParkingLot extends Response {
@@ -26,13 +27,9 @@ public class ParkingLot extends Response {
     @Max(1)
     @Min(-2)
     private Integer floor;
-    private  Boolean current;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @DateTimeFormat(iso = ISO.DATE)
-    private Date freeFrom;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "CET")
-    @DateTimeFormat(iso = ISO.DATE)
-    private Date freeTill;
+    private LinkedList<AvailablePeriod> availablePeriods;
+    private Boolean current;
+
 
 
     private Date reserved;
@@ -90,22 +87,6 @@ public class ParkingLot extends Response {
         this.current = current;
     }
 
-    public Date getFreeFrom() {
-        return freeFrom;
-    }
-
-    public void setFreeFrom(@DateTimeFormat(iso = ISO.DATE_TIME) Date freeFrom) {
-        this.freeFrom = freeFrom;
-    }
-
-    public Date getFreeTill() {
-        return freeTill;
-    }
-
-    public void setFreeTill( @DateTimeFormat(iso = ISO.DATE_TIME) Date freeTill) {
-        this.freeTill = freeTill;
-    }
-
     public Account getUser() {
         return user;
     }
@@ -120,5 +101,13 @@ public class ParkingLot extends Response {
 
     public void setReserved(Date reserved) {
         this.reserved = reserved;
+    }
+
+    public LinkedList<AvailablePeriod> getAvailablePeriods() {
+        return availablePeriods;
+    }
+
+    public void setAvailablePeriods(LinkedList<AvailablePeriod> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 }

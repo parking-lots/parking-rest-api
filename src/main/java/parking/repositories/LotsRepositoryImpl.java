@@ -55,11 +55,11 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
         insertObject.setNumber(request.getNumber());
-        insertObject.setFreeFrom(request.getFreeFrom());
-        insertObject.setFreeTill(request.getFreeTill());
+       // insertObject.setAvailablePeriods();
+       // insertObject.setFreeTill(request.getFreeTill());
         insertObject.setFloor(lots.get(0).getFloor());
         insertObject.setOwner(lots.get(0).getOwner());
-        operations.insert(insertObject, "ParkingLot");
+        operations.save(insertObject);
 
     }
 
