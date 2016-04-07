@@ -9,10 +9,13 @@ import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
+import parking.beans.response.Parking;
 import parking.helper.ToolHelper;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
 
@@ -36,17 +39,28 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
                 Criteria.where("user.$id").is(user.getId()))
         );
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-
         return lots;
     }
 
     @Override
     public void freeOwnersParking(SetUnusedRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
-        Update updateFields = new Update();
-        updateFields.set("freeTill",ToolHelper.formatDate(request.getFreeTill()));
-        updateFields.set("freeFrom",ToolHelper.formatDate(request.getFreeFrom()));
-        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        //Update updateFields = new Update();
+        //updateFields.set("freeTill",ToolHelper.formatDate(request.getFreeTill()));
+        //updateFields.set("freeFrom",ToolHelper.formatDate(request.getFreeFrom()));
+        //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+
+        ParkingLot insertObject = new ParkingLot();
+
+        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+
+        insertObject.setNumber(request.getNumber());
+        insertObject.setFreeFrom(request.getFreeFrom());
+        insertObject.setFreeTill(request.getFreeTill());
+        insertObject.setFloor(lots.get(0).getFloor());
+        insertObject.setOwner(lots.get(0).getOwner());
+        operations.insert(insertObject, "ParkingLot");
+
     }
 
     @Override
@@ -55,7 +69,9 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Update updateFields = new Update();
         updateFields.unset("freeTill");
         updateFields.unset("freeFrom");
-        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+      //  operations.update(searchQuery, updateFields, ParkingLot.class);
+
     }
 
     @Override

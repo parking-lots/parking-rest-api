@@ -32,13 +32,13 @@ public class UserControllerTest {
     Principal principal;
 
     @Test(expected = UserException.class)
-    public void whenNotLoggedInShouldThrowException() throws UserException {
+    public void whenNotLoggedInShouldThrowException() throws ApplicationException {
 
         controller.profile(servletRequest, null);
     }
 
     @Test
-    public void whenLoggedInShouldCallServiceMethod() throws UserException {
+    public void whenLoggedInShouldCallServiceMethod() throws ApplicationException {
         controller.profile(servletRequest, principal);
 
         verify(userService, times(1)).getCurrentUserProfile();
