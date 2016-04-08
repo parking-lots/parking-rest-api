@@ -45,21 +45,21 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     @Override
     public void freeOwnersParking(SetUnusedRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
-        //Update updateFields = new Update();
-        //updateFields.set("freeTill",ToolHelper.formatDate(request.getFreeTill()));
-        //updateFields.set("freeFrom",ToolHelper.formatDate(request.getFreeFrom()));
-        //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        Update updateFields = new Update();
+        updateFields.set("freeTill",ToolHelper.formatDate(request.getFreeTill()));
+        updateFields.set("freeFrom",ToolHelper.formatDate(request.getFreeFrom()));
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
 
-        ParkingLot insertObject = new ParkingLot();
-
-        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-
-        insertObject.setNumber(request.getNumber());
-        insertObject.setFreeFrom(request.getFreeFrom());
-        insertObject.setFreeTill(request.getFreeTill());
-        insertObject.setFloor(lots.get(0).getFloor());
-        insertObject.setOwner(lots.get(0).getOwner());
-        operations.insert(insertObject, "ParkingLot");
+//        ParkingLot insertObject = new ParkingLot();
+//
+//        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+//
+//        insertObject.setNumber(request.getNumber());
+//        insertObject.setFreeFrom(request.getFreeFrom());
+//        insertObject.setFreeTill(request.getFreeTill());
+//        insertObject.setFloor(lots.get(0).getFloor());
+//        insertObject.setOwner(lots.get(0).getOwner());
+//        operations.insert(insertObject, "ParkingLot");
 
     }
 
@@ -67,10 +67,11 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public void recallParking(ParkingNumberRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
-        updateFields.unset("freeTill");
-        updateFields.unset("freeFrom");
-        //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-      //  operations.update(searchQuery, updateFields, ParkingLot.class);
+//        updateFields.unset("freeTill");
+//        updateFields.unset("freeFrom");
+        updateFields.unset("availablePeriods");
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+//        operations.update(searchQuery, updateFields, ParkingLot.class);
 
     }
 
