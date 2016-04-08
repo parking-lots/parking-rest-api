@@ -6,15 +6,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.helper.ToolHelper;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
@@ -51,12 +50,17 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
 
         ParkingLot insertObject = new ParkingLot();
+        AvailablePeriod availablePeriod = new AvailablePeriod();
+        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<AvailablePeriod>();
 
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
+        availablePeriod.setFreeFrom(request.getFreeFrom());
+        availablePeriod.setFreeTill(request.getFreeTill());
+        availablePeriods.add(availablePeriod);
+
         insertObject.setNumber(request.getNumber());
-       // insertObject.setAvailablePeriods();
-       // insertObject.setFreeTill(request.getFreeTill());
+        insertObject.setAvailablePeriods(availablePeriods);
         insertObject.setFloor(lots.get(0).getFloor());
         insertObject.setOwner(lots.get(0).getOwner());
         operations.save(insertObject);
