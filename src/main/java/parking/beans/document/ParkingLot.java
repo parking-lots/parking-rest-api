@@ -1,5 +1,7 @@
 package parking.beans.document;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -10,9 +12,8 @@ import parking.beans.response.Response;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
 
 @Document(collection = "lots")
 public class ParkingLot extends Response {
@@ -25,8 +26,11 @@ public class ParkingLot extends Response {
     @Max(1)
     @Min(-2)
     private Integer floor;
+    private LinkedList<AvailablePeriod> availablePeriods;
     private Boolean current;
-    private List<AvailablePeriods> availablePeriods = new ArrayList<>();
+
+
+
     private Date reserved;
     @DBRef
     private Account user;
@@ -82,14 +86,6 @@ public class ParkingLot extends Response {
         this.current = current;
     }
 
-    public List<AvailablePeriods> getAvailablePeriods() {
-        return availablePeriods;
-    }
-
-    public void setAvailablePeriods(List<AvailablePeriods> availablePeriods) {
-        this.availablePeriods = availablePeriods;
-    }
-
     public Account getUser() {
         return user;
     }
@@ -104,5 +100,13 @@ public class ParkingLot extends Response {
 
     public void setReserved(Date reserved) {
         this.reserved = reserved;
+    }
+
+    public LinkedList<AvailablePeriod> getAvailablePeriods() {
+        return availablePeriods;
+    }
+
+    public void setAvailablePeriods(LinkedList<AvailablePeriod> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 }

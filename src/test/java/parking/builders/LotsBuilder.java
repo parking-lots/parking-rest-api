@@ -1,18 +1,23 @@
 package parking.builders;
 
 import parking.beans.document.Account;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 
 import java.util.Date;
+import java.util.LinkedList;
 
 public class LotsBuilder {
 
     private ParkingLot lot;
 
     public LotsBuilder() {
+        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
+        AvailablePeriod availablePeriod = new AvailablePeriod();
+        availablePeriod.setFreeFrom(null);
+        availablePeriod.setFreeTill(null);
         this.lot = new ParkingLot();
-        this.lot.setFreeFrom(null);
-        this.lot.setFreeTill(null);
+        this.lot.setAvailablePeriods(availablePeriods);
     }
 
     public LotsBuilder number(Integer number) {
@@ -25,15 +30,15 @@ public class LotsBuilder {
         return this;
     }
 
-    public LotsBuilder freeFrom(Date from) {
+    /*public LotsBuilder freeFrom(Date from) {
         this.lot.setFreeFrom(from);
         return this;
-    }
+    } */
 
-    public LotsBuilder freeTill(Date till) {
+    /*public LotsBuilder freeTill(Date till) {
         this.lot.setFreeTill(till);
         return this;
-    }
+    }*/
 
     public LotsBuilder user(Account current) {
         this.lot.setUser(current);
