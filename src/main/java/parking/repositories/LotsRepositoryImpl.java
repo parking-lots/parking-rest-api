@@ -62,11 +62,11 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public void recallParking(ParkingNumberRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
-        updateFields.unset("freeTill");
-        updateFields.unset("freeFrom");
-        //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-      //  operations.update(searchQuery, updateFields, ParkingLot.class);
-
+//        updateFields.unset("freeTill");
+//        updateFields.unset("freeFrom");
+        updateFields.unset("availablePeriods");
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+//        operations.update(searchQuery, updateFields, ParkingLot.class);
 
     }
 

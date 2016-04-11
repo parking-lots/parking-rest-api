@@ -2,16 +2,16 @@ package parking.beans.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import parking.beans.document.ParkingLot;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Parking extends Response {
     private Integer number;
     private Profile owner;
     private Integer floor;
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
-    private Date freeFrom;
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
-    private Date freeTill;
+    private List<AvailablePeriods> availablePeriods = new ArrayList<>();
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date reserved;
     private Profile user;
@@ -19,8 +19,7 @@ public class Parking extends Response {
     public Parking(ParkingLot lot, Boolean owner) {
         this.number = lot.getNumber();
         this.floor = lot.getFloor();
-        this.freeFrom = lot.getFreeFrom();
-        this.freeTill = lot.getFreeTill();
+        this.availablePeriods = lot.getAvailablePeriods();
         this.reserved = lot.getReserved();
         this.user = (lot.getUser() != null)? new Profile(lot.getUser(), false): null;
         if (owner) {
@@ -52,21 +51,12 @@ public class Parking extends Response {
         this.floor = floor;
     }
 
-
-    public Date getFreeFrom() {
-        return freeFrom;
+    public List<AvailablePeriods> getAvailablePeriods() {
+        return availablePeriods;
     }
 
-    public void setFreeFrom(Date freeFrom) {
-        this.freeFrom = freeFrom;
-    }
-
-    public Date getFreeTill() {
-        return freeTill;
-    }
-
-    public void setFreeTill(Date freeTill) {
-        this.freeTill = freeTill;
+    public void setAvailablePeriods(List<AvailablePeriods> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 
     public Date getReserved() {

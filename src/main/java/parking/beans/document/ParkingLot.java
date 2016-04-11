@@ -6,8 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.format.annotation.DateTimeFormat;
+import parking.beans.response.AvailablePeriods;
 import parking.beans.response.Response;
 
 import javax.validation.constraints.Digits;
