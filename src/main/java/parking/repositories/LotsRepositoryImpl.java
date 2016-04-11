@@ -1,7 +1,9 @@
 package parking.repositories;
 
+import com.mongodb.DBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -44,26 +46,15 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     @Override
     public void freeOwnersParking(SetUnusedRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
-        //Update updateFields = new Update();
-        //updateFields.set("freeTill",ToolHelper.formatDate(request.getFreeTill()));
-        //updateFields.set("freeFrom",ToolHelper.formatDate(request.getFreeFrom()));
-        //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
 
-        ParkingLot insertObject = new ParkingLot();
+        Update updateFields = new Update();
+
         AvailablePeriod availablePeriod = new AvailablePeriod();
-        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<AvailablePeriod>();
-
-        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-
         availablePeriod.setFreeFrom(request.getFreeFrom());
         availablePeriod.setFreeTill(request.getFreeTill());
-        availablePeriods.add(availablePeriod);
 
-        insertObject.setNumber(request.getNumber());
-        insertObject.setAvailablePeriods(availablePeriods);
-        insertObject.setFloor(lots.get(0).getFloor());
-        insertObject.setOwner(lots.get(0).getOwner());
-        operations.save(insertObject);
+        updateFields.addToSet("availablePeriods", availablePeriod);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
 
     }
 
@@ -75,6 +66,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         updateFields.unset("freeFrom");
         //operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
       //  operations.update(searchQuery, updateFields, ParkingLot.class);
+
 
     }
 
