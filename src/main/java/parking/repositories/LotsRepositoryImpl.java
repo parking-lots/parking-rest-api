@@ -1,9 +1,7 @@
 package parking.repositories;
 
-import com.mongodb.DBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -12,11 +10,10 @@ import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
-import parking.beans.response.Parking;
 import parking.helper.ToolHelper;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
 
@@ -33,8 +30,8 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
         Date currentDate = ToolHelper.getCurrentDate();
 
-        searchQuery.addCriteria(Criteria.where("freeTill").gte(currentDate));
-        searchQuery.addCriteria(Criteria.where("freeFrom").lte(currentDate));
+        searchQuery.addCriteria(Criteria.where("availablePeriods.freeTill").gte(currentDate));
+        searchQuery.addCriteria(Criteria.where("availablePeriods.freeFrom").lte(currentDate));
         searchQuery.addCriteria(new Criteria().orOperator(
                 Criteria.where("reserved").is(null),
                 Criteria.where("user.$id").is(user.getId()))
@@ -62,12 +59,8 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public void recallParking(ParkingNumberRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
-//        updateFields.unset("freeTill");
-//        updateFields.unset("freeFrom");
         updateFields.unset("availablePeriods");
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-//        operations.update(searchQuery, updateFields, ParkingLot.class);
-
     }
 
     @Override
