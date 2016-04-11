@@ -1,17 +1,17 @@
 package parking.beans.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
 
 public class Parking extends Response {
     private Integer number;
     private Profile owner;
     private Integer floor;
-    private List<AvailablePeriods> availablePeriods = new ArrayList<>();
+    private LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date reserved;
     private Profile user;
@@ -51,11 +51,11 @@ public class Parking extends Response {
         this.floor = floor;
     }
 
-    public List<AvailablePeriods> getAvailablePeriods() {
+    public LinkedList<AvailablePeriod> getAvailablePeriods() {
         return availablePeriods;
     }
 
-    public void setAvailablePeriods(List<AvailablePeriods> availablePeriods) {
+    public void setAvailablePeriods(LinkedList<AvailablePeriod> availablePeriods) {
         this.availablePeriods = availablePeriods;
     }
 

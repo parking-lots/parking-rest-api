@@ -1,7 +1,6 @@
 package parking.beans.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -9,18 +8,16 @@ import java.util.Date;
  * Created by Lina on 07/04/16.
  */
 public class AvailablePeriod {
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeFrom;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "CET")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeTill;
 
     public Date getFreeFrom() {
         return freeFrom;
     }
 
-    public void setFreeFrom(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date freeFrom) {
+    public void setFreeFrom(Date freeFrom) {
         this.freeFrom = freeFrom;
     }
 
@@ -28,7 +25,7 @@ public class AvailablePeriod {
         return freeTill;
     }
 
-    public void setFreeTill( @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date freeTill) {
+    public void setFreeTill(Date freeTill) {
         this.freeTill = freeTill;
     }
 }
