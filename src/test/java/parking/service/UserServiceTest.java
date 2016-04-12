@@ -8,15 +8,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
@@ -26,67 +21,62 @@ import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
+
+    private static final String MOCKED_USER_NAME = "nickname";
 
     @InjectMocks
     private UserService service;
 
     @Mock
     private AccountRepository accountRepository;
-
     @Mock
     private RoleRepository roleRepository;
-
     @Mock
     private LotsRepository lotsRepository;
-
     @Mock
     private SecurityContext mockSecurityContext;
-
     @Mock
     private Authentication authentication;
-
     @Mock
     private ParkingService parkingService;
-
     @Mock
     private HttpServletRequest request;
-
     @Mock
     private AuthenticationManager authenticationManager;
+    @Mock
+    private RegistrationService registrationService;
+    @Mock
+    private ExceptionHandler exceptionHandler;
 
     private Account mockedUser;
     private ParkingLot mockedParking;
-
     private HashMap<String, Role> mockedRoles = new HashMap<String, Role>();
-
-    private static final String MOCKED_USER_NAME = "nickname";
 
     @Before
     public void initMock() {
         when(authentication.getName()).thenReturn(MOCKED_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
+        when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedUser = new Account("Name Surname", "nickname", "****");
@@ -98,7 +88,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void whenGetingCurrentUser() throws UserException{
+    public void whenGetingCurrentUser() throws UserException {
         Profile profile = service.getCurrentUserProfile();
         assertEquals(profile.toString(), new Profile(mockedUser).toString());
     }
@@ -121,9 +111,10 @@ public class UserServiceTest {
 
     @Test
     public void createMethodMustBeDefiedAndAcceptAccountObject() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("createUser", Account.class).getName(), "createUser");
+        assertEquals(UserService.class.getMethod("createUser", Account.class, HttpServletRequest.class).getName(), "createUser");
     }
-    @Test(expected = UserException.class)
+
+    @Test(expected = ApplicationException.class)
     public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException {
         service.createUser(mockedUser, request);
     }
@@ -194,7 +185,7 @@ public class UserServiceTest {
 
     @Test
     public void attachParkingMethodShouldBeDefined() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("attachParking", Account.class, Integer.class).getName(), "attachParking");
+        assertEquals(UserService.class.getMethod("attachParking", Account.class, Integer.class, HttpServletRequest.class).getName(), "attachParking");
     }
 
     @Test
@@ -212,7 +203,7 @@ public class UserServiceTest {
     @Test(expected = ParkingException.class)
     public void whenAttachParkingWhichOwnedByAnotherUserShouldThrowException() throws ApplicationException {
         mockedParking.setOwner(new Account("Name surname", "name.surname", "******"));
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
+        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
         service.attachParking(mockedUser, 161, request);
     }
 

@@ -4,7 +4,6 @@ import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 
-import java.util.Date;
 import java.util.LinkedList;
 
 public class LotsBuilder {
@@ -29,16 +28,6 @@ public class LotsBuilder {
         this.lot.setOwner(owner);
         return this;
     }
-
-    /*public LotsBuilder freeFrom(Date from) {
-        this.lot.setFreeFrom(from);
-        return this;
-    } */
-
-    /*public LotsBuilder freeTill(Date till) {
-        this.lot.setFreeTill(till);
-        return this;
-    }*/
 
     public LotsBuilder user(Account current) {
         this.lot.setUser(current);

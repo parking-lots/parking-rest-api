@@ -6,11 +6,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import parking.beans.response.Parking;
 import parking.beans.document.ParkingLot;
+import parking.beans.response.Parking;
 import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
 import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +19,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.*;
-
-import static org.mockito.BDDMockito.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParkingControllerTest {
@@ -33,7 +31,6 @@ public class ParkingControllerTest {
 
     @Mock
     private ParkingService service;
-
     @Mock
     private HttpServletRequest httpRequest;
 
@@ -48,9 +45,9 @@ public class ParkingControllerTest {
         mockedParkingLotList.add(new LotsBuilder().number(104).build());
 
         Function<ParkingLot, Parking> mapper = lot -> new Parking(lot, true);
-        mockedParkingList =  mockedParkingLotList.stream()
+        mockedParkingList = mockedParkingLotList.stream()
                 .map(mapper)
-                .collect(Collectors.<Parking> toList());
+                .collect(Collectors.<Parking>toList());
     }
 
     @Test

@@ -13,11 +13,9 @@ import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
 import parking.service.RegistrationService;
 
-import java.lang.reflect.Method;
+import javax.servlet.http.HttpServletRequest;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AdminControllerTest {
@@ -26,17 +24,16 @@ public class AdminControllerTest {
     private AdminController adminController;
 
     @Mock
+    HttpServletRequest httpRequest;
+    @Mock
     private RegistrationService registrationService;
-
     @Mock
     private AccountRepository accountRepository;
 
     @Test
     public void createUserMustBeMethod() throws NoSuchMethodException {
-        String methodName = "createUser";
-        Method method = AdminController.class.getMethod(methodName, RegistrationForm.class);
-
-        assertEquals(method.getName(), methodName);
+        assertEquals(AdminController.class.getMethod("createUser", RegistrationForm.class,
+                HttpServletRequest.class).getName(), "createUser");
     }
 
     @Test
@@ -44,10 +41,5 @@ public class AdminControllerTest {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
         form.setParking(null);
-
-      //  given(registrationService.registerUser(form.getAccount(), form.getParking())).willReturn(form.getAccount());
-
-      //  adminController.createUser(form);
-      //  verify(registrationService).registerUser(form.getAccount(), form.getParking());
     }
 }

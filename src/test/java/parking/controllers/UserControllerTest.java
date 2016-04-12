@@ -1,5 +1,6 @@
 package parking.controllers;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -7,13 +8,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.request.ChangePassword;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.service.UserService;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -23,15 +26,20 @@ public class UserControllerTest {
     private UserController controller;
 
     @Mock
-    private UserService userService;
-
-    @Mock
     HttpServletRequest servletRequest;
-
     @Mock
     Principal principal;
+    @Mock
+    private UserService userService;
+    @Mock
+    private ExceptionHandler exceptionHandler;
 
-    @Test(expected = UserException.class)
+    @Before
+    public void initMock() throws ApplicationException {
+        when(exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, servletRequest)).thenReturn(new ApplicationException("message"));
+    }
+
+    @Test(expected = ApplicationException.class)
     public void whenNotLoggedInShouldThrowException() throws ApplicationException {
 
         controller.profile(servletRequest, null);

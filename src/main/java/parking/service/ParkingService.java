@@ -80,7 +80,7 @@ public class ParkingService {
         ParkingLot existParkingLot;
         try {
             existParkingLot =  getParkingByNumber(parkingLot.getNumber(), request);
-        } catch (ParkingException e) {
+        } catch (ApplicationException e) {
             existParkingLot = null;
         }
         if(Optional.ofNullable(existParkingLot).isPresent()) {

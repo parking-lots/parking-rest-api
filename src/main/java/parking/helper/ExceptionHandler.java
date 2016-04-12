@@ -40,7 +40,7 @@ public class ExceptionHandler {
             case PARKING_OWNED_BY_ANOTHER:
                 return new ParkingException(getMessage(message.getMsg(), request));
             default:
-                return null;
+                return (ApplicationException) new Exception(message.getMsg());
         }
     }
 

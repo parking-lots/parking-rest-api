@@ -10,8 +10,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.ParkingException;
-import parking.exceptions.UserException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,10 +25,8 @@ public class RegistrationServiceTest {
 
     @Mock
     private UserService userService;
-
     @Mock
     private ParkingService parkingService;
-
     @Mock
     private HttpServletRequest request;
 
@@ -45,12 +41,12 @@ public class RegistrationServiceTest {
 
     @Test
     public void registerMustBeDefineAndAcceptRegisterObject() throws NoSuchMethodException {
-        assertEquals(RegistrationService.class.getMethod("registerUser", Account.class, ParkingLot.class).getName(), "registerUser");
+        assertEquals(RegistrationService.class.getMethod("registerUser", Account.class, ParkingLot.class, HttpServletRequest.class).getName(), "registerUser");
     }
 
     @Test
     public void whenRegistreationSuccessShouldReturnAccount() throws ApplicationException {
-        given(userService.createUser(mockedAccount,request)).willReturn(mockedAccount);
+        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
 
         assertTrue(Account.class.isInstance(registrationService.registerUser(mockedAccount, mockedParking, request)));
@@ -69,7 +65,7 @@ public class RegistrationServiceTest {
     public void whenRegisterUserShouldCallAttachParkingMethod() throws ApplicationException {
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
         given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
-        registrationService.registerUser(mockedAccount, mockedParking, request );
+        registrationService.registerUser(mockedAccount, mockedParking, request);
 
         verify(userService).attachParking(mockedAccount, mockedParking.getNumber(), request);
     }
