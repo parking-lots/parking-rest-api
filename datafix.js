@@ -1,0 +1,1 @@
+db.lots.update({},{$unset:{freeFrom:"",freeTill:""}},{multi: true})
