@@ -37,7 +37,7 @@ public class AdminController {
         return new Profile(registrationService.registerUser(form.getAccount(), form.getParking(), request));
     }
 
-    @RequestMapping(value = "/userlist", method = RequestMethod.GET)
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<User> displayUsers(HttpServletRequest request) throws UserException, ApplicationException {
         return adminService.getUsers();
 
