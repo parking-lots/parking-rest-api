@@ -1,5 +1,8 @@
 package parking.beans.response;
 
+import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
+
 /**
  * Created by Lina on 14/04/16.
  */
@@ -7,7 +10,19 @@ public class User extends Response {
     private String fullName;
     private String username;
     private String role;
-    private int parkingNo;
+    private String number;
+    private ParkingLot parkingLot;
+
+    public User(Account account){
+        this.fullName = account.getFullName();
+        this.username = account.getUsername();
+        this.role = "owner";
+
+        parkingLot = new ParkingLot();
+        parkingLot = account.getParking();
+        this.number = (parkingLot==null) ? "" : (parkingLot.getNumber().toString());
+
+    }
 
     public String getFullName() {
         return fullName;
@@ -33,11 +48,11 @@ public class User extends Response {
         this.role = role;
     }
 
-    public int getParkingNo() {
-        return parkingNo;
+    public String getNumber() {
+        return number;
     }
 
-    public void setParkingNo(int parkingNo) {
-        this.parkingNo = parkingNo;
+    public void setNumber(String number) {
+        this.number = number;
     }
 }
