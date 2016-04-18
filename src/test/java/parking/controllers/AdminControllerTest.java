@@ -12,6 +12,7 @@ import parking.beans.request.RegistrationForm;
 import parking.beans.response.User;
 import parking.builders.LotsBuilder;
 import parking.builders.UserBuilder;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
@@ -25,6 +26,9 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AdminControllerTest {
@@ -48,15 +52,12 @@ public class AdminControllerTest {
                 HttpServletRequest.class).getName(), "createUser");
     }
 
-    private List<User> mockedUserList = new ArrayList<User>();
+    private List<User> mockedUserList = new ArrayList<>();
 
     @Before
-    public void initMockData(){
+    public void initMockData() {
 
-//        mockedUserList.add(new UserBuilder("Name1","nick1","owner","111"));
-//        mockedUserList.add(new UserBuilder().number(101).build());
-//        mockedUserList.add(new UserBuilder().number(103).build());
-//        mockedUserList.add(new UserBuilder().number(104).build());
+        mockedUserList.add(new UserBuilder().build());
     }
 
     @Test
@@ -67,7 +68,14 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenDisplayUsersShouldCallService() throws UserException, ParkingException {
-        given(adminService.getUsers()).willReturn(mockedUserList);
+    public void whenDisplayUsersShouldCallService() throws ApplicationException {
+//        given(adminService.getUsers()).willReturn(mockedUserList);
+        adminController.displayUsers(mock(HttpServletRequest.class));
+        then(adminService).should(times(1)).getUsers();
+    }
+
+    @Test
+    public void whenDisplayUsersShouldReturnUsersFromService(){
+
     }
 }

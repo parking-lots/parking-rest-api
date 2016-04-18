@@ -59,11 +59,11 @@ public class User extends Response {
         this.number = number;
     }
 
-    public List<String> getHasRoles() {
+    public List<String> getRoles() {
         return Roles;
     }
 
-    public void setHasRoles(List<String> hasRoles) {
+    public void setRoles(List<String> hasRoles) {
         this.Roles = hasRoles;
     }
 }
