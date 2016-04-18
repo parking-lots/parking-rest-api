@@ -1,6 +1,7 @@
 package parking.builders;
 
 import parking.beans.document.Account;
+import parking.beans.document.Role;
 import parking.beans.response.User;
 
 import java.util.ArrayList;
@@ -23,10 +24,6 @@ public class UserBuilder{
         account = new Account();
         account.setUsername("nickname");
         account.setFullName("Nick Namesson");
-
-        //Role role
-        //account.setRoles("OWNER");
-       // roles.add("ADMIN");
     }
 
     public String getName() {

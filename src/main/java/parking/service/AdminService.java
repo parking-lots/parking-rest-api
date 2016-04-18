@@ -8,6 +8,7 @@ import parking.repositories.AccountRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -16,14 +17,15 @@ public class AdminService {
     private AccountRepository accountRepository;
 
     public List<User> getUsers() {
-        List<User> userList = new ArrayList<>();
+       // List<User> userList = new ArrayList<>();
 
-        User user;
-        for (Account a: accountRepository.findAll()){
-            user = new User(a);
-            userList.add(user);
-        }
+        return accountRepository.findAll().stream()
+                .map(User::new)
+                .collect(Collectors.toList());
+//        for (Account account: accountRepository.findAll()){
+//            userList.add(new User(account));
+//        }
 
-        return userList;
+ //       return userList;
     }
 }
