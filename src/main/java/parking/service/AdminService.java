@@ -17,15 +17,10 @@ public class AdminService {
     private AccountRepository accountRepository;
 
     public List<User> getUsers() {
-       // List<User> userList = new ArrayList<>();
 
         return accountRepository.findAll().stream()
                 .map(User::new)
                 .collect(Collectors.toList());
-//        for (Account account: accountRepository.findAll()){
-//            userList.add(new User(account));
-//        }
 
- //       return userList;
     }
 }
