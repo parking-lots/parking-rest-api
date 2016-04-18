@@ -2,6 +2,11 @@ package parking.beans.response;
 
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
+import parking.beans.document.Role;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Lina on 14/04/16.
@@ -9,14 +14,20 @@ import parking.beans.document.ParkingLot;
 public class User extends Response {
     private String fullName;
     private String username;
-    private String role;
+    private String roleName;
+    private List<String> Roles = new ArrayList<>();
     private String number;
     private ParkingLot parkingLot;
 
     public User(Account account){
         this.fullName = account.getFullName();
         this.username = account.getUsername();
-        this.role = "owner";
+        if (account.getRoles().size() != 0) {
+            for (Role r : account.getRoles()) {
+                this.roleName = r.getName();
+                this.Roles.add(this.roleName);
+            }
+        }
 
         parkingLot = new ParkingLot();
         parkingLot = account.getParking();
@@ -40,19 +51,19 @@ public class User extends Response {
         this.username = username;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getNumber() {
         return number;
     }
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public List<String> getHasRoles() {
+        return Roles;
+    }
+
+    public void setHasRoles(List<String> hasRoles) {
+        this.Roles = hasRoles;
     }
 }
