@@ -27,9 +27,12 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -60,7 +63,7 @@ public class UserServiceTest {
     @Mock
     private ParkingService parkingService;
     @Mock
-    private HttpServletRequest request;
+    private HttpServletResponse response;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -71,6 +74,8 @@ public class UserServiceTest {
     private Account mockedUser;
     private ParkingLot mockedParking;
     private HashMap<String, Role> mockedRoles = new HashMap<String, Role>();
+    private Cookie[] cookies = new Cookie[]{};
+    private HttpServletRequest request = mock(HttpServletRequest.class);
 
     @Before
     public void initMock() {
@@ -177,9 +182,6 @@ public class UserServiceTest {
 
         service.createUser(mockedUser, request);
 
-        //ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-        //verify(accountRepository).insert(captor.capture());
-
         assertEquals("nickname", mockedUser.getUsername());//captor.getValue().getUsername());
     }
 
@@ -189,7 +191,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenAttachParkingToUserSuccessShouldCallUdpdateServiceMethod() throws ApplicationException {
+    public void whenAttachParkingToUserSuccessShouldCallUpdateServiceMethod() throws ApplicationException {
         given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
         service.attachParking(mockedUser, 161, request);
 
@@ -214,7 +216,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenAttachParkinShoulAddOwnerRole() throws ApplicationException {
+    public void whenAttachParkingShouldAddOwnerRole() throws ApplicationException {
         given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
         given(roleRepository.findByName(Role.ROLE_OWNER)).willReturn(new Role(Role.ROLE_OWNER));
 
@@ -227,7 +229,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void login() throws ApplicationException {
+    public void whenLoginWithAnyRememberMeOptionShouldSucceed() throws ApplicationException {
         String username = "Lina";
         String password = "****";
 
@@ -235,6 +237,7 @@ public class UserServiceTest {
         LoginForm loginForm = new LoginForm();
         loginForm.setUsername(username);
         loginForm.setPassword(password);
+        loginForm.setRemember(true);
 
         String realLoginName = "lina";
         mockedUser = new Account("Lina Po", realLoginName, password);
@@ -242,8 +245,52 @@ public class UserServiceTest {
         given(request.getSession(true)).willReturn(mock(HttpSession.class));
 
         service.login(loginForm, request);
-
     }
 
+    @Test
+    public void whenSettingCookiesTheyAreSavedToBrowser() throws ApplicationException{
+        final ArgumentCaptor<Cookie> captor = ArgumentCaptor.forClass(Cookie.class);
 
+        service.setRememberMeCookies(mockedUser);
+
+        verify(response, times(2)).addCookie(captor.capture());
+        final List<Cookie> cookiesList = captor.getAllValues();
+
+        for (Cookie cookie: cookiesList) {
+            if(cookie.getName().equals("username") && !cookie.getValue().equals(" ")) {
+                assertEquals(cookie.getName(),"username");
+            }
+            if(cookie.getName().equals("password") && !cookie.getValue().equals(" ")) {
+                assertEquals(cookie.getName(),"password");
+            }
+        }
+    }
+
+    @Test
+    public void whenRememberMeCookiesCreatedUserAutomaticallyLoggedIn() throws ApplicationException{
+        cookies = new Cookie[] {new Cookie("username",mockedUser.getUsername()), new Cookie("password",mockedUser.getPassword())};
+
+        given(request.getCookies()).willReturn(cookies);
+
+        String username = cookies[0].getValue();
+        String password = cookies[1].getValue();
+
+        given(accountRepository.findByUsername(username)).willReturn(mockedUser);
+        given(request.getSession(true)).willReturn(mock(HttpSession.class));
+
+        service.rememberMeLogin(username,password,request);
+        whenGetingCurrentUser();
+    }
+
+    @Test
+    public void whenLogoutCookiesDeleted(){
+        cookies = new Cookie[] {new Cookie("username",mockedUser.getUsername()), new Cookie("password",mockedUser.getPassword())};
+
+        given(request.getCookies()).willReturn(cookies);
+
+        service.deleteCookies(request);
+
+        assertEquals(cookies[0].getValue()," ");
+        assertEquals(cookies[1].getValue()," ");
+    }
 }
