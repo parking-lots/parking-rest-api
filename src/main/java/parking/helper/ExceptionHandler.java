@@ -34,6 +34,7 @@ public class ExceptionHandler {
             case USER_NOT_FOUND:
             case WRONG_CREDENTIALS:
             case NOT_LOGGED:
+            case NO_COOKIE_DATA:
                 return new UserException(getMessage(message.getMsg(), request));
             case PARKING_ALREADY_EXISTS:
             case PARKING_DID_NOT_EXIST:

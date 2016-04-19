@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.service.UserService;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -29,10 +29,22 @@ public class AuthenticationController {
     @Autowired
     private ExceptionHandler exceptionHandler;
 
-
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public void Login(@Valid @RequestBody LoginForm user, HttpServletRequest request) throws ApplicationException {
         userService.login(user, request);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public void rememberMeLogin(HttpServletRequest request) throws ApplicationException {
+        String username = " ", password = " ";
+        Cookie[] cookies = request.getCookies();
+
+        for (int i = 0; i < cookies.length; i++) {
+            if(cookies[i].getName().equals("username")){username = cookies[i].getValue();}
+            if(cookies[i].getName().equals("password")){password = cookies[i].getValue();}
+        }
+
+        userService.rememberMeLogin(username,password,request);
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
@@ -40,6 +52,9 @@ public class AuthenticationController {
         if (principal == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
+
+        userService.deleteCookies(request);
+
         session.invalidate();
     }
 
@@ -54,5 +69,6 @@ public class AuthenticationController {
     public void createUser() {
 //        userService.createUser();
     }
+
 }
 

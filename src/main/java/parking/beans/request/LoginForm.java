@@ -8,6 +8,15 @@ public class LoginForm {
     private String username;
     @NotNull(message = "Password is required!")
     private String password;
+    private Boolean remember;
+
+    public Boolean getRemember() {
+        return remember;
+    }
+
+    public void setRemember(Boolean remember) {
+        this.remember = remember;
+    }
 
     public String getUsername() {
         return username;

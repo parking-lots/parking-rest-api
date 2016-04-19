@@ -10,7 +10,8 @@ public enum ExceptionMessage {
     USER_NOT_FOUND ("user_not_found"),
     PARKING_ALREADY_EXISTS ("parking_already_exists"),
     PARKING_DID_NOT_EXIST ("parking_did_not_exist"),
-    NOT_LOGGED("not_logged");
+    NOT_LOGGED("not_logged"),
+    NO_COOKIE_DATA("no_cookie_data");
 
     private String msg;
 

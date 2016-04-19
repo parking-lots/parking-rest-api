@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Permission;
@@ -29,8 +28,13 @@ import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.RoleRepository;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -51,6 +55,9 @@ public class UserService {
     @Autowired
     private ExceptionHandler exceptionHandler;
 
+    @Autowired
+    private HttpServletResponse response;
+
 
     public Optional<Account> getLoggedUser() throws UserException {
         return Optional.ofNullable(accountRepository.findByUsername(getCurrentUserName()));
@@ -68,7 +75,6 @@ public class UserService {
     public Account getCurrentUser(HttpServletRequest request) throws ApplicationException {
         Optional<Account> currentUser = getLoggedUser();
         if (!currentUser.isPresent()) {
-            //throw new UserException("user_not_found");
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         }
 
@@ -76,13 +82,60 @@ public class UserService {
     }
 
     public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
-
         LoginForm userToValidate = new LoginForm();
         userToValidate.setPassword(user.getPassword());
         userToValidate.setUsername(user.getUsername().toLowerCase());
 
         Account userAccount = validateUser(userToValidate, request);
+        setCookies(userAccount,user.getRemember());
 
+        SecurityContext context = getSecurityContext(userAccount);
+
+        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+    }
+
+    public void setCookies(Account userAccount, boolean remember){
+        if(remember)
+        {
+            Cookie cookieUsername = new Cookie("username",userAccount.getUsername());
+            cookieUsername.setMaxAge(604800);
+            response.addCookie(cookieUsername);
+            Cookie cookiePassword = new Cookie("password",userAccount.getPassword());
+            cookiePassword.setMaxAge(604800);
+            response.addCookie(cookiePassword);
+        }
+    }
+
+    public void rememberMeLogin(String username, String password, HttpServletRequest request)
+            throws AuthenticationCredentialsNotFoundException, ApplicationException {
+        Account userAccount = accountRepository.findByUsername(username);
+
+        if(userAccount != null) {
+            if(userAccount.getPassword().equals(password)) {
+                Cookie[] cookies = request.getCookies();
+
+                for (int i = 0; i < cookies.length; i++) {
+                    if(cookies[i].getName().equals("username") || cookies[i].getName().equals("password"))
+                    {
+                        cookies[i].setMaxAge(604800);
+                    }
+                }
+
+                SecurityContext context = getSecurityContext(userAccount);
+
+                request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+            }
+            else {
+                throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
+            }
+
+        }
+        else {
+            throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
+        }
+    }
+
+    public SecurityContext getSecurityContext(Account userAccount){
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(
                 authenticationManager.authenticate(
@@ -93,10 +146,7 @@ public class UserService {
                         )
                 )
         );
-        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-
-//        RequestContextUtils.getLocaleResolver(request)
-       // new SessionLocaleResolver().setLocale(request, null, Locale.FRENCH);
+        return context;
     }
 
     public Account validateUser(LoginForm loginForm, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
@@ -122,7 +172,7 @@ public class UserService {
     }
 
 
-    private Optional<Account> getUserByUsername(String username) {
+    public Optional<Account> getUserByUsername(String username) {
         Account userName = accountRepository.findByUsername(username);
 
         return Optional.ofNullable(userName);
@@ -156,11 +206,6 @@ public class UserService {
 
     public Account createUser(Account newAccount, HttpServletRequest request) throws ApplicationException {
 
-       /* Account userToCreate = new Account();
-        userToCreate.setUsername(newAccount.getUsername().toLowerCase());
-        userToCreate.setFullName(newAccount.getFullName());
-        userToCreate.setParking(newAccount.getParking());
-        */
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
@@ -186,6 +231,16 @@ public class UserService {
         user.setParking(parking.get());
 
         accountRepository.save(user);
+    }
+
+    public void deleteCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        for (int i = 0; i < cookies.length; i++) {
+            cookies[i].setValue(" ");
+            cookies[i].setMaxAge(1);
+            response.addCookie(cookies[i]);
+        }
     }
 
 }
