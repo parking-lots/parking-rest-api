@@ -41,8 +41,8 @@ public class ParkingController {
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
-    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request) {
-        parkingService.freeOwnersParking(request);
+    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+        parkingService.freeOwnersParking(request, httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
