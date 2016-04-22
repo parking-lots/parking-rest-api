@@ -31,6 +31,7 @@ import parking.repositories.RoleRepository;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,6 +95,7 @@ public class UserService {
         SecurityContext context = getSecurityContext(userAccount);
 
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+        setMaxInactiveIntervalForSession(request);
     }
 
     public void setRememberMeCookies(Account userAccount) {
@@ -104,6 +106,11 @@ public class UserService {
         Cookie cookiePassword = new Cookie("password", userAccount.getPassword());
         cookiePassword.setMaxAge(604800);
         response.addCookie(cookiePassword);
+    }
+
+    public void setMaxInactiveIntervalForSession(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        session.setMaxInactiveInterval(604800);
     }
 
     public void rememberMeLogin(String username, String password, HttpServletRequest request)
@@ -123,6 +130,7 @@ public class UserService {
                 SecurityContext context = getSecurityContext(userAccount);
 
                 request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+                setMaxInactiveIntervalForSession(request);
             } else {
                 throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
             }
