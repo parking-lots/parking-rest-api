@@ -70,6 +70,8 @@ public class UserServiceTest {
     private RegistrationService registrationService;
     @Mock
     private ExceptionHandler exceptionHandler;
+    @Mock
+    private HttpSession session;
 
     private Account mockedUser;
     private ParkingLot mockedParking;
@@ -243,6 +245,7 @@ public class UserServiceTest {
         mockedUser = new Account("Lina Po", realLoginName, password);
         given(accountRepository.findByUsername(realLoginName)).willReturn(mockedUser);
         given(request.getSession(true)).willReturn(mock(HttpSession.class));
+        given(request.getSession()).willReturn(mock(HttpSession.class));
 
         service.login(loginForm, request);
     }
@@ -277,6 +280,7 @@ public class UserServiceTest {
 
         given(accountRepository.findByUsername(username)).willReturn(mockedUser);
         given(request.getSession(true)).willReturn(mock(HttpSession.class));
+        given(request.getSession()).willReturn(mock(HttpSession.class));
 
         service.rememberMeLogin(username,password,request);
         whenGetingCurrentUser();
@@ -292,5 +296,18 @@ public class UserServiceTest {
 
         assertEquals(cookies[0].getValue()," ");
         assertEquals(cookies[1].getValue()," ");
+    }
+
+    @Test
+    public void whenLoginSessionShouldBeAliveForSevenDays(){
+        final ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+
+        given(request.getSession()).willReturn(session);
+
+        service.setMaxInactiveIntervalForSession(request);
+        verify(session).setMaxInactiveInterval(captor.capture());
+        List<Integer> a = captor.getAllValues();
+
+        assertEquals(a.get(0),new Integer(604800));
     }
 }

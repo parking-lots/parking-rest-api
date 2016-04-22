@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
+import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.ParkingException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
@@ -90,6 +90,10 @@ public class ParkingService {
         ParkingNumberRequest request = new ParkingNumberRequest();
         request.setNumber(parking.getNumber());
         lotsRepository.recallParking(request);
+    }
+
+    public void recallSingleParking(RecallSingleParking recallSingleParking){
+        lotsRepository.recallSingleParking(recallSingleParking);
     }
 
     public void reserve(ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {

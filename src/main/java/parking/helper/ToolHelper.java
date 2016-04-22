@@ -17,7 +17,6 @@ public class ToolHelper {
         return format(date);
     }
 
-
     private static Date format(Date date) {
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 

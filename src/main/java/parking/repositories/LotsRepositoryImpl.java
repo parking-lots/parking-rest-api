@@ -1,5 +1,6 @@
 package parking.repositories;
 
+import com.mongodb.BasicDBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -9,6 +10,7 @@ import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
+import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.helper.ToolHelper;
 
@@ -59,6 +61,24 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
         Update updateFields = new Update();
         updateFields.unset("availablePeriods");
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
+
+    @Override
+    public void recallSingleParking(RecallSingleParking recallSingleParking) {
+        Query searchQuery = new Query(Criteria.where("number").is(recallSingleParking.getNumber()));
+        Update updateFields = new Update();
+
+        searchQuery.addCriteria(new Criteria().andOperator(
+                Criteria.where("availablePeriods.freeFrom").is(recallSingleParking.getFreeFrom()),
+                Criteria.where("availablePeriods.freeTill").is(recallSingleParking.getFreeTill())
+        ));
+
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("freeFrom",recallSingleParking.getFreeFrom());
+        obj.put("freeTill",recallSingleParking.getFreeTill());
+        updateFields.pull("availablePeriods", obj);
+
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
