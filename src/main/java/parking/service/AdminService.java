@@ -6,7 +6,7 @@ import parking.beans.document.Account;
 import parking.beans.response.User;
 import parking.repositories.AccountRepository;
 
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,5 +22,10 @@ public class AdminService {
                 .map(User::new)
                 .collect(Collectors.toList());
 
+    }
+
+    public void editUser(Account account, HttpServletRequest request){
+
+        accountRepository.editAccount(account);
     }
 }
