@@ -100,11 +100,11 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenOwnerFreeUpParkingLot() {
+    public void whenOwnerFreeUpParkingLot() throws ApplicationException {
 
         SetUnusedRequest request = new SetUnusedRequest();
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(request);
+        service.freeOwnersParking(request, httpRequest);
 
         ArgumentCaptor captor = ArgumentCaptor.forClass(SetUnusedRequest.class);
         verify(lotsRepository).freeOwnersParking((SetUnusedRequest) captor.capture());
@@ -114,13 +114,13 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenCustomerDoesNotHaveParkingAssigned() {
+    public void whenCustomerDoesNotHaveParkingAssigned() throws ApplicationException {
         mockedAccount.setParking(null);
         SetUnusedRequest request = new SetUnusedRequest();
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.freeOwnersParking(request);
+        service.freeOwnersParking(request, httpRequest);
         verify(lotsRepository, never()).freeOwnersParking(request);
     }
 
