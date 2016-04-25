@@ -53,8 +53,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         availablePeriod.setFreeTill(request.getFreeTill());
 
         updateFields.addToSet("availablePeriods", availablePeriod);
-        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-
+            operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
     @Override
