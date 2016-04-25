@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
-import parking.beans.request.RegistrationForm;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,12 +17,11 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class RegistrationFormTest {
 
-    private static final String METHOD_GET = "get";
-    private static final String METHOD_SET = "set";
-
     @InjectMocks
     private RegistrationForm registrationForm;
 
+    private static final String METHOD_GET = "get";
+    private static final String METHOD_SET = "set";
     ArrayList<Parameter<?>> parameters = new ArrayList<Parameter<?>>();
 
     @Before
@@ -36,7 +34,7 @@ public class RegistrationFormTest {
     public void checkMethods() throws NoSuchMethodException {
         Method[] methods = RegistrationForm.class.getMethods();
 
-        for(Parameter parameter: parameters) {
+        for (Parameter parameter : parameters) {
             Method currentMethod = RegistrationForm.class.getMethod(getMethodName(parameter.getName(), METHOD_SET), parameter.getType());
             assertEquals(currentMethod.getName(), getMethodName(parameter.getName(), METHOD_SET));
 
@@ -46,7 +44,7 @@ public class RegistrationFormTest {
     }
 
     private String getMethodName(String parameterName, String type) {
-        return type + parameterName.substring(0,1).toUpperCase() + parameterName.substring(1);
+        return type + parameterName.substring(0, 1).toUpperCase() + parameterName.substring(1);
 
     }
 }

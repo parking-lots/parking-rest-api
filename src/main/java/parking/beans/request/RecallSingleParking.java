@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class SetUnusedRequest {
+public class RecallSingleParking {
     private Integer number;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom;
@@ -26,11 +26,9 @@ public class SetUnusedRequest {
 
     public void setFreeFrom(Date freeFrom) {
         if (freeFrom == null){
-            freeFrom = new Date();
-            this.freeFrom = formatDateForDatabase(freeFrom).getTime();
-        } else {
-            this.freeFrom = formatDateForDatabase(freeFrom).getTime();
+            return;
         }
+        this.freeFrom = formatDateForDatabase(freeFrom).getTime();
     }
 
     public Date getFreeTill() {
@@ -38,12 +36,7 @@ public class SetUnusedRequest {
     }
 
     public void setFreeTill(Date freeTill) {
-        if (freeTill == null){
-            freeTill = new Date();
-            this.freeTill = formatDateForDatabase(freeTill).getTime();
-        } else {
-            this.freeTill = formatDateForDatabase(freeTill).getTime();
-        }
+        this.freeTill = formatDateForDatabase(freeTill).getTime();
     }
 
     private Calendar formatDateForDatabase(Date oldDate) {

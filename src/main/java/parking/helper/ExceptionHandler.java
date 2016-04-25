@@ -34,13 +34,16 @@ public class ExceptionHandler {
             case USER_NOT_FOUND:
             case WRONG_CREDENTIALS:
             case NOT_LOGGED:
+            case NO_COOKIE_DATA:
                 return new UserException(getMessage(message.getMsg(), request));
             case PARKING_ALREADY_EXISTS:
             case PARKING_DID_NOT_EXIST:
             case PARKING_OWNED_BY_ANOTHER:
+            case END_DATE_IN_THE_PAST:
+            case START_DATE_LATER_THAN_END_DATE:
                 return new ParkingException(getMessage(message.getMsg(), request));
             default:
-                return null;
+                return (ApplicationException) new Exception(message.getMsg());
         }
     }
 

@@ -5,8 +5,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
+import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
@@ -32,7 +34,6 @@ public class ParkingController {
         return parkingService.getAvailable(request).stream()
                 .map(mapper)
                 .collect(Collectors.<Parking> toList());
-
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
@@ -40,9 +41,14 @@ public class ParkingController {
         parkingService.recallParking();
     }
 
+    @RequestMapping(value = "/remove", method = RequestMethod.POST)
+    public void recallSingleParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
+        parkingService.recallSingleParking(recallSingleParking);
+    }
+
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
-    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request) {
-        parkingService.freeOwnersParking(request);
+    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+        parkingService.freeOwnersParking(request, httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)

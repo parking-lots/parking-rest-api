@@ -17,8 +17,8 @@ import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.SetUnusedRequest;
 import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.ParkingException;
-import parking.exceptions.UserException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 
@@ -34,37 +34,41 @@ import static org.mockito.BDDMockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ParkingServiceTest {
 
+    private static final String CURRENT_USER_NAME = "name";
+
     @InjectMocks
     private ParkingService service;
+
+    @Mock
+    HttpServletRequest httpRequest;
     @Mock
     private LotsRepository lotsRepository;
     @Mock
     private AccountRepository accountRepository;
-
     @Mock
     private SecurityContext mockSecurityContext;
-
     @Mock
     private Authentication authentication;
     @Mock
     private UserService userService;
-
     @Mock
-    HttpServletRequest httpRequest;
-
+    private ExceptionHandler exceptionHandler;
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private Account mockedAccount;
-    private static final String CURRENT_USER_NAME = "name";
     private ParkingLot mockedParkingLot;
 
     @Before
     public void initMock() throws ApplicationException {
         when(authentication.getName()).thenReturn(CURRENT_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
+
+        when(exceptionHandler.handleException(ExceptionMessage.PARKING_DID_NOT_EXIST, httpRequest)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, httpRequest)).thenReturn(new ApplicationException("message"));
+
         SecurityContextHolder.setContext(mockSecurityContext);
 
-        mockedAccount= new Account();
+        mockedAccount = new Account();
         mockedAccount.setUsername("username");
         mockedAccount.setParking(new ParkingLot(100, -1));
         when(userService.getCurrentUser(httpRequest)).thenReturn(mockedAccount);
@@ -81,7 +85,7 @@ public class ParkingServiceTest {
     public void whereGetAvailableReturnAllAvailableItems() throws ApplicationException {
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(mockedParkingLotList);
 
-        assert(service.getAvailable(httpRequest)).containsAll(mockedParkingLotList);
+        assert (service.getAvailable(httpRequest)).containsAll(mockedParkingLotList);
     }
 
     @Test
@@ -92,7 +96,7 @@ public class ParkingServiceTest {
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(placedParking);
 
         assertTrue(service.getAvailable(httpRequest).size() == 1
-            && service.getAvailable(httpRequest).get(0).equals(placedParking.get(4)));
+                && service.getAvailable(httpRequest).get(0).equals(placedParking.get(4)));
     }
 
     @Test
@@ -154,13 +158,13 @@ public class ParkingServiceTest {
 
     @Test
     public void whenCancelReservation() throws ApplicationException {
-       service.cancelRezervation(httpRequest);
-       verify(lotsRepository).cancelReservation(mockedAccount);
+        service.cancelRezervation(httpRequest);
+        verify(lotsRepository).cancelReservation(mockedAccount);
     }
 
     @Test
-    public void creataLotShouldBeDefined() throws NoSuchMethodException             {
-        assertEquals(ParkingService.class.getMethod("createLot", ParkingLot.class).getName(), "createLot");
+    public void creataLotShouldBeDefined() throws NoSuchMethodException {
+        assertEquals(ParkingService.class.getMethod("createLot", ParkingLot.class, HttpServletRequest.class).getName(), "createLot");
     }
 
     @Test
@@ -169,13 +173,13 @@ public class ParkingServiceTest {
         given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
 
         ParkingLot newParking = service.createLot(mockedParkingLot, httpRequest);
+
         assertTrue(ParkingLot.class.isInstance(newParking));
     }
 
     @Test
     public void whenCreateLotShouldCallRepository() throws ApplicationException {
         service.createLot(mockedParkingLot, httpRequest);
-
         verify(lotsRepository).insert(mockedParkingLot);
     }
 
@@ -191,7 +195,7 @@ public class ParkingServiceTest {
         assertTrue(objectId.isPresent());
     }
 
-    @Test(expected = ParkingException.class)
+    @Test(expected = ApplicationException.class)
     public void whenCreateAlreadyExistLotShoudThrowException() throws ApplicationException {
         given(lotsRepository.findByNumber(161)).willReturn(mockedParkingLot);
 
@@ -200,13 +204,14 @@ public class ParkingServiceTest {
 
     @Test
     public void getParkingByNumberShouldBeDefined() throws NoSuchMethodException {
-        assertEquals(ParkingService.class.getMethod("getParkingByNumber", Integer.class).getName(), "getParkingByNumber");
+        assertEquals(ParkingService.class.getMethod("getParkingByNumber", Integer.class, HttpServletRequest.class).getName(), "getParkingByNumber");
     }
 
-    @Test(expected = ParkingException.class)
+    @Test(expected = ApplicationException.class)
     public void whenGetNotExistParkingByNumberShouldThrowException() throws ApplicationException {
         given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
         service.getParkingByNumber(mockedParkingLot.getNumber(), httpRequest);
+        service.createLot(mockedParkingLot, httpRequest);
     }
 
     @Test

@@ -8,15 +8,17 @@ import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
+import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.ParkingException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,13 +54,31 @@ public class ParkingService {
         return parkingLots;
     }
 
-    public void freeOwnersParking(SetUnusedRequest request) {
+    public void freeOwnersParking(SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
 
         ParkingLot parking = getParkingNumberByUser();
         if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
         request.setNumber(parking.getNumber());
+
+        Date currentDate = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(currentDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+
+        if (request.getFreeTill().compareTo(cal.getTime()) < 0)
+        {
+            throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
+        }
+        else if (request.getFreeFrom().compareTo(request.getFreeTill())>0){
+            throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
+        }
+
         lotsRepository.freeOwnersParking(request);
     }
 
@@ -72,6 +92,10 @@ public class ParkingService {
         lotsRepository.recallParking(request);
     }
 
+    public void recallSingleParking(RecallSingleParking recallSingleParking){
+        lotsRepository.recallSingleParking(recallSingleParking);
+    }
+
     public void reserve(ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {
         lotsRepository.reserve(request, userService.getCurrentUser(httpRequest));
     }
@@ -80,7 +104,7 @@ public class ParkingService {
         ParkingLot existParkingLot;
         try {
             existParkingLot =  getParkingByNumber(parkingLot.getNumber(), request);
-        } catch (ParkingException e) {
+        } catch (ApplicationException e) {
             existParkingLot = null;
         }
         if(Optional.ofNullable(existParkingLot).isPresent()) {

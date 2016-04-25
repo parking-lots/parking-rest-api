@@ -1,6 +1,7 @@
 package parking.controllers;
 
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -8,16 +9,31 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.request.RegistrationForm;
+import parking.beans.response.Parking;
+import parking.beans.response.User;
+import parking.builders.LotsBuilder;
+import parking.builders.UserBuilder;
+import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.repositories.AccountRepository;
+import parking.service.AdminService;
 import parking.service.RegistrationService;
 
-import java.lang.reflect.Method;
+import javax.servlet.http.HttpServletRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AdminControllerTest {
@@ -26,17 +42,27 @@ public class AdminControllerTest {
     private AdminController adminController;
 
     @Mock
-    private RegistrationService registrationService;
+    private AdminService adminService;
 
+    @Mock
+    HttpServletRequest httpRequest;
+    @Mock
+    private RegistrationService registrationService;
     @Mock
     private AccountRepository accountRepository;
 
     @Test
     public void createUserMustBeMethod() throws NoSuchMethodException {
-        String methodName = "createUser";
-        Method method = AdminController.class.getMethod(methodName, RegistrationForm.class);
+        assertEquals(AdminController.class.getMethod("createUser", RegistrationForm.class,
+                HttpServletRequest.class).getName(), "createUser");
+    }
 
-        assertEquals(method.getName(), methodName);
+    private List<User> mockedUserList = new ArrayList<>();
+
+    @Before
+    public void initMockData() {
+
+        mockedUserList.add(new UserBuilder().build());
     }
 
     @Test
@@ -44,10 +70,18 @@ public class AdminControllerTest {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
         form.setParking(null);
+    }
 
-      //  given(registrationService.registerUser(form.getAccount(), form.getParking())).willReturn(form.getAccount());
+    @Test
+    public void whenDisplayUsersShouldCallService() throws ApplicationException {
+        adminController.displayUsers(mock(HttpServletRequest.class));
+        then(adminService).should(times(1)).getUsers();
+    }
 
-      //  adminController.createUser(form);
-      //  verify(registrationService).registerUser(form.getAccount(), form.getParking());
+    @Test
+    public void whenDisplayUsersShouldReturnUsersFromService() throws ApplicationException {
+        given(adminService.getUsers()).willReturn(mockedUserList);
+        User returnUser = adminController.displayUsers(mock(HttpServletRequest.class)).get(0);
+        assertThat(returnUser.getUsername(), is(mockedUserList.get(0).getUsername()));
     }
 }
