@@ -34,7 +34,6 @@ public class ParkingController {
         return parkingService.getAvailable(request).stream()
                 .map(mapper)
                 .collect(Collectors.<Parking> toList());
-
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
@@ -42,7 +41,7 @@ public class ParkingController {
         parkingService.recallParking();
     }
 
-    @RequestMapping(value = "/remove", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/remove", method = RequestMethod.POST)
     public void recallSingleParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
         parkingService.recallSingleParking(recallSingleParking);
     }
