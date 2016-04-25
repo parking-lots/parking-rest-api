@@ -2,12 +2,13 @@ package parking.beans.request;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class RecallSingleParking {
     private Integer number;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date freeFrom = new Date();
+    private Date freeFrom;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeTill;
 
@@ -27,7 +28,7 @@ public class RecallSingleParking {
         if (freeFrom == null){
             return;
         }
-        this.freeFrom = freeFrom;
+        this.freeFrom = formatDateForDatabase(freeFrom).getTime();
     }
 
     public Date getFreeTill() {
@@ -35,6 +36,16 @@ public class RecallSingleParking {
     }
 
     public void setFreeTill(Date freeTill) {
-        this.freeTill = freeTill;
+        this.freeTill = formatDateForDatabase(freeTill).getTime();
+    }
+
+    private Calendar formatDateForDatabase(Date oldDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(oldDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
     }
 }
