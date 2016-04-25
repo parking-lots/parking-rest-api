@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
+import parking.helper.ProfileHelper;
 
 /**
  * Created by Lina on 25/04/16.
@@ -30,7 +31,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         if(request.getFullName() != null){
         updateFields.set("fullName", request.getFullName());}
         if(request.getPassword()!= null){
-        updateFields.set("password", request.getPassword());}
+        updateFields.set("password", (ProfileHelper.encryptPassword(request.getPassword())));}
         if(request.getEmail() != null){
         updateFields.set("email", request.getEmail());}
         if(request.getCarList() != null){
