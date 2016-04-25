@@ -8,5 +8,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ProfileHelperTest {
 
     @Test
-    public void whereEncryptPasswordShould(){}
+    public void whereEncryptPasswordShould() {
+    }
 }

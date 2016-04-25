@@ -1,19 +1,15 @@
 package parking.beans.request;
 
-import org.joda.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
-import java.util.Calendar;
 import java.util.Date;
 
-public class SetUnusedRequest {
+public class RecallSingleParking {
     private Integer number;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom = new Date();
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date freeTill = new Date();
+    private Date freeTill;
 
     public Integer getNumber() {
         return number;
@@ -39,9 +35,6 @@ public class SetUnusedRequest {
     }
 
     public void setFreeTill(Date freeTill) {
-        if (freeTill == null){
-            return;
-        }
         this.freeTill = freeTill;
     }
 }

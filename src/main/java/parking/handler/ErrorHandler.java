@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import parking.beans.response.FormFieldError;
 import parking.beans.response.FormFieldsErrorsWrapper;
+import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
 import parking.handler.wrapper.ErrorMessage;
 
@@ -36,6 +37,11 @@ public class ErrorHandler {
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ErrorMessage> handleOccupiedEmailException(UserException e){
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ParkingException.class)
+    public ResponseEntity<ErrorMessage> handleParkingException(ParkingException e){
         return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()),HttpStatus.BAD_REQUEST);
     }
 

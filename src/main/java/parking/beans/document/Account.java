@@ -23,6 +23,8 @@ public class Account {
     private String username;
     @Size(min = 6, max = 10)
     private String password;
+    private String email;
+    private List<Car> carList = new ArrayList<>();
     @DBRef
     private List<Role> roles = new ArrayList<Role>();
     @DBRef
@@ -85,5 +87,21 @@ public class Account {
     }
     public void setParking(ParkingLot parking) {
         this.parking = parking;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public List<Car> getCarList() {
+        return carList;
+    }
+
+    public void setCarList(List<Car> regNoList) {
+        this.carList = regNoList;
     }
 }
