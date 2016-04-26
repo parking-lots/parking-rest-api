@@ -10,7 +10,6 @@ import java.util.List;
 public class User extends Response {
     private String fullName;
     private String username;
-    private String password;
     private String email;
     private String number;
     private List<Car> carList = new ArrayList<>();
@@ -19,7 +18,6 @@ public class User extends Response {
     public User(Account account) {
         this.fullName = account.getFullName();
         this.username = account.getUsername();
-        this.password = account.getPassword();
         this.email = account.getEmail();
         this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
         this.carList = account.getCarList();
@@ -45,14 +43,6 @@ public class User extends Response {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
