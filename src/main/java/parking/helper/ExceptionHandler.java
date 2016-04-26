@@ -3,12 +3,11 @@ package parking.helper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
 import parking.exceptions.ParkingException;
+import parking.exceptions.UserException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
@@ -29,7 +28,7 @@ public class ExceptionHandler {
 
     public ApplicationException handleException(ExceptionMessage message, HttpServletRequest request) {
 
-        switch (message){
+        switch (message) {
             case USER_ALREADY_LOGGED:
             case USER_NOT_FOUND:
             case WRONG_CREDENTIALS:

@@ -30,19 +30,23 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         Update updateFields = new Update();
 
-        if(request.getUsername() != null){
-        updateFields.set("username", request.getUsername());}
-        if(request.getFullName() != null){
-        updateFields.set("fullName", request.getFullName());}
-        if(request.getPassword()!= null){
-        updateFields.set("password", (ProfileHelper.encryptPassword(request.getPassword())));}
-        if(request.getEmail() != null){
-        updateFields.set("email", request.getEmail());}
+        if (request.getUsername() != null) {
+            updateFields.set("username", request.getUsername());
+        }
+        if (request.getFullName() != null) {
+            updateFields.set("fullName", request.getFullName());
+        }
+        if (request.getPassword() != null) {
+            updateFields.set("password", (ProfileHelper.encryptPassword(request.getPassword())));
+        }
+        if (request.getEmail() != null) {
+            updateFields.set("email", request.getEmail());
+        }
 
         List<Car> carList = new ArrayList<>();
         Car car;
 
-        for (Car c: request.getCarList()) {
+        for (Car c : request.getCarList()) {
             if (c.getRegNo() != null) {
                 car = new Car();
                 car.setRegNo(c.getRegNo());

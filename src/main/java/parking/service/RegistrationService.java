@@ -22,7 +22,7 @@ public class RegistrationService {
     public Account registerUser(Account user, ParkingLot parking, HttpServletRequest request) throws ApplicationException {
         Account createdAccount = userService.createUser(user, request);
 
-        if(Optional.ofNullable(parking).isPresent()) {
+        if (Optional.ofNullable(parking).isPresent()) {
             ParkingLot createdParking = parkingService.createLot(parking, request);
             userService.attachParking(createdAccount, createdParking.getNumber(), request);
             parkingService.setOwner(createdAccount, createdParking);

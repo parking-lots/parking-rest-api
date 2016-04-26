@@ -25,7 +25,7 @@ public class RecallSingleParking {
     }
 
     public void setFreeFrom(Date freeFrom) {
-        if (freeFrom == null){
+        if (freeFrom == null) {
             return;
         }
         this.freeFrom = formatDateForDatabase(freeFrom).getTime();

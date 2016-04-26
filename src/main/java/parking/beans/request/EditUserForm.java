@@ -1,7 +1,6 @@
 package parking.beans.request;
 
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
 
 import javax.validation.Valid;
 

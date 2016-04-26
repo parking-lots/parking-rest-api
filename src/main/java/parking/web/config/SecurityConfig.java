@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import parking.security.ParkingAuthenticationProvider;
 import parking.security.HttpAuthenticationEntryPoint;
+import parking.security.ParkingAuthenticationProvider;
 
 @Configuration
 @EnableWebSecurity

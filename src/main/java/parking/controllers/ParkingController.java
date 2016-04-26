@@ -5,14 +5,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
 import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +31,7 @@ public class ParkingController {
         Function<ParkingLot, Parking> mapper = lot -> new Parking(lot, true);
         return parkingService.getAvailable(request).stream()
                 .map(mapper)
-                .collect(Collectors.<Parking> toList());
+                .collect(Collectors.<Parking>toList());
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)

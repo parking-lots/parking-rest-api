@@ -24,7 +24,7 @@ public class AdminService {
 
     }
 
-    public void editUser(Account account, HttpServletRequest request){
+    public void editUser(Account account, HttpServletRequest request) {
 
         accountRepository.editAccount(account);
     }

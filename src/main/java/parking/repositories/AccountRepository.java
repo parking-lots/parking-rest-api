@@ -5,7 +5,8 @@ import parking.beans.document.Account;
 
 import java.util.List;
 
-public interface AccountRepository extends MongoRepository<Account, String>, CustomAccountRepository{
+public interface AccountRepository extends MongoRepository<Account, String>, CustomAccountRepository {
     public Account findByUsername(String username);
+
     public List<Account> findAll();
 }

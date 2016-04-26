@@ -5,7 +5,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import parking.helper.ProfileHelper;
-import parking.helper.ToolHelper;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,7 +29,8 @@ public class Account {
     @DBRef
     private ParkingLot parking;
 
-    public Account(){}
+    public Account() {
+    }
 
     public Account(String fullName, String username, String password) {
         this.fullName = fullName;
@@ -69,9 +69,11 @@ public class Account {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
+
     public List<Role> getRoles() {
         return roles;
     }
+
     public void setRoles(List<Role> roles) {
         if (roles != null) {
             this.roles = roles;
@@ -85,6 +87,7 @@ public class Account {
     public ParkingLot getParking() {
         return parking;
     }
+
     public void setParking(ParkingLot parking) {
         this.parking = parking;
     }

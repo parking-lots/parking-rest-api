@@ -88,7 +88,7 @@ public class UserService {
         userToValidate.setUsername(user.getUsername().toLowerCase());
 
         Account userAccount = validateUser(userToValidate, request);
-        if(user.getRemember()) {
+        if (user.getRemember()) {
             setRememberMeCookies(userAccount);
         }
 
@@ -108,7 +108,7 @@ public class UserService {
         response.addCookie(cookiePassword);
     }
 
-    public void setMaxInactiveIntervalForSession(HttpServletRequest request){
+    public void setMaxInactiveIntervalForSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.setMaxInactiveInterval(604800);
     }
