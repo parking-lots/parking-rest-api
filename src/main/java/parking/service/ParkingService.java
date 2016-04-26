@@ -35,9 +35,6 @@ public class ParkingService {
     private UserService userService;
     @Autowired
     private ExceptionHandler exceptionHandler;
-    @Autowired
-    private EliminateDateTimestamp eliminateDateTimestamp;
-
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
 
@@ -66,17 +63,18 @@ public class ParkingService {
         request.setNumber(parking.getNumber());
 
         Date currentDate = new Date();
+        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
         Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
 
-        if (request.getFreeTill().compareTo(cal.getTime()) < 0)
-        {
-            throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
-        }
-        else if (request.getFreeFrom().compareTo(request.getFreeTill())>0){
+        if (request.getFreeFrom().compareTo(request.getFreeTill()) > 0){
             throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
         }
-
-        lotsRepository.freeOwnersParking(request);
+        else if ((request.getFreeTill().compareTo(cal.getTime()) > 0) && (request.getFreeFrom().compareTo(request.getFreeTill()) < 1)) {
+            throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
+        }
+        else {
+            lotsRepository.freeOwnersParking(request);
+        }
     }
 
     public void recallParking() {
