@@ -40,11 +40,15 @@ public class AuthenticationController {
         Cookie[] cookies = request.getCookies();
 
         for (int i = 0; i < cookies.length; i++) {
-            if(cookies[i].getName().equals("username")){username = cookies[i].getValue();}
-            if(cookies[i].getName().equals("password")){password = cookies[i].getValue();}
+            if (cookies[i].getName().equals("username")) {
+                username = cookies[i].getValue();
+            }
+            if (cookies[i].getName().equals("password")) {
+                password = cookies[i].getValue();
+            }
         }
 
-        userService.rememberMeLogin(username,password,request);
+        userService.rememberMeLogin(username, password, request);
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
@@ -65,6 +69,7 @@ public class AuthenticationController {
         }
         return userService.getCurrentUserProfile();
     }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void createUser() {
 //        userService.createUser();

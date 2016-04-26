@@ -10,7 +10,7 @@ public class FormFieldsErrorsWrapper extends Response {
         this.errors = new ArrayList<FormFieldError>();
     }
 
-    public List<FormFieldError> getErrors () {
+    public List<FormFieldError> getErrors() {
         return errors;
     }
 

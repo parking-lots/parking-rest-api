@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class ToolHelper {
 
-    public static Date getCurrentDate(){
+    public static Date getCurrentDate() {
         Date today = new Date();
         return format(today);
     }
@@ -22,7 +22,8 @@ public class ToolHelper {
 
         try {
             date = formatter.parse(formatter.format(date));
-        } catch (ParseException e) {}
+        } catch (ParseException e) {
+        }
 
         return date;
     }

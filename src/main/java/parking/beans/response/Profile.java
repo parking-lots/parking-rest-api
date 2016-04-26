@@ -2,7 +2,6 @@ package parking.beans.response;
 
 
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
 
 public class Profile extends Response {
 
@@ -21,7 +20,7 @@ public class Profile extends Response {
         fullName = account.getFullName();
         username = account.getUsername();
         if (parkingLot) {
-            parking = (account.getParking() !=null)? new Parking(account.getParking(), false): null;
+            parking = (account.getParking() != null) ? new Parking(account.getParking(), false) : null;
         }
     }
 
