@@ -1,8 +1,8 @@
 package parking.beans.request;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import parking.utils.EliminateDateTimestamp;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class RecallSingleParking {
@@ -11,6 +11,7 @@ public class RecallSingleParking {
     private Date freeFrom;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeTill;
+    private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
 
     public Integer getNumber() {
         return number;
@@ -24,28 +25,13 @@ public class RecallSingleParking {
         return freeFrom;
     }
 
-    public void setFreeFrom(Date freeFrom) {
-        if (freeFrom == null){
-            return;
-        }
-        this.freeFrom = formatDateForDatabase(freeFrom).getTime();
+    public void setFreeFrom(Date freeFrom) { this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();// formatDateForDatabase(freeFrom).getTime();
     }
 
     public Date getFreeTill() {
         return freeTill;
     }
 
-    public void setFreeTill(Date freeTill) {
-        this.freeTill = formatDateForDatabase(freeTill).getTime();
-    }
-
-    private Calendar formatDateForDatabase(Date oldDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(oldDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal;
+    public void setFreeTill(Date freeTill) { this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();// formatDateForDatabase(freeTill).getTime();
     }
 }
