@@ -12,7 +12,7 @@ public class Parking extends Response {
     private Profile owner;
     private Integer floor;
     private LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date reserved;
     private Profile user;
 
@@ -21,9 +21,9 @@ public class Parking extends Response {
         this.floor = lot.getFloor();
         this.availablePeriods = lot.getAvailablePeriods();
         this.reserved = lot.getReserved();
-        this.user = (lot.getUser() != null)? new Profile(lot.getUser(), false): null;
+        this.user = (lot.getUser() != null) ? new Profile(lot.getUser(), false) : null;
         if (owner) {
-            this.owner = (lot.getOwner() != null)? new Profile(lot.getOwner(), false): null;
+            this.owner = (lot.getOwner() != null) ? new Profile(lot.getOwner(), false) : null;
         }
     }
 

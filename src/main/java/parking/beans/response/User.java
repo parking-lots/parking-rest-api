@@ -1,38 +1,32 @@
 package parking.beans.response;
 
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
+import parking.beans.document.Car;
 import parking.beans.document.Role;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Lina on 14/04/16.
- */
 public class User extends Response {
     private String fullName;
     private String username;
-    private String roleName;
-    private List<String> Roles = new ArrayList<>();
+    private String email;
     private String number;
-    private ParkingLot parkingLot;
+    private List<Car> carList = new ArrayList<>();
+    private List<String> roles = new ArrayList<>();
 
-    public User(Account account){
+    public User(Account account) {
         this.fullName = account.getFullName();
         this.username = account.getUsername();
-        if (account.getRoles().size() != 0) {
-            for (Role r : account.getRoles()) {
-                this.roleName = r.getName();
-                this.Roles.add(this.roleName);
+        this.email = account.getEmail();
+        this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
+        this.carList = account.getCarList();
+
+        if (!account.getRoles().isEmpty()) {
+            for (Role role : account.getRoles()) {
+                this.roles.add(role.getName());
             }
         }
-
-        parkingLot = new ParkingLot();
-        parkingLot = account.getParking();
-        this.number = (parkingLot==null) ? "" : (parkingLot.getNumber().toString());
-
     }
 
     public String getFullName() {
@@ -51,6 +45,14 @@ public class User extends Response {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getNumber() {
         return number;
     }
@@ -59,11 +61,19 @@ public class User extends Response {
         this.number = number;
     }
 
-    public List<String> getRoles() {
-        return Roles;
+    public List<Car> getCarList() {
+        return carList;
     }
 
-    public void setRoles(List<String> hasRoles) {
-        this.Roles = hasRoles;
+    public void setCarList(List<Car> carList) {
+        this.carList = carList;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

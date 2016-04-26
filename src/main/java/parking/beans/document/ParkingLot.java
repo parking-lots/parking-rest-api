@@ -1,12 +1,9 @@
 package parking.beans.document;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import parking.beans.response.AvailablePeriods;
 import parking.beans.response.Response;
 
 import javax.validation.constraints.Digits;
@@ -30,7 +27,6 @@ public class ParkingLot extends Response {
     private Boolean current;
 
 
-
     private Date reserved;
     @DBRef
     private Account user;
@@ -38,7 +34,6 @@ public class ParkingLot extends Response {
     private Account owner;
 
     public ParkingLot() {
-
     }
 
     public ParkingLot(Integer number, Integer floor) {

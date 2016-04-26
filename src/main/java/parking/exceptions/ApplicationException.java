@@ -1,7 +1,5 @@
 package parking.exceptions;
 
-import parking.helper.ExceptionHandler;
-
 public class ApplicationException extends Exception {
     protected String errorCause;
 

@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
-import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
@@ -22,11 +21,9 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
-import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,27 +53,18 @@ public class ParkingServiceTest {
     private UserService userService;
     @Mock
     private ExceptionHandler exceptionHandler;
-    @Mock
-    private EliminateDateTimestamp eliminateDateTimestamp;
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
-    private Date mockDate;
-    private RecallSingleParking recallSingleParking = new RecallSingleParking();
 
     @Before
     public void initMock() throws ApplicationException {
-        eliminateDateTimestamp = new EliminateDateTimestamp();
-        mockDate = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
-
         when(authentication.getName()).thenReturn(CURRENT_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
 
         when(exceptionHandler.handleException(ExceptionMessage.PARKING_DID_NOT_EXIST, httpRequest)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, httpRequest)).thenReturn(new ApplicationException("message"));
-        when(exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest)).thenReturn(new ApplicationException("message"));
-        when(exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest)).thenReturn(new ApplicationException("message"));
 
         SecurityContextHolder.setContext(mockSecurityContext);
 
@@ -112,11 +100,9 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenOwnerFreeUpParkingLot() throws ApplicationException{
+    public void whenOwnerFreeUpParkingLot() throws ApplicationException {
 
         SetUnusedRequest request = new SetUnusedRequest();
-        request.setFreeFrom(new Date());
-        request.setFreeTill(new Date());
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
         service.freeOwnersParking(request, httpRequest);
 
@@ -128,7 +114,7 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenCustomerDoesNotHaveParkingAssigned() throws ApplicationException{
+    public void whenCustomerDoesNotHaveParkingAssigned() throws ApplicationException {
         mockedAccount.setParking(null);
         SetUnusedRequest request = new SetUnusedRequest();
 
@@ -238,38 +224,4 @@ public class ParkingServiceTest {
         assertEquals(captor.getValue().getOwner().getUsername(), mockedAccount.getUsername());
     }
 
-    @Test
-    public void whenDeletingOneDateLotsRepositoryCalled() {
-        recallSingleParking.setNumber(100);
-        recallSingleParking.setFreeFrom(mockDate);
-        recallSingleParking.setFreeTill(mockDate);
-
-        service.recallSingleParking(recallSingleParking);
-
-        ArgumentCaptor<RecallSingleParking> captor = ArgumentCaptor.forClass(RecallSingleParking.class);
-        verify(lotsRepository).recallSingleParking(captor.capture());
-
-        assertEquals(captor.getValue().getFreeFrom(),recallSingleParking.getFreeFrom());
-        assertEquals(captor.getValue().getFreeTill(),recallSingleParking.getFreeTill());
-    }
-
-    @Test(expected = ApplicationException.class)
-    public void whenOwnerRecallParkingLotWithEndDateInPast() throws ApplicationException{
-        SetUnusedRequest request = new SetUnusedRequest();
-        request.setNumber(mockedAccount.getParking().getNumber());
-        request.setFreeFrom(new Date(2016-1900,04,25));
-        request.setFreeTill(new Date(2016-1900,04,25));
-        given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(request,httpRequest);
-    }
-
-    @Test(expected = ApplicationException.class)
-    public void whenOwnerRecallParkingLotWithStartDateLaterThanEndDate() throws ApplicationException{
-        SetUnusedRequest request = new SetUnusedRequest();
-        request.setNumber(mockedAccount.getParking().getNumber());
-        request.setFreeFrom(new Date(2016-1900,04,30));
-        request.setFreeTill(new Date(2016-1900,04,29));
-        given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(request,httpRequest);
-    }
 }

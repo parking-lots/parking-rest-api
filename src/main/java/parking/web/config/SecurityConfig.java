@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import parking.security.ParkingAuthenticationProvider;
 import parking.security.HttpAuthenticationEntryPoint;
+import parking.security.ParkingAuthenticationProvider;
 
 @Configuration
 @EnableWebSecurity
@@ -38,9 +38,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.PUT, "/parking/available").hasRole("CAN_SHARE_PARKING")
                 .antMatchers(HttpMethod.PUT, "/parking/reserved").hasRole("CAN_ATTEND_PARKING")
-                .antMatchers(HttpMethod.PUT, "/profile/password").hasRole("CAN_ATTEND_PARKING")
+                .antMatchers(HttpMethod.POST, "/parking/remove").hasRole("CAN_SHARE_PARKING")
                 .antMatchers(HttpMethod.GET, "/parking/available").hasAnyRole("CAN_ATTEND_PARKING", "CAN_SHARE_PARKING")
+                .antMatchers(HttpMethod.PUT, "/profile/password").hasRole("CAN_ATTEND_PARKING")
                 .antMatchers(HttpMethod.POST, "/admin/user/create").hasRole("CAN_CREATE_NEW_USER")
+                .antMatchers(HttpMethod.PUT, "/admin/user/edit").hasRole("CAN_CREATE_NEW_USER")
                 .antMatchers(HttpMethod.GET, "/admin/users").hasAnyRole("CAN_CREATE_NEW_USER");
     }
 

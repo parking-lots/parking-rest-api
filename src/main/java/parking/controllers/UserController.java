@@ -1,13 +1,15 @@
 package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import parking.beans.request.ChangePassword;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
-import parking.helper.*;
 import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;

@@ -52,7 +52,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         availablePeriod.setFreeTill(request.getFreeTill());
 
         updateFields.addToSet("availablePeriods", availablePeriod);
-            operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
     @Override
@@ -74,8 +74,8 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         ));
 
         BasicDBObject obj = new BasicDBObject();
-        obj.put("freeFrom",recallSingleParking.getFreeFrom());
-        obj.put("freeTill",recallSingleParking.getFreeTill());
+        obj.put("freeFrom", recallSingleParking.getFreeFrom());
+        obj.put("freeTill", recallSingleParking.getFreeTill());
         updateFields.pull("availablePeriods", obj);
 
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);

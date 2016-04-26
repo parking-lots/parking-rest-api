@@ -26,7 +26,7 @@ public class SetUnusedRequest {
     }
 
     public void setFreeFrom(Date freeFrom) {
-        if (freeFrom == null){
+        if (freeFrom == null) {
             freeFrom = new Date();
             this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();// formatDateForDatabase(freeFrom).getTime();
         } else {
@@ -39,7 +39,7 @@ public class SetUnusedRequest {
     }
 
     public void setFreeTill(Date freeTill) {
-        if (freeTill == null){
+        if (freeTill == null) {
             freeTill = new Date();
             this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();// formatDateForDatabase(freeTill).getTime();
         } else {

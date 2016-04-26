@@ -36,17 +36,17 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<ErrorMessage> handleOccupiedEmailException(UserException e){
-        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorMessage> handleOccupiedEmailException(UserException e) {
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ParkingException.class)
-    public ResponseEntity<ErrorMessage> handleParkingException(ParkingException e){
-        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorMessage> handleParkingException(ParkingException e) {
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getErrorCause()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorMessage> handleNotReadableRequestException(HttpMessageNotReadableException e) {
-        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getMessage()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
