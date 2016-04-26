@@ -27,6 +27,7 @@ import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.RoleRepository;
+import parking.utils.ParkingerEnums;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -100,17 +101,17 @@ public class UserService {
 
     public void setRememberMeCookies(Account userAccount) {
         Cookie cookieUsername = new Cookie("username", userAccount.getUsername());
-        cookieUsername.setMaxAge(604800);
+        cookieUsername.setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
         response.addCookie(cookieUsername);
 
         Cookie cookiePassword = new Cookie("password", userAccount.getPassword());
-        cookiePassword.setMaxAge(604800);
+        cookiePassword.setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
         response.addCookie(cookiePassword);
     }
 
     public void setMaxInactiveIntervalForSession(HttpServletRequest request){
         HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(604800);
+        session.setMaxInactiveInterval(ParkingerEnums.SevenDaysInMilliseconds);
     }
 
     public void rememberMeLogin(String username, String password, HttpServletRequest request)
@@ -123,7 +124,7 @@ public class UserService {
 
                 for (int i = 0; i < cookies.length; i++) {
                     if (cookies[i].getName().equals("username") || cookies[i].getName().equals("password")) {
-                        cookies[i].setMaxAge(604800);
+                        cookies[i].setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
                     }
                 }
 
