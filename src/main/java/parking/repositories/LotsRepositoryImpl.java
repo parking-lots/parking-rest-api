@@ -45,7 +45,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     @Override
     public void freeOwnersParking(SetUnusedRequest request) {
         Query searchQuery = new Query(Criteria.where("number").is(request.getNumber()));
-
         Update updateFields = new Update();
 
         AvailablePeriod availablePeriod = new AvailablePeriod();
