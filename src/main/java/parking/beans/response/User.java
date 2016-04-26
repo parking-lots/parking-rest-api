@@ -1,38 +1,28 @@
 package parking.beans.response;
 
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Lina on 14/04/16.
- */
 public class User extends Response {
     private String fullName;
     private String username;
-    private String roleName;
-    private List<String> Roles = new ArrayList<>();
+    private List<String> roles = new ArrayList<>();
     private String number;
-    private ParkingLot parkingLot;
 
-    public User(Account account){
+    public User(Account account) {
         this.fullName = account.getFullName();
         this.username = account.getUsername();
-        if (account.getRoles().size() != 0) {
-            for (Role r : account.getRoles()) {
-                this.roleName = r.getName();
-                this.Roles.add(this.roleName);
+
+        if (!account.getRoles().isEmpty()) {
+            for (Role role : account.getRoles()) {
+                this.roles.add(role.getName());
             }
         }
 
-        parkingLot = new ParkingLot();
-        parkingLot = account.getParking();
-        this.number = (parkingLot==null) ? "" : (parkingLot.getNumber().toString());
-
+        this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
     }
 
     public String getFullName() {
@@ -60,10 +50,10 @@ public class User extends Response {
     }
 
     public List<String> getRoles() {
-        return Roles;
+        return roles;
     }
 
     public void setRoles(List<String> hasRoles) {
-        this.Roles = hasRoles;
+        this.roles = hasRoles;
     }
 }
