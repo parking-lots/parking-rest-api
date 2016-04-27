@@ -10,6 +10,8 @@ import parking.beans.document.Car;
 import parking.helper.ProfileHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,16 +45,8 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("email", request.getEmail());
         }
 
-        List<Car> carList = new ArrayList<>();
-        Car car;
-
-        for (Car c : request.getCarList()) {
-            if (c.getRegNo() != null) {
-                car = new Car();
-                car.setRegNo(c.getRegNo());
-                carList.add(car);
-                updateFields.set("carList", carList);
-            }
+        if (request.getCarList().size() > 0) {
+            updateFields.set("carList", request.getCarList());
         }
 
         operations.findAndModify(searchQuery, updateFields, Account.class);
