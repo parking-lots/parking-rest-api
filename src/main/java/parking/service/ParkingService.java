@@ -15,7 +15,6 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
-import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
@@ -35,8 +34,6 @@ public class ParkingService {
     private UserService userService;
     @Autowired
     private ExceptionHandler exceptionHandler;
-    @Autowired
-    private EliminateDateTimestamp eliminateDateTimestamp;
 
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
@@ -66,7 +63,13 @@ public class ParkingService {
         request.setNumber(parking.getNumber());
 
         Date currentDate = new Date();
-        Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(currentDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
 
         if (request.getFreeTill().compareTo(cal.getTime()) < 0) {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
