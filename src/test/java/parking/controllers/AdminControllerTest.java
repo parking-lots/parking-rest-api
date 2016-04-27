@@ -8,9 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
+import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.Parking;
 import parking.beans.response.User;
+import parking.builders.AccountBuilder;
 import parking.builders.LotsBuilder;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
@@ -83,5 +85,12 @@ public class AdminControllerTest {
         given(adminService.getUsers()).willReturn(mockedUserList);
         User returnUser = adminController.displayUsers(mock(HttpServletRequest.class)).get(0);
         assertThat(returnUser.getUsername(), is(mockedUserList.get(0).getUsername()));
+    }
+
+    @Test
+    public void whenEditUserShouldCallService() throws ApplicationException{
+        EditUserForm editUserForm = new EditUserForm();
+        editUserForm.setAccount(new AccountBuilder().build());
+        adminController.editUser(editUserForm,mock(HttpServletRequest.class));
     }
 }
