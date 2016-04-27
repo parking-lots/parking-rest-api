@@ -28,4 +28,8 @@ public class AdminService {
 
         accountRepository.editAccount(account);
     }
+
+    public Long deleteUser(String username) {
+        return accountRepository.deleteByUsername(username);
+    }
 }

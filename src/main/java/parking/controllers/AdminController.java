@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.Profile;
@@ -41,5 +42,10 @@ public class AdminController {
     @RequestMapping(value = "/user/edit", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, HttpServletRequest request) throws ApplicationException {
         adminService.editUser(form.getAccount(), request);
+    }
+
+    @RequestMapping(value="/user/delete", method = RequestMethod.DELETE)
+    public Long deleteUser(@Valid @RequestBody DeleteUser request){
+        return adminService.deleteUser(request.getUsername());
     }
 }

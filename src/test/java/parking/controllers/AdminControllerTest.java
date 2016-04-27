@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
+import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.Parking;
@@ -92,5 +93,12 @@ public class AdminControllerTest {
         EditUserForm editUserForm = new EditUserForm();
         editUserForm.setAccount(new AccountBuilder().build());
         adminController.editUser(editUserForm,mock(HttpServletRequest.class));
+    }
+
+    @Test
+    public void whenDeleteUserCallService() {
+        DeleteUser request = new DeleteUser();
+        request.setUsername("nickname");
+        adminController.deleteUser(request);
     }
 }

@@ -56,4 +56,10 @@ public class AdminServiceTest {
         service.editUser(mockedAccount, request);
         verify(accountRepository).editAccount(any(Account.class));
     }
+
+    @Test
+    public void whenDeleteUser(){
+        service.deleteUser(mockedAccount.getUsername());
+        verify(accountRepository).deleteByUsername(any(String.class));
+    }
 }
