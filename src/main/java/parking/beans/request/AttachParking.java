@@ -1,8 +1,5 @@
 package parking.beans.request;
 
-/**
- * Created by Lina on 28/04/16.
- */
 public class AttachParking {
     Integer lotNumber;
     String username;

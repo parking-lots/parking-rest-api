@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.EditUserForm;
@@ -32,15 +33,22 @@ public class AdminServiceTest {
     private AccountRepository accountRepository;
 
     private Account mockedAccount;
+    private ParkingLot mockedParkingLot;
     private List<Account> mockedAccountList = new ArrayList<>();
     private HttpServletRequest request = mock(HttpServletRequest.class);
 
 
     @Before
     public void initData() {
+        mockedParkingLot = new ParkingLot();
+        mockedParkingLot.setNumber(200);
+        mockedParkingLot.setFloor(-1);
+        mockedParkingLot.setOwner(mockedAccount);
+
         mockedAccount = new Account();
         mockedAccount.setFullName("Tom Tomsson");
         mockedAccount.setUsername("tom111");
+        mockedAccount.setParking(mockedParkingLot);
         mockedAccountList.add(mockedAccount);
 
         given(accountRepository.findAll()).willReturn(mockedAccountList);
@@ -61,5 +69,10 @@ public class AdminServiceTest {
     public void whenDeleteUser(){
         service.deleteUser(mockedAccount.getUsername());
         verify(accountRepository).deleteByUsername(any(String.class));
+    }
+
+    @Test
+    public void whenAttachParking(){
+        service.attachParking(mockedAccount.getParking().getNumber(), mockedAccount.getUsername());
     }
 }

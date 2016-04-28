@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
+import parking.beans.request.AttachParking;
 import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
@@ -100,5 +101,11 @@ public class AdminControllerTest {
         DeleteUser request = new DeleteUser();
         request.setUsername("nickname");
         adminController.deleteUser(request);
+    }
+
+    @Test
+    public void whenAttachParking() {
+        AttachParking request = new AttachParking();
+        adminController.attachParking(request);
     }
 }
