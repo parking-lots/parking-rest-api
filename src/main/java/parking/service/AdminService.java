@@ -3,7 +3,6 @@ package parking.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
-import parking.beans.request.AttachParking;
 import parking.beans.response.User;
 import parking.repositories.AccountRepository;
 
@@ -37,5 +36,9 @@ public class AdminService {
 
     public void attachParking(Integer lotNumber, String username) {
         accountRepository.attachParking(lotNumber, username);
+    }
+
+    public void removeParkingFromUser(String username){
+        accountRepository.removeParking(username);
     }
 }

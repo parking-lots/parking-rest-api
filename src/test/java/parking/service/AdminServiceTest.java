@@ -75,4 +75,9 @@ public class AdminServiceTest {
     public void whenAttachParking(){
         service.attachParking(mockedAccount.getParking().getNumber(), mockedAccount.getUsername());
     }
+
+    @Test
+    public void whenRemoveParkingFromUser(){
+        service.removeParkingFromUser(mockedAccount.getUsername());
+    }
 }

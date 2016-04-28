@@ -8,14 +8,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
-import parking.beans.request.AttachParking;
+import parking.beans.request.alterParking;
 import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
-import parking.beans.response.Parking;
 import parking.beans.response.User;
 import parking.builders.AccountBuilder;
-import parking.builders.LotsBuilder;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
@@ -30,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -105,7 +102,13 @@ public class AdminControllerTest {
 
     @Test
     public void whenAttachParking() {
-        AttachParking request = new AttachParking();
+        alterParking request = new alterParking();
         adminController.attachParking(request);
+    }
+
+    @Test
+    public void whenRemoveParking() {
+        alterParking request = new alterParking();
+        adminController.removeParking(request);
     }
 }

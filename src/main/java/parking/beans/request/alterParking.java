@@ -1,6 +1,6 @@
 package parking.beans.request;
 
-public class AttachParking {
+public class alterParking {
     Integer lotNumber;
     String username;
 

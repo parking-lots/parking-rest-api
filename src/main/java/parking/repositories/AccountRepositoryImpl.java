@@ -56,7 +56,6 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 
-    @Override
     public void attachParking(Integer lotNumber, String username) {
         Query searchQuery = new Query(Criteria.where("username").is(username));
 
@@ -64,6 +63,14 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         ParkingLot parking = lotsRepository.findByNumber(lotNumber);
 
         updateFields.set("parking", parking);
+        operations.findAndModify(searchQuery, updateFields, Account.class);
+    }
+
+    public void removeParking(String username) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
+        Update updateFields = new Update();
+
+        updateFields.unset("parking");
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 }
