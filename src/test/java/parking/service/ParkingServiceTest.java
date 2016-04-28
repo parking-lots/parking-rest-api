@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
-import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
@@ -22,11 +21,9 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
-import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,8 +57,6 @@ public class ParkingServiceTest {
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
-    private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-    private Date mockDate = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
 
     @Before
     public void initMock() throws ApplicationException {
@@ -229,19 +224,4 @@ public class ParkingServiceTest {
         assertEquals(captor.getValue().getOwner().getUsername(), mockedAccount.getUsername());
     }
 
-    @Test
-    public void whenDeletingOneDateLotsRepositoryCalled() {
-        RecallSingleParking recallSingleParking = new RecallSingleParking();
-        recallSingleParking.setNumber(100);
-        recallSingleParking.setFreeFrom(mockDate);
-        recallSingleParking.setFreeTill(mockDate);
-
-        service.recallSingleParking(recallSingleParking);
-
-        ArgumentCaptor<RecallSingleParking> captor = ArgumentCaptor.forClass(RecallSingleParking.class);
-        verify(lotsRepository).recallSingleParking(captor.capture());
-
-        assertEquals(captor.getValue().getFreeFrom(),recallSingleParking.getFreeFrom());
-        assertEquals(captor.getValue().getFreeTill(),recallSingleParking.getFreeTill());
-    }
 }
