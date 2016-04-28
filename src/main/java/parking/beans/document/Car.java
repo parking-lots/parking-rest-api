@@ -11,12 +11,21 @@ import javax.validation.constraints.Size;
 @Document(collection = "car")
 public class Car {
 
+
     @Id
     private ObjectId id;
     @Size(min = 6, max = 15)
     @Pattern(regexp = "^[A-Za-z0-9]*$")
     private String regNo;
     private String model;
+
+    public Car() {
+    }
+
+    public Car(Car car) {
+        this.regNo = car.getRegNo();
+        this.model = car.getModel();
+    }
 
     public ObjectId getId() {
         return id;
