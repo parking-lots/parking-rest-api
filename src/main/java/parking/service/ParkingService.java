@@ -15,6 +15,7 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
+import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
@@ -34,6 +35,8 @@ public class ParkingService {
     private UserService userService;
     @Autowired
     private ExceptionHandler exceptionHandler;
+    @Autowired
+    private EliminateDateTimestamp eliminateDateTimestamp;
 
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
@@ -43,7 +46,7 @@ public class ParkingService {
         List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
 
         // Check if current user using one of parking
-        List<ParkingLot> filteredLots = parkingLots.stream()
+        List<ParkingLot> filteredLots =  parkingLots.stream()
                 .filter(val -> val.getUser() != null && currentUser.getUsername().equals(val.getUser().getUsername()))
                 .collect(Collectors.toList());
 
@@ -57,23 +60,19 @@ public class ParkingService {
     public void freeOwnersParking(SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
 
         ParkingLot parking = getParkingNumberByUser();
-        if (parking == null) {
+        if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
         request.setNumber(parking.getNumber());
 
         Date currentDate = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(currentDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
 
-
-        if (request.getFreeTill().compareTo(cal.getTime()) < 0) {
+        if (request.getFreeTill().compareTo(cal.getTime()) < 0)
+        {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
-        } else if (request.getFreeFrom().compareTo(request.getFreeTill()) > 0) {
+        }
+        else if (request.getFreeFrom().compareTo(request.getFreeTill())>0){
             throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
         }
 
@@ -82,7 +81,7 @@ public class ParkingService {
 
     public void recallParking() {
         ParkingLot parking = getParkingNumberByUser();
-        if (parking == null) {
+        if(parking == null){
             return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
         }
         ParkingNumberRequest request = new ParkingNumberRequest();
@@ -101,11 +100,11 @@ public class ParkingService {
     public ParkingLot createLot(ParkingLot parkingLot, HttpServletRequest request) throws ApplicationException {
         ParkingLot existParkingLot;
         try {
-            existParkingLot = getParkingByNumber(parkingLot.getNumber(), request);
+            existParkingLot =  getParkingByNumber(parkingLot.getNumber(), request);
         } catch (ApplicationException e) {
             existParkingLot = null;
         }
-        if (Optional.ofNullable(existParkingLot).isPresent()) {
+        if(Optional.ofNullable(existParkingLot).isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, request);
         }
         parkingLot.setId(new ObjectId());
