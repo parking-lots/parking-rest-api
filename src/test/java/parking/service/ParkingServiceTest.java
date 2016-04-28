@@ -108,6 +108,9 @@ public class ParkingServiceTest {
     public void whenOwnerFreeUpParkingLot() throws ApplicationException {
 
         SetUnusedRequest request = new SetUnusedRequest();
+        request.setNumber(200);
+        request.setFreeFrom(new Date());
+        request.setFreeTill(new Date());
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
         service.freeOwnersParking(request, httpRequest);
 
