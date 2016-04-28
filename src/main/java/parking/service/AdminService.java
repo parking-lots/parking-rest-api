@@ -30,6 +30,11 @@ public class AdminService {
     }
 
     public Long deleteUser(String username) {
+
         return accountRepository.deleteByUsername(username);
+    }
+
+    public void attachParking(Integer lotNumber) {
+
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
+import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.Profile;
 import parking.beans.response.User;
@@ -47,5 +48,10 @@ public class AdminController {
     @RequestMapping(value="/user/delete", method = RequestMethod.DELETE)
     public Long deleteUser(@Valid @RequestBody DeleteUser request){
         return adminService.deleteUser(request.getUsername());
+    }
+
+    @RequestMapping(value="/user/attach-parking", method = RequestMethod.POST)
+    public void attachParking(@Valid @RequestBody ParkingNumberRequest request){
+        adminService.attachParking(request.getNumber());
     }
 }
