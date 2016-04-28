@@ -24,6 +24,7 @@ import parking.repositories.LotsRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,6 +104,9 @@ public class ParkingServiceTest {
     public void whenOwnerFreeUpParkingLot() throws ApplicationException {
 
         SetUnusedRequest request = new SetUnusedRequest();
+        request.setNumber(200);
+        request.setFreeFrom(new Date());
+        request.setFreeTill(new Date());
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
         service.freeOwnersParking(request, httpRequest);
 
