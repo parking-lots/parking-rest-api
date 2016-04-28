@@ -35,7 +35,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<User> displayUsers(HttpServletRequest request) throws UserException, ApplicationException {
+    public List<User> displayUsers(HttpServletRequest request) throws ApplicationException {
         return adminService.getUsers();
     }
 
