@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-@ApplicationPath("/")
 public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
