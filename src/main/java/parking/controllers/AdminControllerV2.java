@@ -3,22 +3,18 @@ package parking.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.ParkingLot;
-import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
-import parking.beans.request.alterParking;
 import parking.beans.response.Profile;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
 import parking.service.AdminService;
-import parking.service.AdminServiceV2;
 import parking.service.RegistrationService;
 import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,7 +24,7 @@ public class AdminControllerV2 {
     private RegistrationService registrationService;
 
     @Autowired
-    private AdminServiceV2 adminService;
+    private AdminService adminService;
 
     @RequestMapping(value = "/users", method = RequestMethod.PUT)
     public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws UserException, ApplicationException {

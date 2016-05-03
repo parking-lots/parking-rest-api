@@ -15,9 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by Lina on 25/04/16.
- */
 public class AccountRepositoryImpl implements CustomAccountRepository {
 
     private final MongoOperations operations;
@@ -31,23 +28,23 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public LotsRepository lotsRepository;
 
     @Override
-    public void editAccount(Account request) {
-        Query searchQuery = new Query(Criteria.where("username").is(request.getUsername()));
+    public void editAccount(Account account) {
+        Query searchQuery = new Query(Criteria.where("username").is(account.getUsername()));
 
         Update updateFields = new Update();
 
-        if (request.getFullName() != null) {
-            updateFields.set("fullName", request.getFullName());
+        if (account.getFullName() != null) {
+            updateFields.set("fullName", account.getFullName());
         }
-        if (request.getPassword() != null) {
-            updateFields.set("password", (ProfileHelper.encryptPassword(request.getPassword())));
+        if (account.getPassword() != null) {
+            updateFields.set("password", (ProfileHelper.encryptPassword(account.getPassword())));
         }
-        if (request.getEmail() != null) {
-            updateFields.set("email", request.getEmail());
+        if (account.getEmail() != null) {
+            updateFields.set("email", account.getEmail());
         }
 
-        if (request.getCarList().size() > 0) {
-            updateFields.set("carList", request.getCarList());
+        if (account.getCarList().size() > 0) {
+            updateFields.set("carList", account.getCarList());
         }
 
         operations.findAndModify(searchQuery, updateFields, Account.class);

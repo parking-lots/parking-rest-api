@@ -3,8 +3,11 @@ package parking.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 import parking.beans.response.User;
 import parking.repositories.AccountRepository;
+import parking.repositories.LotsRepository;
+import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -15,6 +18,9 @@ public class AdminService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private LotsRepository lotsRepository;
 
     public List<User> getUsers() {
 
@@ -40,5 +46,11 @@ public class AdminService {
 
     public void removeParkingFromUser(String username){
         accountRepository.removeParking(username);
+    }
+
+    public List<ParkingLot> getParkings(ParkingType type) {
+
+        if (type == null) return lotsRepository.findAll();
+        return lotsRepository.findParking(type);
     }
 }

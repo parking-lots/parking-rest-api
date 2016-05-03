@@ -55,7 +55,7 @@ public class ParkingController {
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.DELETE)
-    public void cancelRezervation(HttpServletRequest request) throws ApplicationException {
-        parkingService.cancelRezervation(request);
+    public void cancelReservation(HttpServletRequest request) throws ApplicationException {
+        parkingService.cancelReservation(request);
     }
 }

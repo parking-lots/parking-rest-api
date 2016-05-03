@@ -117,7 +117,7 @@ public class ParkingService {
         return parkingLot.get();
     }
 
-    public void cancelRezervation(HttpServletRequest request) throws ApplicationException {
+    public void cancelReservation(HttpServletRequest request) throws ApplicationException {
         lotsRepository.cancelReservation(userService.getCurrentUser(request));
     }
 
