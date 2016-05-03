@@ -20,4 +20,6 @@ public interface CustomLotsRepository {
     public void reserve(ParkingNumberRequest request, Account user);
 
     public void cancelReservation(Account user);
+
+    public List<ParkingLot> findUnassignedParking();
 }

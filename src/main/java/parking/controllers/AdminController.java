@@ -42,18 +42,8 @@ public class AdminController {
         adminService.editUser(form.getAccount(), request);
     }
 
-    @RequestMapping(value="/user/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value="/users", method = RequestMethod.DELETE)
     public Long deleteUser(@Valid @RequestBody DeleteUser request){
         return adminService.deleteUser(request.getUsername());
-    }
-
-    @RequestMapping(value="/user/attach-parking", method = RequestMethod.POST)
-    public void attachParking(@Valid @RequestBody alterParking request){
-        adminService.attachParking(request.getLotNumber(), request.getUsername());
-    }
-
-    @RequestMapping(value="/user/remove-parking", method = RequestMethod.DELETE)
-    public void removeParking(@Valid @RequestBody alterParking request){
-        adminService.removeParkingFromUser(request.getUsername());
     }
 }

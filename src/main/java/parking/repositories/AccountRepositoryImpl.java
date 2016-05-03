@@ -36,9 +36,6 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         Update updateFields = new Update();
 
-        if (request.getUsername() != null) {
-            updateFields.set("username", request.getUsername());
-        }
         if (request.getFullName() != null) {
             updateFields.set("fullName", request.getFullName());
         }

@@ -104,4 +104,11 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         updateFields.unset("reserved");
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
+
+    public List<ParkingLot> findUnassignedParking() {
+        Query searchQuery = new Query(Criteria.where("owner").is(null));
+
+        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+        return lots;
+    }
 }
