@@ -51,7 +51,7 @@ public class ParkingController {
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
     public void reserveOwnersParking(@Valid @RequestBody ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.reserve(request, httpRequest);
+        parkingService.reserve(request.getNumber(), httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.DELETE)

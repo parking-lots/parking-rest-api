@@ -7,18 +7,19 @@ import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.utils.ParkingType;
 
+import java.util.Date;
 import java.util.List;
 
 public interface CustomLotsRepository {
     public List<ParkingLot> searchAllFields(Account user);
 
-    public void freeOwnersParking(SetUnusedRequest request);
+    public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill);
 
-    public void recallParking(ParkingNumberRequest request);
+    public void recallParking(Integer lotNumber);
 
-    public void recallSingleParking(RecallSingleParking recallSingleParking);
+    public void recallSingleParking(Integer lotNumber, Date freeFrom, Date freeTill);
 
-    public void reserve(ParkingNumberRequest request, Account user);
+    public void reserve(Integer lotNumber, Account user);
 
     public void cancelReservation(Account user);
 

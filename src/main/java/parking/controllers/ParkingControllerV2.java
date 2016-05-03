@@ -41,8 +41,8 @@ public class ParkingControllerV2 {
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)
-    public void reserveOwnersParking(@Valid @RequestBody ParkingNumberRequest request, @PathVariable(value = "lotNumber") Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.reserve(request, httpRequest);
+    public void reserveOwnersParking(@PathVariable(value = "lotNumber") Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
+        parkingService.reserve(lotNumber, httpRequest);
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.DELETE)

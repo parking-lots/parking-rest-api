@@ -73,7 +73,7 @@ public class ParkingService {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         }
         else {
-            lotsRepository.freeOwnersParking(request);
+            lotsRepository.freeOwnersParking(request.getNumber(), request.getFreeFrom(), request.getFreeTill());
         }
     }
 
@@ -84,15 +84,15 @@ public class ParkingService {
         }
         ParkingNumberRequest request = new ParkingNumberRequest();
         request.setNumber(parking.getNumber());
-        lotsRepository.recallParking(request);
+        lotsRepository.recallParking(request.getNumber());
     }
 
     public void recallSingleParking(RecallSingleParking recallSingleParking) {
-        lotsRepository.recallSingleParking(recallSingleParking);
+        lotsRepository.recallSingleParking(recallSingleParking.getNumber(), recallSingleParking.getFreeFrom(), recallSingleParking.getFreeTill());
     }
 
-    public void reserve(ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        lotsRepository.reserve(request, userService.getCurrentUser(httpRequest));
+    public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
+        lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest));
     }
 
     public ParkingLot createLot(ParkingLot parkingLot, HttpServletRequest request) throws ApplicationException {
