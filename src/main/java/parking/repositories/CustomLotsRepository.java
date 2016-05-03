@@ -5,6 +5,7 @@ import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
+import parking.utils.ParkingType;
 
 import java.util.List;
 
@@ -21,5 +22,5 @@ public interface CustomLotsRepository {
 
     public void cancelReservation(Account user);
 
-    public List<ParkingLot> findUnassignedParking();
+    public List<ParkingLot> findParking(ParkingType type);
 }

@@ -13,6 +13,7 @@ import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.helper.ToolHelper;
+import parking.utils.ParkingType;
 
 import java.util.Date;
 import java.util.List;
@@ -105,8 +106,16 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
-    public List<ParkingLot> findUnassignedParking() {
-        Query searchQuery = new Query(Criteria.where("owner").is(null));
+    @Override
+    public List<ParkingLot> findParking(ParkingType type) {
+        Query searchQuery;
+
+        if(type.equals(ParkingType.unassigned)) {
+            searchQuery = new Query(Criteria.where("owner").is(null));
+        }
+        else {
+            searchQuery = new Query();
+        }
 
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
         return lots;

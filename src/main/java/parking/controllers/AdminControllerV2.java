@@ -14,6 +14,7 @@ import parking.exceptions.UserException;
 import parking.service.AdminService;
 import parking.service.AdminServiceV2;
 import parking.service.RegistrationService;
+import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -49,8 +50,8 @@ public class AdminControllerV2 {
         return adminService.deleteUser(username);
     }
 
-    @RequestMapping(value = "/users/parkings/{type}", method = RequestMethod.GET)
-    public List<ParkingLot> getParkings(@PathVariable(value = "type") String type){
+    @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)
+    public List<ParkingLot> getParkings(@PathVariable(value = "type") ParkingType type){
         return adminService.getParkings(type);
     }
 }

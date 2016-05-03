@@ -7,6 +7,7 @@ import parking.beans.document.ParkingLot;
 import parking.beans.response.User;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
+import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -46,14 +47,9 @@ public class AdminServiceV2 {
         accountRepository.removeParking(username);
     }
 
-    public List<ParkingLot> getParkings(String type) {
+    public List<ParkingLot> getParkings(ParkingType type) {
 
-        if (type != null) {
-            switch (type) {
-                case "unassigned": return lotsRepository.findUnassignedParking();
-            }
-        }
-
-        return lotsRepository.findAll();
+        if (type == null) return lotsRepository.findAll();
+        return lotsRepository.findParking(type);
     }
 }
