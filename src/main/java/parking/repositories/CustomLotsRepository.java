@@ -15,9 +15,9 @@ public interface CustomLotsRepository {
 
     public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill);
 
-    public void recallParking(Integer lotNumber);
+    //public void recallParking(Integer lotNumber);
 
-    public void recallSingleParking(Integer lotNumber, Date freeFrom, Date freeTill);
+    public void recallParking(Integer lotNumber, Date freeFrom, Date freeTill);
 
     public void reserve(Integer lotNumber, Account user);
 

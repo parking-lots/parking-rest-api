@@ -56,28 +56,33 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
-    @Override
-    public void recallParking(Integer lotNumber) {
-        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
-        Update updateFields = new Update();
-        updateFields.unset("availablePeriods");
-        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-    }
+//    @Override
+//    public void recallParking(Integer lotNumber) {
+//        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
+//        Update updateFields = new Update();
+//        updateFields.unset("availablePeriods");
+//        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+//    }
 
     @Override
-    public void recallSingleParking(Integer lotNumber, Date freeFrom, Date freeTill) {
+    public void recallParking(Integer lotNumber, Date freeFrom, Date freeTill) {
         Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
         Update updateFields = new Update();
 
-        searchQuery.addCriteria(new Criteria().andOperator(
-                Criteria.where("availablePeriods.freeFrom").is(freeFrom),
-                Criteria.where("availablePeriods.freeTill").is(freeTill)
-        ));
+        if(freeFrom == null && freeTill == null) {
+            updateFields.unset("availablePeriods");
+        }
+        else {
+            searchQuery.addCriteria(new Criteria().andOperator(
+                    Criteria.where("availablePeriods.freeFrom").is(freeFrom),
+                    Criteria.where("availablePeriods.freeTill").is(freeTill)
+            ));
 
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("freeFrom", freeFrom);
-        obj.put("freeTill", freeTill);
-        updateFields.pull("availablePeriods", obj);
+            BasicDBObject obj = new BasicDBObject();
+            obj.put("freeFrom", freeFrom);
+            obj.put("freeTill", freeTill);
+            updateFields.pull("availablePeriods", obj);
+        }
 
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }

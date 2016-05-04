@@ -69,7 +69,7 @@ public class ParkingService {
         if (request.getFreeFrom().compareTo(request.getFreeTill()) > 0){
             throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
         }
-        else if ((request.getFreeTill().compareTo(cal.getTime()) > 0) && (request.getFreeFrom().compareTo(request.getFreeTill()) < 1)) {
+        else if ((request.getFreeTill().compareTo(cal.getTime()) < 0) && (request.getFreeFrom().compareTo(request.getFreeTill()) < 1)) {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         }
         else {
@@ -77,18 +77,18 @@ public class ParkingService {
         }
     }
 
-    public void recallParking() {
-        ParkingLot parking = getParkingNumberByUser();
-        if(parking == null){
-            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
-        }
-        ParkingNumberRequest request = new ParkingNumberRequest();
-        request.setNumber(parking.getNumber());
-        lotsRepository.recallParking(request.getNumber());
-    }
+//    public void recallParking() {
+//        ParkingLot parking = getParkingNumberByUser();
+//        if(parking == null){
+//            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
+//        }
+//        ParkingNumberRequest request = new ParkingNumberRequest();
+//        request.setNumber(parking.getNumber());
+//        lotsRepository.recallParking(request.getNumber());
+//    }
 
-    public void recallSingleParking(RecallSingleParking recallSingleParking) {
-        lotsRepository.recallSingleParking(recallSingleParking.getNumber(), recallSingleParking.getFreeFrom(), recallSingleParking.getFreeTill());
+    public void recallParking(RecallSingleParking recallSingleParking) {
+        lotsRepository.recallParking(recallSingleParking.getNumber(), recallSingleParking.getFreeFrom(), recallSingleParking.getFreeTill());
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {

@@ -34,14 +34,14 @@ public class ParkingController {
                 .collect(Collectors.<Parking>toList());
     }
 
-    @RequestMapping(value = "/available", method = RequestMethod.DELETE)
-    public void recallParking() {
-        parkingService.recallParking();
-    }
+//    @RequestMapping(value = "/available", method = RequestMethod.DELETE)
+//    public void recallParking() {
+//        parkingService.recallParking();
+//    }
 
-    @RequestMapping(value = "/remove", method = RequestMethod.POST)
+    @RequestMapping(value = "/available", method = RequestMethod.DELETE)
     public void recallSingleParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
-        parkingService.recallSingleParking(recallSingleParking);
+        parkingService.recallParking(recallSingleParking);
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)

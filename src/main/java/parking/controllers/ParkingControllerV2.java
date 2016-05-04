@@ -37,7 +37,7 @@ public class ParkingControllerV2 {
 
     @RequestMapping(value = "/availability", method = RequestMethod.DELETE)
     public void recallParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
-        parkingService.recallParking();
+        parkingService.recallParking(recallSingleParking);
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)
