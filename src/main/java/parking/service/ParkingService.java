@@ -77,16 +77,6 @@ public class ParkingService {
         }
     }
 
-//    public void recallParking() {
-//        ParkingLot parking = getParkingNumberByUser();
-//        if(parking == null){
-//            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
-//        }
-//        ParkingNumberRequest request = new ParkingNumberRequest();
-//        request.setNumber(parking.getNumber());
-//        lotsRepository.recallParking(request.getNumber());
-//    }
-
     public void recallParking(RecallSingleParking recallSingleParking) {
         lotsRepository.recallParking(recallSingleParking.getNumber(), recallSingleParking.getFreeFrom(), recallSingleParking.getFreeTill());
     }
