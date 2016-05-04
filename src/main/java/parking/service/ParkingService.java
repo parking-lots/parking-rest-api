@@ -69,7 +69,7 @@ public class ParkingService {
         if (request.getFreeFrom().compareTo(request.getFreeTill()) > 0){
             throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
         }
-        else if ((request.getFreeTill().compareTo(cal.getTime()) > 0) && (request.getFreeFrom().compareTo(request.getFreeTill()) < 1)) {
+        else if ((request.getFreeTill().compareTo(cal.getTime()) < 0) && (request.getFreeFrom().compareTo(request.getFreeTill()) < 1)) {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         }
         else {
