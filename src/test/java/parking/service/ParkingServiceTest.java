@@ -114,11 +114,10 @@ public class ParkingServiceTest {
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
         service.freeOwnersParking(request, httpRequest);
 
-        //ArgumentCaptor captor = ArgumentCaptor.forClass(SetUnusedRequest.class);
-        verify(lotsRepository).freeOwnersParking(request.getNumber(), request.getFreeFrom(), request.getFreeTill());
-
-        //SetUnusedRequest value = (SetUnusedRequest) captor.getValue();
-        //assertEquals(value.getNumber(), mockedAccount.getParking().getNumber());
+        verify(lotsRepository).freeOwnersParking(
+                eq(mockedAccount.getParking().getNumber()),
+                eq(request.getFreeFrom()),
+                eq(request.getFreeTill()));
     }
 
     @Test
