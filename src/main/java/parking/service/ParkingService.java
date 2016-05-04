@@ -77,7 +77,11 @@ public class ParkingService {
     }
 
     public void recallParking(RecallParking recallParking) {
-        lotsRepository.recallParking(recallParking.getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
+        ParkingLot parking = getParkingNumberByUser();
+        if(parking == null){
+            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
+        }
+        lotsRepository.recallParking(parking.getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {

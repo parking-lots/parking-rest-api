@@ -108,7 +108,7 @@ public class ParkingServiceTest {
     public void whenOwnerFreeUpParkingLot() throws ApplicationException {
 
         SetUnusedRequest request = new SetUnusedRequest();
-        request.setNumber(200);
+        request.setNumber(mockedAccount.getParking().getNumber());
         request.setFreeFrom(new Date());
         request.setFreeTill(new Date());
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
@@ -135,7 +135,6 @@ public class ParkingServiceTest {
     @Test
     public void whenOwnerRecallParkingLot() {
         RecallParking recallParking = new RecallParking();
-        recallParking.setNumber(100);
         recallParking.setFreeFrom(mockDate);
         recallParking.setFreeTill(mockDate);
 
@@ -144,33 +143,29 @@ public class ParkingServiceTest {
         service.recallParking(recallParking);
 
        // ArgumentCaptor captor = ArgumentCaptor.forClass(ParkingNumberRequest.class);
-        verify(lotsRepository).recallParking(recallParking.getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
+        verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
 
        // ParkingNumberRequest value = (ParkingNumberRequest) captor.getValue();
        //
-        assertEquals(recallParking.getNumber(), mockedAccount.getParking().getNumber());
+        assertEquals(mockedAccount.getParking().getNumber(), mockedAccount.getParking().getNumber());
     }
 
     @Test
     public void whenCustomerDoesNotHaveParkingAssignedAndTryRecall() {
         RecallParking recallParking = new RecallParking();
-        recallParking.setNumber(200);
-        recallParking.setFreeFrom(new Date());
-        recallParking.setFreeTill(new Date());
 
         mockedAccount.setParking(null);
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
         service.recallParking(recallParking);
-        verify(lotsRepository, never()).recallParking(recallParking.getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
+        verify(lotsRepository, never()).recallParking(200, recallParking.getFreeFrom(), recallParking.getFreeTill());
     }
 
     @Test
     public void whenUserReserveParkingLot() throws ApplicationException {
-        Integer lotNumber = 200;
 
-        service.reserve(lotNumber, httpRequest);
-        verify(lotsRepository).reserve(lotNumber, mockedAccount);
+        service.reserve(mockedAccount.getParking().getNumber(), httpRequest);
+        verify(lotsRepository).reserve(mockedAccount.getParking().getNumber(), mockedAccount);
     }
 
     @Test

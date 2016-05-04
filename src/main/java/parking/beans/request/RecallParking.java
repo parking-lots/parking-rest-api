@@ -6,20 +6,11 @@ import parking.utils.EliminateDateTimestamp;
 import java.util.Date;
 
 public class RecallParking {
-    private Integer number;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeTill;
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-
-    public Integer getNumber() {
-        return number;
-    }
-
-    public void setNumber(Integer number) {
-        this.number = number;
-    }
 
     public Date getFreeFrom() {
         return freeFrom;
