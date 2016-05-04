@@ -3,8 +3,7 @@ package parking.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.ParkingLot;
-import parking.beans.request.ParkingNumberRequest;
-import parking.beans.request.RecallSingleParking;
+import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
@@ -36,8 +35,8 @@ public class ParkingControllerV2 {
     }
 
     @RequestMapping(value = "/availability", method = RequestMethod.DELETE)
-    public void recallParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
-        parkingService.recallParking(recallSingleParking);
+    public void recallParking(@Valid @RequestBody RecallParking recallParking) {
+        parkingService.recallParking(recallParking);
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)

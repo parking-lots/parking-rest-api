@@ -99,16 +99,4 @@ public class AdminControllerTest {
         request.setUsername("nickname");
         adminController.deleteUser(request);
     }
-
-    @Test
-    public void whenAttachParking() {
-        alterParking request = new alterParking();
-        adminController.attachParking(request);
-    }
-
-    @Test
-    public void whenRemoveParking() {
-        alterParking request = new alterParking();
-        adminController.removeParking(request);
-    }
 }

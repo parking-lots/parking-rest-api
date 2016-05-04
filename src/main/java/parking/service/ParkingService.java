@@ -7,8 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
-import parking.beans.request.ParkingNumberRequest;
-import parking.beans.request.RecallSingleParking;
+import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -77,8 +76,8 @@ public class ParkingService {
         }
     }
 
-    public void recallParking(RecallSingleParking recallSingleParking) {
-        lotsRepository.recallParking(recallSingleParking.getNumber(), recallSingleParking.getFreeFrom(), recallSingleParking.getFreeTill());
+    public void recallParking(RecallParking recallParking) {
+        lotsRepository.recallParking(recallParking.getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {

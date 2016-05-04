@@ -5,7 +5,7 @@ import parking.utils.EliminateDateTimestamp;
 
 import java.util.Date;
 
-public class RecallSingleParking {
+public class RecallParking {
     private Integer number;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom;

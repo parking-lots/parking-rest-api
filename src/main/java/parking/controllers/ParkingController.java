@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
-import parking.beans.request.RecallSingleParking;
+import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
@@ -35,8 +35,8 @@ public class ParkingController {
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
-    public void recallSingleParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
-        parkingService.recallParking(recallSingleParking);
+    public void recallParking(@Valid @RequestBody RecallParking recallParking) {
+        parkingService.recallParking(recallParking);
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
