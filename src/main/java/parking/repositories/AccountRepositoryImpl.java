@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
 import parking.beans.document.Car;
+import parking.beans.document.ParkingLot;
 import parking.helper.ProfileHelper;
 
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public AccountRepositoryImpl(MongoOperations operations) {
         this.operations = operations;
     }
+
+    @Autowired
+    public LotsRepository lotsRepository;
 
     @Override
     public void editAccount(Account request) {
@@ -49,6 +53,24 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carList", request.getCarList());
         }
 
+        operations.findAndModify(searchQuery, updateFields, Account.class);
+    }
+
+    public void attachParking(Integer lotNumber, String username) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
+
+        Update updateFields = new Update();
+        ParkingLot parking = lotsRepository.findByNumber(lotNumber);
+
+        updateFields.set("parking", parking);
+        operations.findAndModify(searchQuery, updateFields, Account.class);
+    }
+
+    public void removeParking(String username) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
+        Update updateFields = new Update();
+
+        updateFields.unset("parking");
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 }

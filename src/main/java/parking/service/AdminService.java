@@ -30,6 +30,15 @@ public class AdminService {
     }
 
     public Long deleteUser(String username) {
+
         return accountRepository.deleteByUsername(username);
+    }
+
+    public void attachParking(Integer lotNumber, String username) {
+        accountRepository.attachParking(lotNumber, username);
+    }
+
+    public void removeParkingFromUser(String username){
+        accountRepository.removeParking(username);
     }
 }
