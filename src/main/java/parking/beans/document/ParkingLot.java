@@ -24,6 +24,7 @@ public class ParkingLot extends Response {
     @Min(-2)
     private Integer floor;
     private LinkedList<AvailablePeriod> availablePeriods;
+    private LinkedList<Date> availableDates;
     private Boolean current;
 
 
@@ -97,11 +98,19 @@ public class ParkingLot extends Response {
         this.reserved = reserved;
     }
 
-    public LinkedList<AvailablePeriod> getAvailablePeriods() {
-        return availablePeriods;
+    public LinkedList<Date> getAvailableDates() {
+        return availableDates;
     }
 
-    public void setAvailablePeriods(LinkedList<AvailablePeriod> availablePeriods) {
-        this.availablePeriods = availablePeriods;
+    public void setAvailableDates(LinkedList<Date> availableDates) {
+        this.availableDates = availableDates;
     }
+
+    //    public LinkedList<AvailablePeriod> getAvailablePeriods() {
+//        return availablePeriods;
+//    }
+//
+//    public void setAvailablePeriods(LinkedList<AvailablePeriod> availablePeriods) {
+//        this.availablePeriods = availablePeriods;
+//    }
 }

@@ -16,7 +16,7 @@ public class LotsBuilder {
         availablePeriod.setFreeFrom(null);
         availablePeriod.setFreeTill(null);
         this.lot = new ParkingLot();
-        this.lot.setAvailablePeriods(availablePeriods);
+//        this.lot.setAvailablePeriods(availablePeriods);
     }
 
     public LotsBuilder number(Integer number) {

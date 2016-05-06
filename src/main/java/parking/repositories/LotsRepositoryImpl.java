@@ -12,6 +12,7 @@ import parking.beans.document.ParkingLot;
 import parking.helper.ToolHelper;
 import parking.utils.ParkingType;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -45,21 +46,22 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
         Update updateFields = new Update();
 
-        AvailablePeriod availablePeriod = new AvailablePeriod();
-        availablePeriod.setFreeFrom(freeFrom);
-        availablePeriod.setFreeTill(freeTill);
-
+        AvailablePeriod availablePeriod = new AvailablePeriod(freeFrom, freeTill);
+//        availablePeriod.setFreeFrom(freeFrom);
+//        availablePeriod.setFreeTill(freeTill);
+        System.out.println("updating fields..");
         updateFields.addToSet("availablePeriods", availablePeriod);
+        System.out.println("updateFields:" + updateFields);
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
-//    @Override
-//    public void recallParking(Integer lotNumber) {
-//        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
-//        Update updateFields = new Update();
-//        updateFields.unset("availablePeriods");
-//        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-//    }
+    public void freeOwnersParking(Integer lotNumber, Date availableDate) {
+        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
+        Update updateFields = new Update();
+
+        updateFields.addToSet("availableDates", availableDate);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
 
     @Override
     public void recallParking(Integer lotNumber, Date freeFrom, Date freeTill) {
@@ -78,6 +80,26 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             BasicDBObject obj = new BasicDBObject();
             obj.put("freeFrom", freeFrom);
             obj.put("freeTill", freeTill);
+            updateFields.pull("availablePeriods", obj);
+        }
+
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
+
+    public void recallParking(Integer lotNumber, Date availableDate) {
+        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
+        Update updateFields = new Update();
+
+        if(availableDate == null) {
+            updateFields.unset("availableDates");
+        }
+        else {
+            searchQuery.addCriteria(new Criteria().andOperator(
+                    Criteria.where("availableDates").is(availableDate)
+            ));
+
+            BasicDBObject obj = new BasicDBObject();
+            obj.put("availableDates", availableDate);
             updateFields.pull("availablePeriods", obj);
         }
 

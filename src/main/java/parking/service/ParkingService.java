@@ -17,11 +17,14 @@ import parking.repositories.LotsRepository;
 import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.time.LocalDate.now;
 
 @Service
 public class ParkingService {
@@ -37,11 +40,9 @@ public class ParkingService {
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
 
-        //throw new UserException("test");
         Account currentUser = userService.getCurrentUser(request);
         List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
 
-        // Check if current user using one of parking
         List<ParkingLot> filteredLots =  parkingLots.stream()
                 .filter(val -> val.getUser() != null && currentUser.getUsername().equals(val.getUser().getUsername()))
                 .collect(Collectors.toList());
@@ -53,35 +54,65 @@ public class ParkingService {
         return parkingLots;
     }
 
-    public void freeOwnersParking(SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+    public void freeOwnersParking(Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
 
         ParkingLot parking = getParkingNumberByUser();
         if(parking == null){
-            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
+            return;
         }
-        request.setNumber(parking.getNumber());
 
         Date currentDate = new Date();
         EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
         Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
 
-        if (request.getFreeFrom().compareTo(request.getFreeTill()) > 0){
+        if (freeFrom.compareTo(freeTill) > 0){
             throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
         }
-        else if ((request.getFreeTill().compareTo(cal.getTime()) < 0) && (request.getFreeFrom().compareTo(request.getFreeTill()) < 1)) {
+        else if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1)) {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         }
         else {
-            lotsRepository.freeOwnersParking(request.getNumber(), request.getFreeFrom(), request.getFreeTill());
+            System.out.println("calling lotsRepository..");
+            lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill);
         }
     }
 
-    public void recallParking(RecallParking recallParking) {
+//    public void freeOwnersParking(List<Date> availableDates, HttpServletRequest httpRequest) throws ApplicationException {
+//
+//        ParkingLot parking = getParkingNumberByUser();
+//        if(parking == null){
+//            return;
+//        }
+//
+//        Date currentDate = new Date();
+//        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+//        Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
+//
+//        for (Date d: availableDates)
+//        if ((d.compareTo(cal.getTime()) < 0)) {
+//            throw exceptionHandler.handleException(ExceptionMessage.DATE_IN_THE_PAST, httpRequest);
+//        }
+//        else {
+//            lotsRepository.freeOwnersParking(parking.getNumber(), d);
+//        }
+//    }
+
+    public void recallParking(Date freeFrom, Date freeTill) {
         ParkingLot parking = getParkingNumberByUser();
         if(parking == null){
-            return; //throw new Exception("Customer doesn't have parking assigned, so can't share anything");
+            return;
         }
-        lotsRepository.recallParking(parking.getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
+        lotsRepository.recallParking(parking.getNumber(), freeFrom, freeTill);
+    }
+
+    public void recallParking(List<Date> availableDates) {
+        ParkingLot parking = getParkingNumberByUser();
+        if(parking == null){
+            return;
+        }
+        for (Date d: availableDates) {
+            lotsRepository.recallParking(parking.getNumber(), d);
+        }
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {

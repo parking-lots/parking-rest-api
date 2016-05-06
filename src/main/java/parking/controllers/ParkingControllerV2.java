@@ -2,11 +2,13 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
+import parking.helper.AvailableDatesConverter;
 import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,12 +33,25 @@ public class ParkingControllerV2 {
 
     @RequestMapping(value = "/availability", method = RequestMethod.PUT)
     public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.freeOwnersParking(request, httpRequest);
+        AvailableDatesConverter converter = new AvailableDatesConverter();
+        List<AvailablePeriod> availablePeriods;
+
+        if(request.getAvailableDates().size() == 0){
+            return;
+        }
+        else {
+            availablePeriods = converter.convertToInterval(request.getAvailableDates());
+        }
+
+        for(AvailablePeriod p: availablePeriods) {
+            System.out.println("in the loop where service is invoked");
+            parkingService.freeOwnersParking(p.getFreeFrom(), p.getFreeTill(), httpRequest);
+        }
     }
 
     @RequestMapping(value = "/availability", method = RequestMethod.DELETE)
     public void recallParking(@Valid @RequestBody RecallParking recallParking) {
-        parkingService.recallParking(recallParking);
+        parkingService.recallParking(recallParking.getAvailableDates());
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)

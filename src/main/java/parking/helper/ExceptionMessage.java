@@ -13,7 +13,8 @@ public enum ExceptionMessage {
     NOT_LOGGED("not_logged"),
     NO_COOKIE_DATA("no_cookie_data"),
     END_DATE_IN_THE_PAST("end_date_in_the_past"),
-    START_DATE_LATER_THAN_END_DATE("start_date_later_than_end_date");
+    START_DATE_LATER_THAN_END_DATE("start_date_later_than_end_date"),
+    DATE_IN_THE_PAST("date_in_the_past");
 
     private String msg;
 

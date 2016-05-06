@@ -13,11 +13,18 @@ public class AvailablePeriod {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeTill;
 
+    public AvailablePeriod(Date freeFrom, Date freeTill){
+        this.freeFrom = freeFrom;
+        this.freeTill = freeTill;
+    }
+
     public Date getFreeFrom() {
+
         return freeFrom;
     }
 
     public void setFreeFrom(Date freeFrom) {
+
         this.freeFrom = freeFrom;
     }
 
@@ -26,6 +33,7 @@ public class AvailablePeriod {
     }
 
     public void setFreeTill(Date freeTill) {
+
         this.freeTill = freeTill;
     }
 }

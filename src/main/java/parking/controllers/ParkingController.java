@@ -36,12 +36,12 @@ public class ParkingController {
 
     @RequestMapping(value = "/available", method = RequestMethod.DELETE)
     public void recallParking(@Valid @RequestBody RecallParking recallParking) {
-        parkingService.recallParking(recallParking);
+        parkingService.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill());
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
     public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.freeOwnersParking(request, httpRequest);
+        parkingService.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
