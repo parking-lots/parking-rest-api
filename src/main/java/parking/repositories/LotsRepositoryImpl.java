@@ -114,43 +114,41 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             searchQuery.addCriteria(Criteria.where("availablePeriods.freeTill").gte(availableDate));
 
             List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+            Date queryFreeFrom = lots.get(0).getAvailablePeriods().get(0).getFreeFrom();
+            Date queryFreeTill = lots.get(0).getAvailablePeriods().get(0).getFreeTill();
 
-            if (lots.get(0).getAvailablePeriods().get(0).getFreeFrom().equals(availableDate)){
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(availableDate);
-                cal.add(Calendar.DATE, 1);
+            AvailablePeriod availablePeriod;
 
-                AvailablePeriod availablePeriod = new AvailablePeriod(cal.getTime(), lots.get(0).getAvailablePeriods().get(0).getFreeTill());
+            Calendar before = Calendar.getInstance();
+            before.setTime(availableDate);
+            before.add(Calendar.DATE, -1);
+
+            Calendar after = Calendar.getInstance();
+            after.setTime(availableDate);
+            after.add(Calendar.DATE, 1);
+
+            if (queryFreeFrom.equals(availableDate)){
+
+                availablePeriod = new AvailablePeriod(after.getTime(), queryFreeTill);
                 updateFields.push("availablePeriods", availablePeriod);
             }
-            else if (lots.get(0).getAvailablePeriods().get(0).getFreeTill().equals(availableDate)){
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(availableDate);
-                cal.add(Calendar.DATE, -1);
+            else if (queryFreeTill.equals(availableDate)){
 
-                AvailablePeriod availablePeriod = new AvailablePeriod(lots.get(0).getAvailablePeriods().get(0).getFreeFrom(), cal.getTime());
+                availablePeriod = new AvailablePeriod(queryFreeFrom, before.getTime());
                 updateFields.push("availablePeriods", availablePeriod);
             }
             else {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(availableDate);
-                cal.add(Calendar.DATE, -1);
 
-                Calendar cal1 = Calendar.getInstance();
-                cal1.setTime(availableDate);
-                cal1.add(Calendar.DATE, 1);
-
-                AvailablePeriod availablePeriod = new AvailablePeriod(lots.get(0).getAvailablePeriods().get(0).getFreeFrom(), cal.getTime());
-
-                AvailablePeriod availablePeriod1 = new AvailablePeriod(cal1.getTime(), lots.get(0).getAvailablePeriods().get(0).getFreeTill());
+                availablePeriod = new AvailablePeriod(queryFreeFrom, before.getTime());
+                AvailablePeriod availablePeriod1 = new AvailablePeriod(after.getTime(), queryFreeTill);
                 AvailablePeriod[] periods = {availablePeriod, availablePeriod1};
-
                 updateFields.pushAll("availablePeriods", periods);
             }
 
             operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
             removeAvailablePeriod(lotNumber, availableDate);
         }
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
     @Override
