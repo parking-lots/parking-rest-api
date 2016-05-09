@@ -108,11 +108,10 @@ public class ParkingServiceTest {
     public void whenOwnerFreeUpParkingLot() throws ApplicationException {
 
         SetUnusedRequest request = new SetUnusedRequest();
-        request.setNumber(mockedAccount.getParking().getNumber());
         request.setFreeFrom(new Date());
         request.setFreeTill(new Date());
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(request, httpRequest);
+        service.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
 
         verify(lotsRepository).freeOwnersParking(
                 eq(mockedAccount.getParking().getNumber()),
@@ -127,8 +126,8 @@ public class ParkingServiceTest {
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.freeOwnersParking(request, httpRequest);
-        verify(lotsRepository, never()).freeOwnersParking(request.getNumber(), request.getFreeFrom(), request.getFreeTill());
+        service.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
+        verify(lotsRepository, never()).freeOwnersParking(200, request.getFreeFrom(), request.getFreeTill());
     }
 
     @Test
@@ -139,7 +138,7 @@ public class ParkingServiceTest {
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(recallParking);
+        service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill());
 
        // ArgumentCaptor captor = ArgumentCaptor.forClass(ParkingNumberRequest.class);
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
@@ -156,7 +155,7 @@ public class ParkingServiceTest {
         mockedAccount.setParking(null);
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(recallParking);
+        service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill());
         verify(lotsRepository, never()).recallParking(200, recallParking.getFreeFrom(), recallParking.getFreeTill());
     }
 

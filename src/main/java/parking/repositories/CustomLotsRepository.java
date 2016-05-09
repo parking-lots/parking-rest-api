@@ -13,7 +13,7 @@ public interface CustomLotsRepository {
 
     public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill);
 
-    public void freeOwnersParking(Integer lotNumber, Date availableDate);
+    //public void freeOwnersParking(Integer lotNumber, Date availableDate);
 
     public void recallParking(Integer lotNumber, Date freeFrom, Date freeTill);
 

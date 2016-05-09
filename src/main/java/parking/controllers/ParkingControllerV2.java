@@ -44,7 +44,6 @@ public class ParkingControllerV2 {
         }
 
         for(AvailablePeriod p: availablePeriods) {
-            System.out.println("in the loop where service is invoked");
             parkingService.freeOwnersParking(p.getFreeFrom(), p.getFreeTill(), httpRequest);
         }
     }

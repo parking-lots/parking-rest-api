@@ -12,11 +12,8 @@ public class LotsBuilder {
 
     public LotsBuilder() {
         LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
-        AvailablePeriod availablePeriod = new AvailablePeriod();
-        availablePeriod.setFreeFrom(null);
-        availablePeriod.setFreeTill(null);
+        AvailablePeriod availablePeriod = new AvailablePeriod(null, null);
         this.lot = new ParkingLot();
-//        this.lot.setAvailablePeriods(availablePeriods);
     }
 
     public LotsBuilder number(Integer number) {

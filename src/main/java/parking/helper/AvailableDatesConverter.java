@@ -18,7 +18,6 @@ public class AvailableDatesConverter {
         Collections.sort(availableDates);
 
         for (Date d : availableDates) {
-            System.out.println(d);
             if (availablePeriod == null){
                 availablePeriod = new AvailablePeriod(d, d);
                 continue;
@@ -32,6 +31,7 @@ public class AvailableDatesConverter {
             }
         }
         availablePeriods.add(availablePeriod);
+
         return availablePeriods;
     }
 }

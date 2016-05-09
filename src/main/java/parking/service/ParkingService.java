@@ -50,7 +50,6 @@ public class ParkingService {
         if (filteredLots.size() > 0) {
             return filteredLots;
         }
-
         return parkingLots;
     }
 
@@ -72,7 +71,6 @@ public class ParkingService {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         }
         else {
-            System.out.println("calling lotsRepository..");
             lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill);
         }
     }
