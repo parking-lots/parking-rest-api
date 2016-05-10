@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.RecallParking;
@@ -25,10 +26,7 @@ import parking.repositories.LotsRepository;
 import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -75,7 +73,7 @@ public class ParkingServiceTest {
 
         mockedAccount = new Account();
         mockedAccount.setUsername("username");
-        mockedAccount.setParking(new ParkingLot(100, -1));
+
         when(userService.getCurrentUser(httpRequest)).thenReturn(mockedAccount);
 
         mockedParkingLotList.add(new LotsBuilder().number(100).build());
@@ -83,7 +81,15 @@ public class ParkingServiceTest {
         mockedParkingLotList.add(new LotsBuilder().number(103).build());
         mockedParkingLotList.add(new LotsBuilder().number(104).build());
 
+        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
+        //2016-11-12 - 2016-11-20
+        AvailablePeriod availablePeriod = new AvailablePeriod(new Date(1478908800000L), new Date(1479600000000L));
+        availablePeriods.add(availablePeriod);
+
         mockedParkingLot = new ParkingLot(161, -2);
+        mockedParkingLot.setOwner(mockedAccount);
+        mockedParkingLot.setAvailablePeriods(availablePeriods);
+        mockedAccount.setParking(mockedParkingLot);
     }
 
     @Test
@@ -110,6 +116,7 @@ public class ParkingServiceTest {
         SetUnusedRequest request = new SetUnusedRequest();
         request.setFreeFrom(new Date());
         request.setFreeTill(new Date());
+
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
         service.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
 
@@ -146,6 +153,24 @@ public class ParkingServiceTest {
        // ParkingNumberRequest value = (ParkingNumberRequest) captor.getValue();
        //
         assertEquals(mockedAccount.getParking().getNumber(), mockedAccount.getParking().getNumber());
+    }
+
+    @Test
+    public void whenOwnerRecallParkingWithSingleDates() {
+        Date singleDate = new Date(1479168000000L); //2016-11-15
+        List<Date> dateList = new ArrayList<>();
+        dateList.add(singleDate);
+
+        RecallParking recallParking = new RecallParking();
+        recallParking.setAvailableDates(dateList);
+
+        given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
+
+        service.recallParking(recallParking.getAvailableDates());
+
+        verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getAvailableDates().get(0));
+
+        assertTrue("requested date is still in the availablePeriod!", !mockedAccount.getParking().getAvailablePeriods().contains(singleDate));
     }
 
     @Test

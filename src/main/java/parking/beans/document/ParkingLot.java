@@ -24,7 +24,6 @@ public class ParkingLot extends Response {
     @Min(-2)
     private Integer floor;
     private LinkedList<AvailablePeriod> availablePeriods;
-    //private LinkedList<Date> availableDates;
     private Boolean current;
 
 
