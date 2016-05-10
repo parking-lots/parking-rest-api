@@ -122,6 +122,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             updateFields.unset("availablePeriods");
         }
         else {
+            availableDate = ToolHelper.formatDate(availableDate);
             searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeFrom").lte(availableDate)
                    .and("availablePeriods.freeTill").gte(availableDate)));
 
