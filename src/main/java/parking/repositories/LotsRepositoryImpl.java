@@ -95,8 +95,20 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
         BasicDBObject obj = new BasicDBObject();
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-        obj.put("freeFrom", lots.get(0).getAvailablePeriods().get(0).getFreeFrom());
-        obj.put("freeTill", lots.get(0).getAvailablePeriods().get(0).getFreeTill());
+
+        Date queryFreeFrom = null;
+        Date queryFreeTill = null;
+
+        for(AvailablePeriod period: lots.get(0).getAvailablePeriods()){
+            if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0){
+                queryFreeFrom = period.getFreeFrom();
+                queryFreeTill = period.getFreeTill();
+            }
+        }
+
+        obj.put("freeFrom", queryFreeFrom);
+        obj.put("freeTill", queryFreeTill);
+
         updateFields.pull("availablePeriods", obj);
 
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
@@ -110,12 +122,20 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             updateFields.unset("availablePeriods");
         }
         else {
-            searchQuery.addCriteria(Criteria.where("availablePeriods.freeFrom").lte(availableDate));
-            searchQuery.addCriteria(Criteria.where("availablePeriods.freeTill").gte(availableDate));
+            searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeFrom").lte(availableDate)
+                   .and("availablePeriods.freeTill").gte(availableDate)));
 
             List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-            Date queryFreeFrom = lots.get(0).getAvailablePeriods().get(0).getFreeFrom();
-            Date queryFreeTill = lots.get(0).getAvailablePeriods().get(0).getFreeTill();
+
+            Date queryFreeFrom = null;
+            Date queryFreeTill = null;
+
+            for(AvailablePeriod period: lots.get(0).getAvailablePeriods()){
+                if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0){
+                    queryFreeFrom = period.getFreeFrom();
+                    queryFreeTill = period.getFreeTill();
+                }
+            }
 
             AvailablePeriod availablePeriod;
 
@@ -127,7 +147,11 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             after.setTime(availableDate);
             after.add(Calendar.DATE, 1);
 
-            if (queryFreeFrom.equals(availableDate)){
+            if (queryFreeFrom.equals(availableDate) && queryFreeTill.equals(availableDate)){
+                removeAvailablePeriod(lotNumber, availableDate);
+                return;
+            }
+            else if (queryFreeFrom.equals(availableDate)){
 
                 availablePeriod = new AvailablePeriod(after.getTime(), queryFreeTill);
                 updateFields.push("availablePeriods", availablePeriod);
@@ -148,7 +172,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
             removeAvailablePeriod(lotNumber, availableDate);
         }
-        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
     @Override

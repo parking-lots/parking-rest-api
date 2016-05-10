@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class SetUnusedRequest {
-    //private Integer number;
-    //@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LinkedList<Date> availableDates;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom;
@@ -16,20 +14,15 @@ public class SetUnusedRequest {
     private Date freeTill;
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
 
-//    public Integer getNumber() {
-//        return number;
-//    }
-//
-//    public void setNumber(Integer number) {
-//        this.number = number;
-//    }
-
 
     public LinkedList<Date> getAvailableDates() {
         return availableDates;
     }
 
     public void setAvailableDates(LinkedList<Date> availableDates) {
+        for(Date d: availableDates){
+            d = eliminateDateTimestamp.formatDateForDatabase(d).getTime();
+        }
         this.availableDates = availableDates;
     }
 

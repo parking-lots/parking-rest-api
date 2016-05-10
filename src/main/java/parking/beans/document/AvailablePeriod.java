@@ -1,6 +1,7 @@
 package parking.beans.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import parking.utils.EliminateDateTimestamp;
 
 import java.util.Date;
 
@@ -14,8 +15,9 @@ public class AvailablePeriod {
     private Date freeTill;
 
     public AvailablePeriod(Date freeFrom, Date freeTill){
-        this.freeFrom = freeFrom;
-        this.freeTill = freeTill;
+        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+        this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();
+        this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();
     }
 
     public Date getFreeFrom() {
@@ -24,8 +26,8 @@ public class AvailablePeriod {
     }
 
     public void setFreeFrom(Date freeFrom) {
-
-        this.freeFrom = freeFrom;
+        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+        this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();
     }
 
     public Date getFreeTill() {
@@ -33,7 +35,7 @@ public class AvailablePeriod {
     }
 
     public void setFreeTill(Date freeTill) {
-
-        this.freeTill = freeTill;
+        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+        this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();
     }
 }

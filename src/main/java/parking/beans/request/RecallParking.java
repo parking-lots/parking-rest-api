@@ -37,10 +37,9 @@ public class RecallParking {
     }
 
     public void setAvailableDates(List<Date> availableDates) {
+        for(Date d: availableDates){
+            d = eliminateDateTimestamp.formatDateForDatabase(d).getTime();
+        }
         this.availableDates = availableDates;
-//        this.availableDates
-//                .stream()
-//                .map(d -> eliminateDateTimestamp.formatDateForDatabase(d).getTime())
-//                .collect(Collectors.toList());
     }
 }
