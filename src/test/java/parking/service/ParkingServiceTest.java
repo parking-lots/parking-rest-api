@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.*;
 
@@ -169,8 +170,6 @@ public class ParkingServiceTest {
         service.recallParking(recallParking.getAvailableDates());
 
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getAvailableDates().get(0));
-
-        assertTrue("requested date is still in the availablePeriod!", !mockedAccount.getParking().getAvailablePeriods().contains(singleDate));
     }
 
     @Test
@@ -225,9 +224,9 @@ public class ParkingServiceTest {
         ArgumentCaptor<ParkingLot> captor = ArgumentCaptor.forClass(ParkingLot.class);
         verify(lotsRepository).insert(captor.capture());
 
-        Optional<ObjectId> objectId = Optional.ofNullable(captor.getValue().getId());
+        Optional<ObjectId> maybeObjectId = Optional.ofNullable(captor.getValue().getId());
 
-        assertTrue(objectId.isPresent());
+        assertTrue(maybeObjectId.isPresent());
     }
 
     @Test(expected = ApplicationException.class)
