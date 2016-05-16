@@ -83,13 +83,13 @@ public class UserService {
         return getLoggedUser().get();
     }
 
-    public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
+    public void login(String username, String password, Boolean remember, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
         LoginForm userToValidate = new LoginForm();
-        userToValidate.setPassword(user.getPassword());
-        userToValidate.setUsername(user.getUsername().toLowerCase());
+        userToValidate.setPassword(password);
+        userToValidate.setUsername(username.toLowerCase());
 
         Account userAccount = validateUser(userToValidate, request);
-        if (user.getRemember()) {
+        if (remember) {
             setRememberMeCookies(userAccount);
         }
 
@@ -102,10 +102,12 @@ public class UserService {
     public void setRememberMeCookies(Account userAccount) {
         Cookie cookieUsername = new Cookie("username", userAccount.getUsername());
         cookieUsername.setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
+        cookieUsername.setPath("/");
         response.addCookie(cookieUsername);
 
         Cookie cookiePassword = new Cookie("password", userAccount.getPassword());
         cookiePassword.setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
+        cookiePassword.setPath("/");
         response.addCookie(cookiePassword);
     }
 
@@ -120,13 +122,6 @@ public class UserService {
 
         if (userAccount != null) {
             if (userAccount.getPassword().equals(password)) {
-                Cookie[] cookies = request.getCookies();
-
-                for (int i = 0; i < cookies.length; i++) {
-                    if (cookies[i].getName().equals("username") || cookies[i].getName().equals("password")) {
-                        cookies[i].setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
-                    }
-                }
 
                 SecurityContext context = getSecurityContext(userAccount);
 
@@ -242,6 +237,7 @@ public class UserService {
         Cookie[] cookies = request.getCookies();
 
         for (int i = 0; i < cookies.length; i++) {
+            cookies[i].setPath("/");
             cookies[i].setValue(" ");
             cookies[i].setMaxAge(0);
             response.addCookie(cookies[i]);

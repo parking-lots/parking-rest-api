@@ -31,24 +31,8 @@ public class AuthenticationController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public void Login(@Valid @RequestBody LoginForm user, HttpServletRequest request) throws ApplicationException {
-        userService.login(user, request);
-    }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public void rememberMeLogin(HttpServletRequest request) throws ApplicationException {
-        String username = " ", password = " ";
-        Cookie[] cookies = request.getCookies();
-
-        for (int i = 0; i < cookies.length; i++) {
-            if (cookies[i].getName().equals("username")) {
-                username = cookies[i].getValue();
-            }
-            if (cookies[i].getName().equals("password")) {
-                password = cookies[i].getValue();
-            }
-        }
-
-        userService.rememberMeLogin(username, password, request);
+        userService.login(user.getUsername(), user.getPassword(), user.getRemember(), request);
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
@@ -60,14 +44,6 @@ public class AuthenticationController {
         userService.deleteCookies(request);
 
         session.invalidate();
-    }
-
-    @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public Profile profile(HttpServletRequest request, Principal principal) throws ApplicationException {
-        if (principal == null) {
-            throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
-        }
-        return userService.getCurrentUserProfile();
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)

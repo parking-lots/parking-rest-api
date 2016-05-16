@@ -31,25 +31,8 @@ public class UserControllerV2 {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public void Login(@Valid @RequestBody LoginForm user, HttpServletRequest request) throws ApplicationException {
-        userService.login(user, request);
+        userService.login(user.getUsername(), user.getPassword(), user.getRemember(), request);
     }
-
-//    @RequestMapping(value = "/login", method = RequestMethod.GET)
-//    public void rememberMeLogin(HttpServletRequest request) throws ApplicationException {
-//        String username = " ", password = " ";
-//        Cookie[] cookies = request.getCookies();
-//
-//        for (int i = 0; i < cookies.length; i++) {
-//            if (cookies[i].getName().equals("username")) {
-//                username = cookies[i].getValue();
-//            }
-//            if (cookies[i].getName().equals("password")) {
-//                password = cookies[i].getValue();
-//            }
-//        }
-//
-//        userService.rememberMeLogin(username, password, request);
-//    }
 
     @RequestMapping(value = "/login", method = RequestMethod.DELETE)
     public void logout(HttpSession session, Principal principal, HttpServletRequest request) throws ApplicationException {
@@ -64,9 +47,27 @@ public class UserControllerV2 {
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
     public Profile profile(HttpServletRequest request, Principal principal) throws ApplicationException {
-        if (principal == null) {
+
+        String username = null, password = null;
+        Cookie[] cookies = request.getCookies();
+
+        for (int i = 0; i < cookies.length; i++) {
+
+            if (cookies[i].getName().equals("username")) {
+                username = cookies[i].getValue();
+            }
+            if (cookies[i].getName().equals("password")) {
+                password = cookies[i].getValue();
+            }
+        }
+
+        if (principal == null && username == null && password == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
+        else if (username != null && password != null){
+            userService.rememberMeLogin(username, password, request);
+        }
+
         return userService.getCurrentUserProfile();
     }
 
