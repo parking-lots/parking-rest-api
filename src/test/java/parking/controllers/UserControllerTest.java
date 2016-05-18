@@ -42,7 +42,7 @@ public class UserControllerTest {
     @Test(expected = ApplicationException.class)
     public void whenNotLoggedInShouldThrowException() throws ApplicationException {
 
-        controller.profile(servletRequest, null);
+        controller.profile(null, null);
     }
 
     @Test

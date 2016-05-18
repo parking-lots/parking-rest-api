@@ -37,22 +37,21 @@ public class UserController {
     public Profile profile(HttpServletRequest request, Principal principal) throws ApplicationException {
 
         String username = null, password = null;
-        Cookie[] cookies = request.getCookies();
 
-        for (int i = 0; i < cookies.length; i++) {
+            for (Cookie cookie : request.getCookies()) {
 
-            if (cookies[i].getName().equals("username")) {
-                username = cookies[i].getValue();
+                if (cookie.getName().equals("username")) {
+                    username = cookie.getValue();
+                }
+                if (cookie.getName().equals("password")) {
+                    password = cookie.getValue();
+                }
             }
-            if (cookies[i].getName().equals("password")) {
-                password = cookies[i].getValue();
-            }
-        }
 
         if (principal == null && username == null && password == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
-        else if (username != null && password != null){
+        else if (principal == null && username != null && password != null){
             userService.rememberMeLogin(username, password, request);
         }
 

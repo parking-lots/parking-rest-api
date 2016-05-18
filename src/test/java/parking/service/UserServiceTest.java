@@ -247,7 +247,7 @@ public class UserServiceTest {
         given(request.getSession(true)).willReturn(mock(HttpSession.class));
         given(request.getSession()).willReturn(mock(HttpSession.class));
 
-        service.login(loginForm, request);
+        service.login(loginForm.getUsername(), loginForm.getPassword(), loginForm.getRemember(), request);
     }
 
     @Test

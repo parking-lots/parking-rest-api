@@ -34,9 +34,9 @@ public class ParkingController {
                 .collect(Collectors.<Parking>toList());
     }
 
-    @RequestMapping(value = "/available", method = RequestMethod.DELETE)
-    public void recallParking(@Valid @RequestBody RecallParking recallParking) {
-        parkingService.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill());
+    @RequestMapping(value = "/remove", method = RequestMethod.DELETE)
+    public void recallParking(@Valid @RequestBody RecallParking recallParking, HttpServletRequest request) throws ApplicationException {
+        parkingService.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), request);
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)

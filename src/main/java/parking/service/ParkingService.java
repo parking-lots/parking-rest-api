@@ -16,6 +16,7 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
 import parking.utils.EliminateDateTimestamp;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -40,10 +41,14 @@ public class ParkingService {
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
 
+        if(request.getUserPrincipal() == null){
+            userService.reinstateSession(request);
+        }
+
         Account currentUser = userService.getCurrentUser(request);
         List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
 
-        List<ParkingLot> filteredLots =  parkingLots.stream()
+        List<ParkingLot> filteredLots = parkingLots.stream()
                 .filter(val -> val.getUser() != null && currentUser.getUsername().equals(val.getUser().getUsername()))
                 .collect(Collectors.toList());
 
@@ -55,8 +60,13 @@ public class ParkingService {
 
     public void freeOwnersParking(Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
 
+        if (httpRequest.getUserPrincipal() == null) {
+            userService.reinstateSession(httpRequest);
+        }
+
         ParkingLot parking = getParkingNumberByUser();
-        if(parking == null){
+
+        if (parking == null) {
             return;
         }
 
@@ -64,13 +74,11 @@ public class ParkingService {
         EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
         Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
 
-        if (freeFrom.compareTo(freeTill) > 0){
+        if (freeFrom.compareTo(freeTill) > 0) {
             throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
-        }
-        else if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1)) {
+        } else if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1)) {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
-        }
-        else {
+        } else {
             lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill);
         }
     }
@@ -95,36 +103,50 @@ public class ParkingService {
 //        }
 //    }
 
-    public void recallParking(Date freeFrom, Date freeTill) {
+    public void recallParking(Date freeFrom, Date freeTill, HttpServletRequest request) throws ApplicationException {
+
+        if(request.getUserPrincipal() == null){
+            userService.reinstateSession(request);
+        }
+
         ParkingLot parking = getParkingNumberByUser();
         if(parking == null){
             return;
         }
+
         lotsRepository.recallParking(parking.getNumber(), freeFrom, freeTill);
     }
 
-    public void recallParking(List<Date> availableDates) {
+    public void recallParking(List<Date> availableDates, HttpServletRequest request) throws ApplicationException {
+
+        if(request.getUserPrincipal() == null){
+            userService.reinstateSession(request);
+        }
+
         ParkingLot parking = getParkingNumberByUser();
-        if(parking == null){
+        if (parking == null) {
             return;
         }
-        for (Date d: availableDates) {
+        for (Date d : availableDates) {
             lotsRepository.recallParking(parking.getNumber(), d);
         }
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
+        if(httpRequest.getUserPrincipal() == null){
+            userService.reinstateSession(httpRequest);
+        }
         lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest));
     }
 
     public ParkingLot createLot(ParkingLot parkingLot, HttpServletRequest request) throws ApplicationException {
         ParkingLot existParkingLot;
         try {
-            existParkingLot =  getParkingByNumber(parkingLot.getNumber(), request);
+            existParkingLot = getParkingByNumber(parkingLot.getNumber(), request);
         } catch (ApplicationException e) {
             existParkingLot = null;
         }
-        if(Optional.ofNullable(existParkingLot).isPresent()) {
+        if (Optional.ofNullable(existParkingLot).isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, request);
         }
         parkingLot.setId(new ObjectId());
@@ -156,4 +178,5 @@ public class ParkingService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
+
 }

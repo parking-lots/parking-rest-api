@@ -1,6 +1,7 @@
 package parking.repositories;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 
 import java.util.List;
