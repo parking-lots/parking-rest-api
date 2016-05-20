@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import parking.Application;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -81,9 +83,14 @@ public class UserServiceTest {
 
     @Before
     public void initMock() {
+        Cookie ck1 = new Cookie("cookie", "aaaa");
+        Cookie ck2 = new Cookie("othercookie", "bbbb");
+
         when(authentication.getName()).thenReturn(MOCKED_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
+        when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedUser = new Account("Name Surname", "nickname", "****");
@@ -232,7 +239,7 @@ public class UserServiceTest {
 
     @Test
     public void whenLoginWithAnyRememberMeOptionShouldSucceed() throws ApplicationException {
-        String username = "Lina";
+        String username = "nickname";
         String password = "****";
 
         given(authentication.getName()).willReturn(null);
@@ -271,7 +278,7 @@ public class UserServiceTest {
 
     @Test
     public void whenRememberMeCookiesCreatedUserAutomaticallyLoggedIn() throws ApplicationException{
-        cookies = new Cookie[] {new Cookie("username",mockedUser.getUsername()), new Cookie("password",mockedUser.getPassword())};
+        cookies = new Cookie[] {new Cookie("username", mockedUser.getUsername()), new Cookie("password",mockedUser.getPassword())};
 
         given(request.getCookies()).willReturn(cookies);
 
@@ -282,7 +289,14 @@ public class UserServiceTest {
         given(request.getSession(true)).willReturn(mock(HttpSession.class));
         given(request.getSession()).willReturn(mock(HttpSession.class));
 
-        service.rememberMeLogin(username,password,request);
+        try {
+            service.rememberMeLogin(username, password, request);
+            fail("user is not logged");
+        }
+        catch (ApplicationException application) {
+
+        }
+
         whenGetingCurrentUser();
     }
 

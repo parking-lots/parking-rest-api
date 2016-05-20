@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Deprecated
 @RequestMapping(value = "/admin")
 public class AdminController {
 

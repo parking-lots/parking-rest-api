@@ -85,6 +85,10 @@ public class UserService {
     public void login(String username, String password, Boolean remember, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
         rememberMeLogin(username.toLowerCase(), password, request);
         if (remember) {
+            Account account = accountRepository.findByUsername(username);
+            if(account == null){
+                return;
+            }
             setRememberMeCookies(accountRepository.findByUsername(username));
         }
     }
@@ -141,6 +145,20 @@ public class UserService {
                 )
         );
         return context;
+    }
+
+    public Account validateUser(LoginForm loginForm, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
+        if (getLoggedUser().isPresent()) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
+        }
+
+        Account account = accountRepository.findByUsername(loginForm.getUsername());
+
+        if (account == null || !ProfileHelper.checkPassword(loginForm.getPassword(), account.getPassword())) {
+            throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
+        }
+
+        return account;
     }
 
     public void changePassword(ChangePassword password, HttpServletRequest request) throws ApplicationException {

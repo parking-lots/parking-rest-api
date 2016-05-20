@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
+@Deprecated
 @RequestMapping(value = "/user")
 public class AuthenticationController {
 

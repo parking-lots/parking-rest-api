@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
+@Deprecated
 @RequestMapping(value = "/parking")
 public class ParkingController {
 
@@ -34,7 +35,7 @@ public class ParkingController {
                 .collect(Collectors.<Parking>toList());
     }
 
-    @RequestMapping(value = "/remove", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/remove", method = RequestMethod.POST)
     public void recallParking(@Valid @RequestBody RecallParking recallParking, HttpServletRequest request) throws ApplicationException {
         parkingService.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), request);
     }

@@ -139,14 +139,14 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenOwnerRecallParkingLot() {
+    public void whenOwnerRecallParkingLot() throws ApplicationException {
         RecallParking recallParking = new RecallParking();
         recallParking.setFreeFrom(mockDate);
         recallParking.setFreeTill(mockDate);
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill());
+        service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), httpRequest);
 
        // ArgumentCaptor captor = ArgumentCaptor.forClass(ParkingNumberRequest.class);
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
@@ -157,7 +157,7 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void whenOwnerRecallParkingWithSingleDates() {
+    public void whenOwnerRecallParkingWithSingleDates() throws ApplicationException {
         Date singleDate = new Date(1479168000000L); //2016-11-15
         List<Date> dateList = new ArrayList<>();
         dateList.add(singleDate);
@@ -167,19 +167,19 @@ public class ParkingServiceTest {
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(recallParking.getAvailableDates());
+        service.recallParking(recallParking.getAvailableDates(), httpRequest);
 
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getAvailableDates().get(0));
     }
 
     @Test
-    public void whenCustomerDoesNotHaveParkingAssignedAndTryRecall() {
+    public void whenCustomerDoesNotHaveParkingAssignedAndTryRecall() throws ApplicationException {
         RecallParking recallParking = new RecallParking();
 
         mockedAccount.setParking(null);
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill());
+        service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), httpRequest);
         verify(lotsRepository, never()).recallParking(200, recallParking.getFreeFrom(), recallParking.getFreeTill());
     }
 
