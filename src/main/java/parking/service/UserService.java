@@ -86,7 +86,7 @@ public class UserService {
         rememberMeLogin(username.toLowerCase(), password, request);
         if (remember) {
             Account account = accountRepository.findByUsername(username);
-            if(account == null){
+            if (account == null) {
                 return;
             }
             setRememberMeCookies(accountRepository.findByUsername(username));
@@ -120,18 +120,21 @@ public class UserService {
         Account userAccount = accountRepository.findByUsername(username);
 
         if (userAccount != null) {
-            if (ProfileHelper.checkPassword(password, userAccount.getPassword())) {
-                SecurityContext context = getSecurityContext(userAccount);
-
-                request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-                setMaxInactiveIntervalForSession(request);
-            } else {
-                throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
+            if (password != null) {
+                if (!ProfileHelper.checkPassword(password, userAccount.getPassword())) {
+                    return;
+                }
             }
+
+            SecurityContext context = getSecurityContext(userAccount);
+
+            request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+            setMaxInactiveIntervalForSession(request);
         } else {
             throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
         }
     }
+
 
     public SecurityContext getSecurityContext(Account userAccount) {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -233,36 +236,43 @@ public class UserService {
 
     public void deleteCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-
-        for (int i = 0; i < cookies.length; i++) {
-            cookies[i].setPath("/");
-            cookies[i].setValue(" ");
-            cookies[i].setMaxAge(0);
-            response.addCookie(cookies[i]);
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                cookies[i].setPath("/");
+                cookies[i].setValue(" ");
+                cookies[i].setMaxAge(0);
+                response.addCookie(cookies[i]);
+            }
         }
     }
 
     public void reinstateSession(HttpServletRequest httpRequest) throws ApplicationException {
 
         String username = null;
+        String password = null;
 
-        for (Cookie cookie : httpRequest.getCookies()) {
+        Cookie[] cookies = httpRequest.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : httpRequest.getCookies()) {
 
-            if (cookie.getName().equals("username")) {
-                username = cookie.getValue();
+                if (cookie.getName().equals("username")) {
+                    username = cookie.getValue();
 
-                cookie.setPath("/");
-                cookie.setMaxAge(7 * 24 * 60 * 60);
-                response.addCookie(cookie);
-            }
-            if (cookie.getName().equals("password")) {
-                cookie.setPath("/");
-                cookie.setMaxAge(7 * 24 * 60 * 60);
-                response.addCookie(cookie);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(7 * 24 * 60 * 60);
+                    response.addCookie(cookie);
+                }
+                if (cookie.getName().equals("password")) {
+                    password = cookie.getValue();
 
-                Account userAccount = accountRepository.findByUsername(username);
-                if (userAccount != null && userAccount.getPassword().equals(cookie.getValue())) {
-                    rememberMeLogin(username, cookie.getValue(), httpRequest);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(7 * 24 * 60 * 60);
+                    response.addCookie(cookie);
+
+                    Account userAccount = accountRepository.findByUsername(username);
+                    if (userAccount != null && userAccount.getPassword().equals(password)) {
+                        rememberMeLogin(username, null, httpRequest);
+                    }
                 }
             }
         }

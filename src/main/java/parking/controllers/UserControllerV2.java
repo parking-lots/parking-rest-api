@@ -37,6 +37,16 @@ public class UserControllerV2 {
 
     @RequestMapping(value = "/login", method = RequestMethod.DELETE)
     public void logout(HttpSession session, Principal principal, HttpServletRequest request) throws ApplicationException {
+//        Cookie[] cookie = request.getCookies();
+//        if (cookie != null) {
+//            System.out.println("cookies are not null");
+//            for(Cookie c: request.getCookies()){
+//                if(c.getName().equals("username")){
+//                    System.out.println("cookie name: "+ c.getName());
+//                }
+//            }
+//        }
+
         if (principal == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }

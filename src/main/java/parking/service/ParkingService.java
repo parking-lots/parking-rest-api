@@ -41,10 +41,6 @@ public class ParkingService {
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
 
-        if(request.getUserPrincipal() == null){
-            userService.reinstateSession(request);
-        }
-
         Account currentUser = userService.getCurrentUser(request);
         List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
 
@@ -59,10 +55,6 @@ public class ParkingService {
     }
 
     public void freeOwnersParking(Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
-
-        if (httpRequest.getUserPrincipal() == null) {
-            userService.reinstateSession(httpRequest);
-        }
 
         ParkingLot parking = getParkingNumberByUser();
 
@@ -83,31 +75,7 @@ public class ParkingService {
         }
     }
 
-//    public void freeOwnersParking(List<Date> availableDates, HttpServletRequest httpRequest) throws ApplicationException {
-//
-//        ParkingLot parking = getParkingNumberByUser();
-//        if(parking == null){
-//            return;
-//        }
-//
-//        Date currentDate = new Date();
-//        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-//        Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
-//
-//        for (Date d: availableDates)
-//        if ((d.compareTo(cal.getTime()) < 0)) {
-//            throw exceptionHandler.handleException(ExceptionMessage.DATE_IN_THE_PAST, httpRequest);
-//        }
-//        else {
-//            lotsRepository.freeOwnersParking(parking.getNumber(), d);
-//        }
-//    }
-
     public void recallParking(Date freeFrom, Date freeTill, HttpServletRequest request) throws ApplicationException {
-
-        if(request.getUserPrincipal() == null){
-            userService.reinstateSession(request);
-        }
 
         ParkingLot parking = getParkingNumberByUser();
         if(parking == null){
@@ -119,10 +87,6 @@ public class ParkingService {
 
     public void recallParking(List<Date> availableDates, HttpServletRequest request) throws ApplicationException {
 
-        if(request.getUserPrincipal() == null){
-            userService.reinstateSession(request);
-        }
-
         ParkingLot parking = getParkingNumberByUser();
         if (parking == null) {
             return;
@@ -133,9 +97,6 @@ public class ParkingService {
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
-        if(httpRequest.getUserPrincipal() == null){
-            userService.reinstateSession(httpRequest);
-        }
         lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest));
     }
 

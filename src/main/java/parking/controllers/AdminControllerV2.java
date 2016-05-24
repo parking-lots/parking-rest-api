@@ -2,6 +2,7 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
@@ -38,6 +39,7 @@ public class AdminControllerV2 {
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, @PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
+        form.getAccount().setUsername(username);
         adminService.editUser(form.getAccount(), request);
     }
 
