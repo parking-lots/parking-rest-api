@@ -131,10 +131,12 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             Date queryFreeFrom = null;
             Date queryFreeTill = null;
 
-            for(AvailablePeriod period: lots.get(0).getAvailablePeriods()){
-                if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0){
-                    queryFreeFrom = period.getFreeFrom();
-                    queryFreeTill = period.getFreeTill();
+            if(lots != null) {
+                for (AvailablePeriod period : lots.get(0).getAvailablePeriods()) {
+                    if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0) {
+                        queryFreeFrom = period.getFreeFrom();
+                        queryFreeTill = period.getFreeTill();
+                    }
                 }
             }
 
@@ -147,6 +149,10 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             Calendar after = Calendar.getInstance();
             after.setTime(availableDate);
             after.add(Calendar.DATE, 1);
+
+            if(queryFreeFrom == null || queryFreeTill == null){
+                return;
+            }
 
             if (queryFreeFrom.equals(availableDate) && queryFreeTill.equals(availableDate)){
                 removeAvailablePeriod(lotNumber, availableDate);
