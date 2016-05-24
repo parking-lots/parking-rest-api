@@ -47,10 +47,5 @@ public class AuthenticationController {
         session.invalidate();
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void createUser() {
-//        userService.createUser();
-    }
-
 }
 

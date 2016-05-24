@@ -72,9 +72,5 @@ public class AvailableDatesConverterTest {
         dateList.add(date3);
 
         assertEquals(1, (availableDatesConverter.convertToInterval(dateList)).size());
-
-        //not always works since new Date() is called at different time
-        //assertEquals(new Date(), (availableDatesConverter.convertToInterval(dateList)).get(0).getFreeFrom());
-        //assertEquals(new Date(), (availableDatesConverter.convertToInterval(dateList)).get(0).getFreeTill());
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
-import parking.beans.request.ParkingNumberRequest;
 import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.builders.LotsBuilder;
@@ -29,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.*;
 
@@ -148,11 +146,8 @@ public class ParkingServiceTest {
 
         service.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), httpRequest);
 
-       // ArgumentCaptor captor = ArgumentCaptor.forClass(ParkingNumberRequest.class);
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getFreeFrom(), recallParking.getFreeTill());
 
-       // ParkingNumberRequest value = (ParkingNumberRequest) captor.getValue();
-       //
         assertEquals(mockedAccount.getParking().getNumber(), mockedAccount.getParking().getNumber());
     }
 
