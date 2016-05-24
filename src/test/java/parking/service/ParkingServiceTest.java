@@ -81,6 +81,7 @@ public class ParkingServiceTest {
         mockedParkingLotList.add(new LotsBuilder().number(104).build());
 
         LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
+
         //2016-11-12 - 2016-11-20
         AvailablePeriod availablePeriod = new AvailablePeriod(new Date(1478908800000L), new Date(1479600000000L));
         availablePeriods.add(availablePeriod);
