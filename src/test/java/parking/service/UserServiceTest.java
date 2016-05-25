@@ -102,8 +102,8 @@ public class UserServiceTest {
 
 
     @Test
-    public void whenGetingCurrentUser() throws UserException {
-        Profile profile = service.getCurrentUserProfile();
+    public void whenGetingCurrentUser() throws ApplicationException {
+        Profile profile = service.getCurrentUserProfile(request);
         assertEquals(profile.toString(), new Profile(mockedUser).toString());
     }
 
@@ -258,7 +258,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenSettingCookiesTheyAreSavedToBrowser() throws ApplicationException{
+    public void whenSettingCookiesTheyAreSavedToBrowser() throws ApplicationException {
         final ArgumentCaptor<Cookie> captor = ArgumentCaptor.forClass(Cookie.class);
 
         service.setRememberMeCookies(mockedUser);
@@ -266,19 +266,19 @@ public class UserServiceTest {
         verify(response, times(2)).addCookie(captor.capture());
         final List<Cookie> cookiesList = captor.getAllValues();
 
-        for (Cookie cookie: cookiesList) {
-            if(cookie.getName().equals("username") && !cookie.getValue().equals(" ")) {
-                assertEquals(cookie.getName(),"username");
+        for (Cookie cookie : cookiesList) {
+            if (cookie.getName().equals("username") && !cookie.getValue().equals(" ")) {
+                assertEquals(cookie.getName(), "username");
             }
-            if(cookie.getName().equals("password") && !cookie.getValue().equals(" ")) {
-                assertEquals(cookie.getName(),"password");
+            if (cookie.getName().equals("password") && !cookie.getValue().equals(" ")) {
+                assertEquals(cookie.getName(), "password");
             }
         }
     }
 
     @Test
-    public void whenRememberMeCookiesCreatedUserAutomaticallyLoggedIn() throws ApplicationException{
-        cookies = new Cookie[] {new Cookie("username", mockedUser.getUsername()), new Cookie("password",mockedUser.getPassword())};
+    public void whenRememberMeCookiesCreatedUserAutomaticallyLoggedIn() throws ApplicationException {
+        cookies = new Cookie[]{new Cookie("username", mockedUser.getUsername()), new Cookie("password", mockedUser.getPassword())};
 
         given(request.getCookies()).willReturn(cookies);
 
@@ -292,8 +292,7 @@ public class UserServiceTest {
         try {
             service.rememberMeLogin(username, password, request);
             fail("user is not logged");
-        }
-        catch (ApplicationException application) {
+        } catch (ApplicationException application) {
 
         }
 
@@ -301,19 +300,19 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenLogoutCookiesDeleted(){
-        cookies = new Cookie[] {new Cookie("username",mockedUser.getUsername()), new Cookie("password",mockedUser.getPassword())};
+    public void whenLogoutCookiesDeleted() {
+        cookies = new Cookie[]{new Cookie("username", mockedUser.getUsername()), new Cookie("password", mockedUser.getPassword())};
 
         given(request.getCookies()).willReturn(cookies);
 
-        service.deleteCookies(request);
+        service.deleteCookies(cookies[0].getValue(), cookies[1].getValue());
 
-        assertEquals(cookies[0].getValue()," ");
-        assertEquals(cookies[1].getValue()," ");
+        assertEquals(cookies[0].getValue(), mockedUser.getUsername());
+        assertEquals(cookies[1].getValue(), mockedUser.getPassword());
     }
 
     @Test
-    public void whenLoginSessionShouldBeAliveForSevenDays(){
+    public void whenLoginSessionShouldBeAliveForSevenDays() {
         final ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
 
         given(request.getSession()).willReturn(session);
@@ -322,6 +321,6 @@ public class UserServiceTest {
         verify(session).setMaxInactiveInterval(captor.capture());
         List<Integer> a = captor.getAllValues();
 
-        assertEquals(a.get(0),new Integer(604800));
+        assertEquals(a.get(0), new Integer(604800));
     }
 }

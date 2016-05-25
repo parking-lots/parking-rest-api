@@ -18,7 +18,7 @@ public class HttpRequestInterceptor extends HandlerInterceptorAdapter {
                              HttpServletResponse response, Object handler)
             throws ApplicationException {
 
-        if(request.getUserPrincipal() == null){
+        if (request.getUserPrincipal() == null) {
             try {
                 userService.reinstateSession(request);
             } catch (ApplicationException e) {

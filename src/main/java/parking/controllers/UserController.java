@@ -56,7 +56,7 @@ public class UserController {
             userService.rememberMeLogin(username, password, request);
         }
 
-            return userService.getCurrentUserProfile();
+            return userService.getCurrentUserProfile(request);
 
     }
 

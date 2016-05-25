@@ -2,10 +2,7 @@ package parking.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
@@ -37,12 +34,12 @@ public class AuthenticationController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
-    public void logout(HttpSession session, Principal principal, HttpServletRequest request) throws ApplicationException {
+    public void logout(@CookieValue(value = "username", defaultValue = "") String username, @CookieValue(value = "password", defaultValue = "") String password, HttpSession session, Principal principal, HttpServletRequest request) throws ApplicationException {
         if (principal == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
 
-        userService.deleteCookies(request);
+        userService.deleteCookies(username, password);
 
         session.invalidate();
     }

@@ -59,7 +59,7 @@ public class UserControllerTest {
     public void whenLoggedInShouldCallServiceMethod() throws ApplicationException {
         controller.profile(servletRequest, principal);
 
-        verify(userService, times(1)).getCurrentUserProfile();
+        verify(userService, times(1)).getCurrentUserProfile(servletRequest);
     }
 
     @Test

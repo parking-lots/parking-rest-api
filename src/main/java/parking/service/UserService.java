@@ -32,10 +32,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -69,8 +66,12 @@ public class UserService {
         return authentication.getName();
     }
 
-    public Profile getCurrentUserProfile() throws UserException {
-        return new Profile(getLoggedUser().get(), true);
+    public Profile getCurrentUserProfile(HttpServletRequest httpRequest) throws ApplicationException {
+        try {
+            return new Profile(getLoggedUser().get(), true);
+        } catch (NoSuchElementException e) {
+            throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, httpRequest);
+        }
     }
 
     public Account getCurrentUser(HttpServletRequest request) throws ApplicationException {
@@ -131,7 +132,7 @@ public class UserService {
             request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
             setMaxInactiveIntervalForSession(request);
         } else {
-            throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
+            throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
     }
 
@@ -234,15 +235,20 @@ public class UserService {
         accountRepository.save(user);
     }
 
-    public void deleteCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                cookies[i].setPath("/");
-                cookies[i].setValue(" ");
-                cookies[i].setMaxAge(0);
-                response.addCookie(cookies[i]);
-            }
+    public void deleteCookies(String username, String password) {
+
+        if (username != "" && password != "") {
+            Cookie cookie = new Cookie("username", username);
+            cookie.setPath("/");
+            cookie.setValue(" ");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+
+            cookie = new Cookie("password", password);
+            cookie.setPath("/");
+            cookie.setValue(" ");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
         }
     }
 
@@ -268,14 +274,18 @@ public class UserService {
                     cookie.setPath("/");
                     cookie.setMaxAge(7 * 24 * 60 * 60);
                     response.addCookie(cookie);
+                }
+            }
 
-                    Account userAccount = accountRepository.findByUsername(username);
-                    if (userAccount != null && userAccount.getPassword().equals(password)) {
-                        rememberMeLogin(username, null, httpRequest);
-                    }
+            if (username != null && password != null) {
+                Account userAccount = accountRepository.findByUsername(username);
+
+                if (userAccount != null && userAccount.getPassword().equals(password)) {
+                    rememberMeLogin(username, null, httpRequest);
                 }
             }
         }
     }
+
 
 }
