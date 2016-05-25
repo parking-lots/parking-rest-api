@@ -36,15 +36,13 @@ public class ParkingControllerV2 {
         AvailableDatesConverter converter = new AvailableDatesConverter();
         List<AvailablePeriod> availablePeriods;
 
-        if(request.getAvailableDates().size() == 0){
-            return;
-        }
-        else {
-            availablePeriods = converter.convertToInterval(request.getAvailableDates());
-        }
+        if (request.getAvailableDates().size() > 0) {
 
-        for(AvailablePeriod p: availablePeriods) {
-            parkingService.freeOwnersParking(p.getFreeFrom(), p.getFreeTill(), httpRequest);
+            availablePeriods = converter.convertToInterval(request.getAvailableDates());
+
+            for (AvailablePeriod p : availablePeriods) {
+                parkingService.freeOwnersParking(p.getFreeFrom(), p.getFreeTill(), httpRequest);
+            }
         }
     }
 
