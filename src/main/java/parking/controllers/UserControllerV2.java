@@ -33,7 +33,6 @@ public class UserControllerV2 {
 
     @RequestMapping(value = "/login", method = RequestMethod.DELETE)
     public void logout(@CookieValue(value = "username", defaultValue = "") String username, @CookieValue(value = "password", defaultValue = "") String password, HttpSession session, Principal principal, HttpServletRequest request) throws ApplicationException {
-        System.out.println("cookie username: " + username);
         if (principal == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
