@@ -14,7 +14,8 @@ public enum ExceptionMessage {
     NO_COOKIE_DATA("no_cookie_data"),
     END_DATE_IN_THE_PAST("end_date_in_the_past"),
     START_DATE_LATER_THAN_END_DATE("start_date_later_than_end_date"),
-    DATE_IN_THE_PAST("date_in_the_past");
+    DATE_IN_THE_PAST("date_in_the_past"),
+    DATE_DOES_NOT_EXIST("date_does_not_exist");
 
     private String msg;
 

@@ -9,10 +9,14 @@ import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
+import parking.exceptions.ApplicationException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.helper.ToolHelper;
 import parking.utils.ParkingType;
 import sun.util.calendar.CalendarSystem;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +31,9 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public LotsRepositoryImpl(MongoOperations operations) {
         this.operations = operations;
     }
+
+    @Autowired
+    private ExceptionHandler exceptionHandler;
 
     @Override
     public List<ParkingLot> searchAllFields(final Account user) {
@@ -114,7 +121,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
-    public void recallParking(Integer lotNumber, Date availableDate) {
+    public void recallParking(Integer lotNumber, Date availableDate, HttpServletRequest httpRequest) throws ApplicationException {
         Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
         Update updateFields = new Update();
 
@@ -131,13 +138,16 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             Date queryFreeFrom = null;
             Date queryFreeTill = null;
 
-            if(lots != null) {
+            if(lots.size() > 0) {
                 for (AvailablePeriod period : lots.get(0).getAvailablePeriods()) {
                     if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0) {
                         queryFreeFrom = period.getFreeFrom();
                         queryFreeTill = period.getFreeTill();
                     }
                 }
+            }
+            else{
+                throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
             }
 
             AvailablePeriod availablePeriod;

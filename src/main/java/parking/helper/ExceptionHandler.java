@@ -41,6 +41,7 @@ public class ExceptionHandler {
             case END_DATE_IN_THE_PAST:
             case START_DATE_LATER_THAN_END_DATE:
             case DATE_IN_THE_PAST:
+            case DATE_DOES_NOT_EXIST:
                 return new ParkingException(getMessage(message.getMsg(), request));
             default:
                 return (ApplicationException) new Exception(message.getMsg());

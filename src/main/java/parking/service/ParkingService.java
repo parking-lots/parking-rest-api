@@ -6,18 +6,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.exceptions.ApplicationException;
+import parking.helper.AvailableDatesConverter;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
+import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
+import parking.utils.ActionType;
 import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.*;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +39,8 @@ public class ParkingService {
     private LotsRepository lotsRepository;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private LogRepository logRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -72,6 +79,11 @@ public class ParkingService {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         } else {
             lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill);
+
+            Account user = userService.getCurrentUser(httpRequest);
+            ObjectId userId = user.getId();
+            ObjectId targetUserId = parking.getOwner().getId();
+            logRepository.insertActionLog(ActionType.SHARE, targetUserId, parking.getNumber(), freeFrom, freeTill, null, userId, null);
         }
     }
 
@@ -92,7 +104,19 @@ public class ParkingService {
             return;
         }
         for (Date d : availableDates) {
-            lotsRepository.recallParking(parking.getNumber(), d);
+            lotsRepository.recallParking(parking.getNumber(), d, request);
+        }
+
+        Account user = userService.getCurrentUser(request);
+        ObjectId userId = user.getId();
+        ObjectId targetUserId = parking.getOwner().getId();
+
+        List<AvailablePeriod> availablePeriods;
+        AvailableDatesConverter converter = new AvailableDatesConverter();
+        availablePeriods = converter.convertToInterval(availableDates);
+
+        for(AvailablePeriod availablePeriod: availablePeriods){
+            logRepository.insertActionLog(ActionType.UNSHARE, targetUserId, parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, userId, null);
         }
     }
 
