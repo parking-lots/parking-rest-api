@@ -52,23 +52,48 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
         Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
 
-        searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeTill").gte(freeFrom)));
-
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+
         for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
             if (availablePeriod.getFreeFrom().compareTo(freeTill) <= 0 && availablePeriod.getFreeTill().compareTo(freeFrom) >= 0) {
                 throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
+
+            } else if ((int) ((freeFrom.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+
+                updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
+                return;
+
+            } else if ((int) ((availablePeriod.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+
+                updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
+                return;
             }
         }
 
         Update updateFields = new Update();
+        AvailablePeriod newAvailablePeriod = new AvailablePeriod(freeFrom, freeTill);
+        updateFields.addToSet("availablePeriods", newAvailablePeriod);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
 
-        AvailablePeriod availablePeriod = new AvailablePeriod(freeFrom, freeTill);
-
-        updateFields.addToSet("availablePeriods", availablePeriod);
+    private void updateAvailablePeriods(Date dbFreeFrom, Date dbFreeTill, Query searchQuery, Date newFreeFrom, Date newFreeTill) {
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("freeFrom", dbFreeFrom);
+        obj.put("freeTill", dbFreeTill);
+        Update updateFields = new Update();
+        updateFields.pull("availablePeriods", obj);
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
 
-}
+        updateFields = new Update();
+        AvailablePeriod newAvailablePeriod = null;
+        if (newFreeFrom.compareTo(dbFreeFrom) <= 0) {
+            newAvailablePeriod = new AvailablePeriod(newFreeFrom, dbFreeTill);
+        } else {
+            newAvailablePeriod = new AvailablePeriod(dbFreeFrom, newFreeTill);
+        }
+        updateFields.addToSet("availablePeriods", newAvailablePeriod);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
 
     public void freeOwnersParking(Integer lotNumber, Date availableDate) {
         Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
@@ -148,9 +173,9 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
                         queryFreeFrom = period.getFreeFrom();
                         queryFreeTill = period.getFreeTill();
                     }
-                    else{
-                        throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
-                    }
+                }
+                if (queryFreeFrom == null || queryFreeTill == null) {
+                    throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
                 }
             }
 
