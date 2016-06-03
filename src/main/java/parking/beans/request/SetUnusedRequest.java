@@ -4,21 +4,26 @@ import org.springframework.format.annotation.DateTimeFormat;
 import parking.utils.EliminateDateTimestamp;
 
 import java.util.Date;
+import java.util.LinkedList;
 
 public class SetUnusedRequest {
-    private Integer number;
+    private LinkedList<Date> availableDates;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeFrom;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date freeTill;
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
 
-    public Integer getNumber() {
-        return number;
+
+    public LinkedList<Date> getAvailableDates() {
+        return availableDates;
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void setAvailableDates(LinkedList<Date> availableDates) {
+        for(Date d: availableDates){
+            d = eliminateDateTimestamp.formatDateForDatabase(d).getTime();
+        }
+        this.availableDates = availableDates;
     }
 
     public Date getFreeFrom() {

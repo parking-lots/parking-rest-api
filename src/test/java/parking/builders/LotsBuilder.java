@@ -4,6 +4,7 @@ import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 
+import java.util.Date;
 import java.util.LinkedList;
 
 public class LotsBuilder {
@@ -12,11 +13,8 @@ public class LotsBuilder {
 
     public LotsBuilder() {
         LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
-        AvailablePeriod availablePeriod = new AvailablePeriod();
-        availablePeriod.setFreeFrom(null);
-        availablePeriod.setFreeTill(null);
+        AvailablePeriod availablePeriod = new AvailablePeriod(new Date(), new Date());
         this.lot = new ParkingLot();
-        this.lot.setAvailablePeriods(availablePeriods);
     }
 
     public LotsBuilder number(Integer number) {

@@ -1,6 +1,7 @@
 package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,11 +13,15 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.service.UserService;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
+@Deprecated
 @RequestMapping(value = "/profile")
 public class UserController {
 
@@ -26,12 +31,33 @@ public class UserController {
     @Autowired
     private ExceptionHandler exceptionHandler;
 
+    @Autowired
+    private HttpServletResponse response;
+
     @RequestMapping(method = RequestMethod.GET)
     public Profile profile(HttpServletRequest request, Principal principal) throws ApplicationException {
-        if (principal == null) {
+
+        String username = null, password = null;
+
+            for (Cookie cookie : request.getCookies()) {
+
+                if (cookie.getName().equals("username")) {
+                    username = cookie.getValue();
+                }
+                if (cookie.getName().equals("password")) {
+                    password = cookie.getValue();
+                }
+            }
+
+        if (principal == null && username == null && password == null) {
             throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
         }
-        return userService.getCurrentUserProfile();
+        else if (principal == null && username != null && password != null){
+            userService.rememberMeLogin(username, password, request);
+        }
+
+            return userService.getCurrentUserProfile(request);
+
     }
 
     @RequestMapping(value = "/password", method = RequestMethod.PUT)

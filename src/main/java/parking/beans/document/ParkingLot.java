@@ -97,7 +97,7 @@ public class ParkingLot extends Response {
         this.reserved = reserved;
     }
 
-    public LinkedList<AvailablePeriod> getAvailablePeriods() {
+        public LinkedList<AvailablePeriod> getAvailablePeriods() {
         return availablePeriods;
     }
 

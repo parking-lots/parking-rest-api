@@ -27,16 +27,12 @@ import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.RoleRepository;
-import parking.utils.ParkingerEnums;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -70,8 +66,12 @@ public class UserService {
         return authentication.getName();
     }
 
-    public Profile getCurrentUserProfile() throws UserException {
-        return new Profile(getLoggedUser().get(), true);
+    public Profile getCurrentUserProfile(HttpServletRequest httpRequest) throws ApplicationException {
+        try {
+            return new Profile(getLoggedUser().get(), true);
+        } catch (NoSuchElementException e) {
+            throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, httpRequest);
+        }
     }
 
     public Account getCurrentUser(HttpServletRequest request) throws ApplicationException {
@@ -83,62 +83,59 @@ public class UserService {
         return getLoggedUser().get();
     }
 
-    public void login(LoginForm user, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
-        LoginForm userToValidate = new LoginForm();
-        userToValidate.setPassword(user.getPassword());
-        userToValidate.setUsername(user.getUsername().toLowerCase());
-
-        Account userAccount = validateUser(userToValidate, request);
-        if (user.getRemember()) {
-            setRememberMeCookies(userAccount);
+    public void login(String username, String password, Boolean remember, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
+        rememberMeLogin(username.toLowerCase(), password, request);
+        if (remember) {
+            Account account = accountRepository.findByUsername(username);
+            if (account == null) {
+                return;
+            }
+            setRememberMeCookies(accountRepository.findByUsername(username));
         }
-
-        SecurityContext context = getSecurityContext(userAccount);
-
-        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-        setMaxInactiveIntervalForSession(request);
     }
 
     public void setRememberMeCookies(Account userAccount) {
         Cookie cookieUsername = new Cookie("username", userAccount.getUsername());
-        cookieUsername.setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
+        cookieUsername.setMaxAge(7 * 24 * 60 * 60);
+        cookieUsername.setPath("/");
         response.addCookie(cookieUsername);
 
         Cookie cookiePassword = new Cookie("password", userAccount.getPassword());
-        cookiePassword.setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
+        cookiePassword.setMaxAge(7 * 24 * 60 * 60);
+        cookiePassword.setPath("/");
         response.addCookie(cookiePassword);
     }
 
     public void setMaxInactiveIntervalForSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(ParkingerEnums.SevenDaysInMilliseconds);
+        session.setMaxInactiveInterval(7 * 24 * 60 * 60);
     }
 
     public void rememberMeLogin(String username, String password, HttpServletRequest request)
             throws AuthenticationCredentialsNotFoundException, ApplicationException {
+
+        if (getLoggedUser().isPresent()) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
+        }
+
         Account userAccount = accountRepository.findByUsername(username);
 
         if (userAccount != null) {
-            if (userAccount.getPassword().equals(password)) {
-                Cookie[] cookies = request.getCookies();
-
-                for (int i = 0; i < cookies.length; i++) {
-                    if (cookies[i].getName().equals("username") || cookies[i].getName().equals("password")) {
-                        cookies[i].setMaxAge(ParkingerEnums.SevenDaysInMilliseconds);
-                    }
+            if (password != null) {
+                if (!ProfileHelper.checkPassword(password, userAccount.getPassword())) {
+                    throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
                 }
-
-                SecurityContext context = getSecurityContext(userAccount);
-
-                request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-                setMaxInactiveIntervalForSession(request);
-            } else {
-                throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
             }
+
+            SecurityContext context = getSecurityContext(userAccount);
+
+            request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+            setMaxInactiveIntervalForSession(request);
         } else {
-            throw exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request);
+            throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
         }
     }
+
 
     public SecurityContext getSecurityContext(Account userAccount) {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -238,14 +235,57 @@ public class UserService {
         accountRepository.save(user);
     }
 
-    public void deleteCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
+    public void deleteCookies(String username, String password) {
 
-        for (int i = 0; i < cookies.length; i++) {
-            cookies[i].setValue(" ");
-            cookies[i].setMaxAge(0);
-            response.addCookie(cookies[i]);
+        if (username != "" && password != "") {
+            Cookie cookie = new Cookie("username", username);
+            cookie.setPath("/");
+            cookie.setValue(" ");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+
+            cookie = new Cookie("password", password);
+            cookie.setPath("/");
+            cookie.setValue(" ");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
         }
     }
+
+    public void reinstateSession(HttpServletRequest httpRequest) throws ApplicationException {
+
+        String username = null;
+        String password = null;
+
+        Cookie[] cookies = httpRequest.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : httpRequest.getCookies()) {
+
+                if (cookie.getName().equals("username")) {
+                    username = cookie.getValue();
+
+                    cookie.setPath("/");
+                    cookie.setMaxAge(7 * 24 * 60 * 60);
+                    response.addCookie(cookie);
+                }
+                if (cookie.getName().equals("password")) {
+                    password = cookie.getValue();
+
+                    cookie.setPath("/");
+                    cookie.setMaxAge(7 * 24 * 60 * 60);
+                    response.addCookie(cookie);
+                }
+            }
+
+            if (username != null && password != null) {
+                Account userAccount = accountRepository.findByUsername(username);
+
+                if (userAccount != null && userAccount.getPassword().equals(password)) {
+                    rememberMeLogin(username, null, httpRequest);
+                }
+            }
+        }
+    }
+
 
 }

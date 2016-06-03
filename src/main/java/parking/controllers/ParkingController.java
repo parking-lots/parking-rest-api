@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.ParkingNumberRequest;
-import parking.beans.request.RecallSingleParking;
+import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
+@Deprecated
 @RequestMapping(value = "/parking")
 public class ParkingController {
 
@@ -34,28 +35,23 @@ public class ParkingController {
                 .collect(Collectors.<Parking>toList());
     }
 
-    @RequestMapping(value = "/available", method = RequestMethod.DELETE)
-    public void recallParking() {
-        parkingService.recallParking();
-    }
-
     @RequestMapping(value = "/remove", method = RequestMethod.POST)
-    public void recallSingleParking(@Valid @RequestBody RecallSingleParking recallSingleParking) {
-        parkingService.recallSingleParking(recallSingleParking);
+    public void recallParking(@Valid @RequestBody RecallParking recallParking, HttpServletRequest request) throws ApplicationException {
+        parkingService.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), request);
     }
 
     @RequestMapping(value = "/available", method = RequestMethod.PUT)
     public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.freeOwnersParking(request, httpRequest);
+        parkingService.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
     public void reserveOwnersParking(@Valid @RequestBody ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.reserve(request, httpRequest);
+        parkingService.reserve(request.getNumber(), httpRequest);
     }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.DELETE)
-    public void cancelRezervation(HttpServletRequest request) throws ApplicationException {
-        parkingService.cancelRezervation(request);
+    public void cancelReservation(HttpServletRequest request) throws ApplicationException {
+        parkingService.cancelReservation(request);
     }
 }

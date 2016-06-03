@@ -11,10 +11,8 @@ import parking.beans.document.Account;
 import parking.beans.request.DeleteUser;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
-import parking.beans.response.Parking;
 import parking.beans.response.User;
 import parking.builders.AccountBuilder;
-import parking.builders.LotsBuilder;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
@@ -24,17 +22,14 @@ import parking.service.AdminService;
 import parking.service.RegistrationService;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
