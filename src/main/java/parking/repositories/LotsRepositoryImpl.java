@@ -18,10 +18,7 @@ import sun.util.calendar.CalendarSystem;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
 
@@ -53,28 +50,16 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
     @Override
     public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
-        Query searchQuery = new Query();
+        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
 
-        searchQuery.addCriteria(
-                new Criteria()
-                        .andOperator(
-                                Criteria.where("availablePeriods.freeFrom").lte(freeTill),
-                                Criteria.where("availablePeriods.freeTill").gte(freeFrom),
-                                Criteria.where("number").is(lotNumber)
-                        )
-
-        );
-              //  .and("availablePeriods.freeTill").gte(freeFrom)));
-
-      //  searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeTill").gte(freeFrom)));
+        searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeTill").gte(freeFrom)));
 
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-        String query = searchQuery.toString();
-
-        if (lots.size() > 0) {
-            throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
-        } else {
-            searchQuery = new Query(Criteria.where("number").is(lotNumber));
+        for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
+            if (availablePeriod.getFreeFrom().compareTo(freeTill) <= 0 && availablePeriod.getFreeTill().compareTo(freeFrom) >= 0) {
+                throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
+            }
+        }
 
         Update updateFields = new Update();
 
@@ -82,8 +67,8 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
         updateFields.addToSet("availablePeriods", availablePeriod);
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
-    }
-    }
+
+}
 
     public void freeOwnersParking(Integer lotNumber, Date availableDate) {
         Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
@@ -151,8 +136,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             updateFields.unset("availablePeriods");
         } else {
             availableDate = ToolHelper.formatDate(availableDate);
-            searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeFrom").lte(availableDate)
-                    .and("availablePeriods.freeTill").gte(availableDate)));
 
             List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
@@ -165,9 +148,10 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
                         queryFreeFrom = period.getFreeFrom();
                         queryFreeTill = period.getFreeTill();
                     }
+                    else{
+                        throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
+                    }
                 }
-            } else {
-                throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
             }
 
             AvailablePeriod availablePeriod;
@@ -179,10 +163,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
             Calendar after = Calendar.getInstance();
             after.setTime(availableDate);
             after.add(Calendar.DATE, 1);
-
-            if (queryFreeFrom == null || queryFreeTill == null) {
-                return;
-            }
 
             if (queryFreeFrom.equals(availableDate) && queryFreeTill.equals(availableDate)) {
                 removeAvailablePeriod(lotNumber, availableDate);
@@ -220,7 +200,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
-        if(lots.size() == 0){
+        if (lots.size() == 0) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
         }
 
