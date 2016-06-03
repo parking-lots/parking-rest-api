@@ -52,14 +52,37 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill) {
-        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
+    public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
+        Query searchQuery = new Query();
+
+        searchQuery.addCriteria(
+                new Criteria()
+                        .andOperator(
+                                Criteria.where("availablePeriods.freeFrom").lte(freeTill),
+                                Criteria.where("availablePeriods.freeTill").gte(freeFrom),
+                                Criteria.where("number").is(lotNumber)
+                        )
+
+        );
+              //  .and("availablePeriods.freeTill").gte(freeFrom)));
+
+      //  searchQuery.addCriteria(new Criteria().andOperator(Criteria.where("availablePeriods.freeTill").gte(freeFrom)));
+
+        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+        String query = searchQuery.toString();
+
+        if (lots.size() > 0) {
+            throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
+        } else {
+            searchQuery = new Query(Criteria.where("number").is(lotNumber));
+
         Update updateFields = new Update();
 
         AvailablePeriod availablePeriod = new AvailablePeriod(freeFrom, freeTill);
 
         updateFields.addToSet("availablePeriods", availablePeriod);
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    }
     }
 
     public void freeOwnersParking(Integer lotNumber, Date availableDate) {
@@ -186,7 +209,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Override
-    public void reserve(Integer lotNumber, Account user) {
+    public void reserve(Integer lotNumber, Account user, HttpServletRequest httpRequest) throws ApplicationException {
         Query searchQuery = new Query();
         Date currentDate = ToolHelper.getCurrentDate();
         searchQuery.addCriteria(new Criteria()
@@ -194,6 +217,13 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
                         Criteria.where("number").is(lotNumber),
                         Criteria.where("reserved").is(null)
                 ));
+
+        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+
+        if(lots.size() == 0){
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
+        }
+
         Update updateFields = new Update();
         updateFields.set("user", user);
         updateFields.set("reserved", currentDate);

@@ -13,13 +13,13 @@ import java.util.List;
 public interface CustomLotsRepository {
     public List<ParkingLot> searchAllFields(Account user);
 
-    public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill);
+    public void freeOwnersParking(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException;
 
     public void recallParking(Integer lotNumber, Date freeFrom, Date freeTill);
 
     public void recallParking(Integer lotNumber, Date availableDate, HttpServletRequest httpRequest) throws ApplicationException;
 
-    public void reserve(Integer lotNumber, Account user);
+    public void reserve(Integer lotNumber, Account user, HttpServletRequest httpRequest) throws ApplicationException;
 
     public void cancelReservation(Account user);
 

@@ -78,7 +78,7 @@ public class ParkingService {
         } else if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1)) {
             throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
         } else {
-            lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill);
+            lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill, httpRequest);
 
             Account user = userService.getCurrentUser(httpRequest);
             ObjectId userId = user.getId();
@@ -121,7 +121,14 @@ public class ParkingService {
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
-        lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest));
+        ParkingLot lot = lotsRepository.findByNumber(lotNumber);
+
+        if(lot == null){
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
+        }
+        else {
+            lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest), httpRequest);
+        }
     }
 
     public ParkingLot createLot(ParkingLot parkingLot, HttpServletRequest request) throws ApplicationException {
@@ -141,7 +148,7 @@ public class ParkingService {
     public ParkingLot getParkingByNumber(Integer number, HttpServletRequest request) throws ApplicationException {
         Optional<ParkingLot> parkingLot = Optional.ofNullable(lotsRepository.findByNumber(number));
         if (!parkingLot.isPresent()) {
-            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DID_NOT_EXIST, request);
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, request);
         }
         return parkingLot.get();
     }

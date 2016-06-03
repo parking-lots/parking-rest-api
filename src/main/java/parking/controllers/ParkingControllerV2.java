@@ -56,8 +56,8 @@ public class ParkingControllerV2 {
         parkingService.reserve(lotNumber, httpRequest);
     }
 
-    @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.DELETE)
-    public void cancelReservation(@PathVariable(value = "lotNumber") Integer lotNumber, HttpServletRequest request) throws ApplicationException {
+    @RequestMapping(value = "/reservation", method = RequestMethod.DELETE)
+    public void cancelReservation(HttpServletRequest request) throws ApplicationException {
         parkingService.cancelReservation(request);
     }
 }

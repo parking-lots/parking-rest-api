@@ -36,12 +36,14 @@ public class ExceptionHandler {
             case NO_COOKIE_DATA:
                 return new UserException(getMessage(message.getMsg(), request));
             case PARKING_ALREADY_EXISTS:
-            case PARKING_DID_NOT_EXIST:
+            case PARKING_DOES_NOT_EXIST:
             case PARKING_OWNED_BY_ANOTHER:
+            case PARKING_NOT_AVAILABLE:
             case END_DATE_IN_THE_PAST:
             case START_DATE_LATER_THAN_END_DATE:
             case DATE_IN_THE_PAST:
             case DATE_DOES_NOT_EXIST:
+            case OVERLAPPING_PERIOD:
                 return new ParkingException(getMessage(message.getMsg(), request));
             default:
                 return (ApplicationException) new Exception(message.getMsg());
