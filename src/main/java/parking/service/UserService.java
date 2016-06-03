@@ -123,7 +123,7 @@ public class UserService {
         if (userAccount != null) {
             if (password != null) {
                 if (!ProfileHelper.checkPassword(password, userAccount.getPassword())) {
-                    return;
+                    throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
                 }
             }
 
@@ -132,7 +132,7 @@ public class UserService {
             request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
             setMaxInactiveIntervalForSession(request);
         } else {
-            throw exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, request);
+            throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
         }
     }
 
