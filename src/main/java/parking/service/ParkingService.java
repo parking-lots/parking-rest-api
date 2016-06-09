@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
-import parking.beans.request.RecallParking;
-import parking.beans.request.SetUnusedRequest;
 import parking.exceptions.ApplicationException;
 import parking.helper.AvailableDatesConverter;
 import parking.helper.ExceptionHandler;
@@ -20,17 +18,12 @@ import parking.repositories.LotsRepository;
 import parking.utils.ActionType;
 import parking.utils.EliminateDateTimestamp;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.*;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.time.LocalDate.now;
 
 @Service
 public class ParkingService {
@@ -61,36 +54,36 @@ public class ParkingService {
         return parkingLots;
     }
 
-    public void freeOwnersParking(Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
+    public void freeOwnersParking(ObjectId ownerId, Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
 
-        ParkingLot parking = getParkingNumberByUser();
+        validatePeriod(lotNumber, freeFrom, freeTill, httpRequest);
 
-        if (parking == null) {
-            return;
-        }
+        lotsRepository.freeOwnersParking(lotNumber, freeFrom, freeTill, httpRequest);
 
+        Account user = userService.getCurrentUser(httpRequest);
+        ObjectId userId = user.getId();
+        logRepository.insertActionLog(ActionType.SHARE, ownerId, lotNumber, freeFrom, freeTill, null, userId, null);
+    }
+
+    public void validatePeriod(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpServletRequest) throws ApplicationException {
         Date currentDate = new Date();
         EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
         Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
 
-        if (freeFrom.compareTo(freeTill) > 0) {
-            throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpRequest);
-        } else if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1)) {
-            throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpRequest);
-        } else {
-            lotsRepository.freeOwnersParking(parking.getNumber(), freeFrom, freeTill, httpRequest);
+        if (freeFrom.compareTo(freeTill) > 0)
+            throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpServletRequest);
 
-            Account user = userService.getCurrentUser(httpRequest);
-            ObjectId userId = user.getId();
-            ObjectId targetUserId = parking.getOwner().getId();
-            logRepository.insertActionLog(ActionType.SHARE, targetUserId, parking.getNumber(), freeFrom, freeTill, null, userId, null);
-        }
+        if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1))
+            throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpServletRequest);
+
+        lotsRepository.checkPeriod(lotNumber, freeFrom, freeTill, httpServletRequest);
+
     }
 
     public void recallParking(Date freeFrom, Date freeTill, HttpServletRequest request) throws ApplicationException {
 
         ParkingLot parking = getParkingNumberByUser();
-        if(parking == null){
+        if (parking == null) {
             return;
         }
 
@@ -115,7 +108,7 @@ public class ParkingService {
         AvailableDatesConverter converter = new AvailableDatesConverter();
         availablePeriods = converter.convertToInterval(availableDates);
 
-        for(AvailablePeriod availablePeriod: availablePeriods){
+        for (AvailablePeriod availablePeriod : availablePeriods) {
             logRepository.insertActionLog(ActionType.UNSHARE, targetUserId, parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, userId, null);
         }
     }
@@ -123,10 +116,9 @@ public class ParkingService {
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
         ParkingLot lot = lotsRepository.findByNumber(lotNumber);
 
-        if(lot == null){
+        if (lot == null) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
-        }
-        else {
+        } else {
             lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest), httpRequest);
         }
     }
@@ -162,7 +154,7 @@ public class ParkingService {
         return lotsRepository.save(parkingLot);
     }
 
-    private ParkingLot getParkingNumberByUser() {
+    public ParkingLot getParkingNumberByUser() {
         return accountRepository.findByUsername(getCurrentUserName()).getParking();
     }
 

@@ -14,6 +14,7 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ToolHelper;
 import parking.utils.ParkingType;
+import parking.utils.PeriodMergeType;
 import sun.util.calendar.CalendarSystem;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,17 +56,28 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
         for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
-            if (availablePeriod.getFreeFrom().compareTo(freeTill) <= 0 && availablePeriod.getFreeTill().compareTo(freeFrom) >= 0) {
-                throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
 
-            } else if ((int) ((freeFrom.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+            if ((int) ((freeFrom.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                for (AvailablePeriod availablePeriod1 : lots.get(0).getAvailablePeriods()) {
+                    if ((int) ((availablePeriod1.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                        updateAvailablePeriods(PeriodMergeType.MIDDLE, availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), availablePeriod1.getFreeFrom(), availablePeriod1.getFreeTill(), searchQuery, freeFrom, freeTill);
+                        return;
+                    }
+                }
 
-                updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
+                updateAvailablePeriods(PeriodMergeType.RIGHT, availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, null, searchQuery, freeFrom, freeTill);
                 return;
+            }
 
-            } else if ((int) ((availablePeriod.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+            if ((int) ((availablePeriod.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                for (AvailablePeriod availablePeriod1 : lots.get(0).getAvailablePeriods()) {
+                    if ((int) ((freeFrom.getTime() - availablePeriod1.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                        updateAvailablePeriods(PeriodMergeType.MIDDLE, availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), availablePeriod1.getFreeFrom(), availablePeriod1.getFreeTill(), searchQuery, freeFrom, freeTill);
+                        return;
+                    }
+                }
 
-                updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
+                updateAvailablePeriods(PeriodMergeType.LEFT, availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, null, searchQuery, freeFrom, freeTill);
                 return;
             }
         }
@@ -76,21 +88,60 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
-    private void updateAvailablePeriods(Date dbFreeFrom, Date dbFreeTill, Query searchQuery, Date newFreeFrom, Date newFreeTill) {
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("freeFrom", dbFreeFrom);
-        obj.put("freeTill", dbFreeTill);
-        Update updateFields = new Update();
-        updateFields.pull("availablePeriods", obj);
-        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+    @Override
+    public void checkPeriod(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
+        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
 
-        updateFields = new Update();
-        AvailablePeriod newAvailablePeriod = null;
-        if (newFreeFrom.compareTo(dbFreeFrom) <= 0) {
-            newAvailablePeriod = new AvailablePeriod(newFreeFrom, dbFreeTill);
-        } else {
-            newAvailablePeriod = new AvailablePeriod(dbFreeFrom, newFreeTill);
+        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+
+        for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
+            if (availablePeriod.getFreeFrom().compareTo(freeTill) <= 0 && availablePeriod.getFreeTill().compareTo(freeFrom) >= 0) {
+                throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
+            }
         }
+    }
+
+    private void updateAvailablePeriods(PeriodMergeType mergeType, Date dbFreeFrom1, Date dbFreeTill1, Date dbFreeFrom2, Date dbFreeTill2, Query searchQuery, Date newFreeFrom, Date newFreeTill) {
+        BasicDBObject obj = new BasicDBObject();
+
+        if (mergeType == PeriodMergeType.MIDDLE) {
+            obj.put("freeFrom", dbFreeFrom1);
+            obj.put("freeTill", dbFreeTill1);
+            Update updateFields = new Update();
+            updateFields.pull("availablePeriods", obj);
+            operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+
+            obj = new BasicDBObject();
+            obj.put("freeFrom", dbFreeFrom2);
+            obj.put("freeTill", dbFreeTill2);
+            updateFields = new Update();
+            updateFields.pull("availablePeriods", obj);
+            operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        } else {
+            obj.put("freeFrom", dbFreeFrom1);
+            obj.put("freeTill", dbFreeTill1);
+            Update updateFields = new Update();
+            updateFields.pull("availablePeriods", obj);
+            operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        }
+
+        Update updateFields = new Update();
+        AvailablePeriod newAvailablePeriod = null;
+        switch (mergeType) {
+            case MIDDLE:
+                if (dbFreeFrom1.compareTo(dbFreeTill2) < 0) {
+                    newAvailablePeriod = new AvailablePeriod(dbFreeFrom1, dbFreeTill2);
+                } else {
+                    newAvailablePeriod = new AvailablePeriod(dbFreeFrom2, dbFreeTill1);
+                }
+                break;
+            case LEFT:
+                newAvailablePeriod = new AvailablePeriod(newFreeFrom, dbFreeTill1);
+                break;
+            case RIGHT:
+                newAvailablePeriod = new AvailablePeriod(dbFreeFrom1, newFreeTill);
+        }
+
         updateFields.addToSet("availablePeriods", newAvailablePeriod);
         operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }

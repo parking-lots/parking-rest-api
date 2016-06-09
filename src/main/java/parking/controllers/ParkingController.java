@@ -40,10 +40,10 @@ public class ParkingController {
         parkingService.recallParking(recallParking.getFreeFrom(), recallParking.getFreeTill(), request);
     }
 
-    @RequestMapping(value = "/available", method = RequestMethod.PUT)
-    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
-    }
+//    @RequestMapping(value = "/available", method = RequestMethod.PUT)
+//    public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+//        parkingService.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
+//    }
 
     @RequestMapping(value = "/reserved", method = RequestMethod.PUT)
     public void reserveOwnersParking(@Valid @RequestBody ParkingNumberRequest request, HttpServletRequest httpRequest) throws ApplicationException {

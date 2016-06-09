@@ -8,11 +8,12 @@ import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
-import parking.helper.AvailableDatesConverter;
+import parking.helper.*;
 import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 public class ParkingControllerV2 {
     @Autowired
     private ParkingService parkingService;
+    @Autowired
+    private parking.helper.ExceptionHandler exceptionHandler;
 
     @RequestMapping(value = "/available", method = RequestMethod.GET)
     public List<Parking> getAllAvailable(HttpServletRequest request) throws ApplicationException {
@@ -33,6 +36,12 @@ public class ParkingControllerV2 {
 
     @RequestMapping(value = "/availability", method = RequestMethod.PUT)
     public void freeOwnersParking(@Valid @RequestBody SetUnusedRequest request, HttpServletRequest httpRequest) throws ApplicationException {
+        ParkingLot parking = parkingService.getParkingNumberByUser();
+
+        if (parking == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
+        }
+
         AvailableDatesConverter converter = new AvailableDatesConverter();
         List<AvailablePeriod> availablePeriods;
 
@@ -41,7 +50,11 @@ public class ParkingControllerV2 {
             availablePeriods = converter.convertToInterval(request.getAvailableDates());
 
             for (AvailablePeriod p : availablePeriods) {
-                parkingService.freeOwnersParking(p.getFreeFrom(), p.getFreeTill(), httpRequest);
+                parkingService.validatePeriod(parking.getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
+            }
+
+            for (AvailablePeriod p : availablePeriods) {
+                parkingService.freeOwnersParking(parking.getOwner().getId(), parking.getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
             }
         }
     }
