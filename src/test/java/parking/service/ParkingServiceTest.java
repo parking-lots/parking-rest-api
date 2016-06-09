@@ -21,6 +21,7 @@ import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
+import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.utils.EliminateDateTimestamp;
 
@@ -44,6 +45,8 @@ public class ParkingServiceTest {
     @Mock
     private LotsRepository lotsRepository;
     @Mock
+    private LogRepository logRepository;
+    @Mock
     private AccountRepository accountRepository;
     @Mock
     private SecurityContext mockSecurityContext;
@@ -53,6 +56,7 @@ public class ParkingServiceTest {
     private UserService userService;
     @Mock
     private ExceptionHandler exceptionHandler;
+
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private Account mockedAccount;
@@ -65,7 +69,7 @@ public class ParkingServiceTest {
         when(authentication.getName()).thenReturn(CURRENT_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
 
-        when(exceptionHandler.handleException(ExceptionMessage.PARKING_DID_NOT_EXIST, httpRequest)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, httpRequest)).thenReturn(new ApplicationException("message"));
 
         SecurityContextHolder.setContext(mockSecurityContext);
@@ -112,29 +116,26 @@ public class ParkingServiceTest {
 
     @Test
     public void whenOwnerFreeUpParkingLot() throws ApplicationException {
-
-        SetUnusedRequest request = new SetUnusedRequest();
-        request.setFreeFrom(new Date());
-        request.setFreeTill(new Date());
+        Date from = new Date();
+        Date to = new Date();
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
+        service.freeOwnersParking(mockedParkingLot.getOwner().getId(), mockedParkingLot.getNumber(), from, to, httpRequest);
 
         verify(lotsRepository).freeOwnersParking(
                 eq(mockedAccount.getParking().getNumber()),
-                eq(request.getFreeFrom()),
-                eq(request.getFreeTill()));
+                eq(from),
+                eq(to),
+                eq(httpRequest));
     }
 
     @Test
     public void whenCustomerDoesNotHaveParkingAssigned() throws ApplicationException {
         mockedAccount.setParking(null);
-        SetUnusedRequest request = new SetUnusedRequest();
-
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.freeOwnersParking(request.getFreeFrom(), request.getFreeTill(), httpRequest);
-        verify(lotsRepository, never()).freeOwnersParking(200, request.getFreeFrom(), request.getFreeTill());
+        service.freeOwnersParking(null, mockedParkingLot.getNumber(), new Date(), new Date(), httpRequest);
+        verify(lotsRepository, never()).freeOwnersParking(200, new Date(), new Date(), httpRequest);
     }
 
     @Test
@@ -154,18 +155,15 @@ public class ParkingServiceTest {
 
     @Test
     public void whenOwnerRecallParkingWithSingleDates() throws ApplicationException {
-        Date singleDate = new Date(1479168000000L); //2016-11-15
+        Date singleDate = new Date();
         List<Date> dateList = new ArrayList<>();
         dateList.add(singleDate);
 
-        RecallParking recallParking = new RecallParking();
-        recallParking.setAvailableDates(dateList);
-
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(recallParking.getAvailableDates(), httpRequest);
+        service.recallParking(dateList, httpRequest);
 
-        verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), recallParking.getAvailableDates().get(0));
+        verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), dateList.get(0), httpRequest);
     }
 
     @Test
@@ -182,8 +180,8 @@ public class ParkingServiceTest {
     @Test
     public void whenUserReserveParkingLot() throws ApplicationException {
 
-        service.reserve(mockedAccount.getParking().getNumber(), httpRequest);
-        verify(lotsRepository).reserve(mockedAccount.getParking().getNumber(), mockedAccount);
+        service.reserve(mockedParkingLot.getNumber(), httpRequest);
+        verify(lotsRepository).reserve(mockedAccount.getParking().getNumber(), mockedAccount, httpRequest);
     }
 
     @Test

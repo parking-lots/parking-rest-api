@@ -21,6 +21,8 @@ public interface CustomLotsRepository {
 
     public void recallParking(Integer lotNumber, Date availableDate, HttpServletRequest httpRequest) throws ApplicationException;
 
+    public void checkRecallDate(Integer lotNumber, Date availableDate, HttpServletRequest httpRequest) throws ApplicationException;
+
     public void reserve(Integer lotNumber, Account user, HttpServletRequest httpRequest) throws ApplicationException;
 
     public void cancelReservation(Account user);

@@ -227,9 +227,6 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
                         queryFreeTill = period.getFreeTill();
                     }
                 }
-                if (queryFreeFrom == null || queryFreeTill == null) {
-                    throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
-                }
             }
 
             AvailablePeriod availablePeriod;
@@ -263,6 +260,27 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
             operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
             removeAvailablePeriod(lotNumber, availableDate);
+        }
+    }
+
+    public void checkRecallDate(Integer lotNumber, Date availableDate, HttpServletRequest httpRequest) throws ApplicationException {
+        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
+
+        if (availableDate != null) {
+            availableDate = ToolHelper.formatDate(availableDate);
+
+            List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
+
+            boolean dateExists = false;
+
+            if (lots.size() > 0) {
+                for (AvailablePeriod period : lots.get(0).getAvailablePeriods()) {
+                    if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0)
+                        dateExists = true;
+                }
+                if (dateExists == false)
+                    throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
+            }
         }
     }
 
