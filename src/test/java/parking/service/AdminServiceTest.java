@@ -78,6 +78,7 @@ public class AdminServiceTest {
 
     @Test
     public void whenRemoveParkingFromUser(){
+
         service.removeParkingFromUser(mockedAccount.getUsername());
     }
 }

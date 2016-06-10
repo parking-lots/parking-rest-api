@@ -179,9 +179,18 @@ public class ParkingServiceTest {
 
     @Test
     public void whenUserReserveParkingLot() throws ApplicationException {
+        given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(mockedParkingLot);
 
         service.reserve(mockedParkingLot.getNumber(), httpRequest);
-        verify(lotsRepository).reserve(mockedAccount.getParking().getNumber(), mockedAccount, httpRequest);
+        verify(lotsRepository).reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
+    }
+
+    @Test(expected = ApplicationException.class)
+    public void whenUserReserveNonExistingParkingLot() throws ApplicationException {
+        given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
+
+        service.reserve(mockedParkingLot.getNumber(), httpRequest);
+        verify(lotsRepository, never()).reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
     }
 
     @Test

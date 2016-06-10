@@ -36,23 +36,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.authorizeRequests()
-                .antMatchers(HttpMethod.PUT, "/parking/available").hasRole("CAN_SHARE_PARKING")
-                .antMatchers(HttpMethod.PUT, "/parking/reserved").hasRole("CAN_ATTEND_PARKING")
-                .antMatchers(HttpMethod.POST, "/parking/remove").hasRole("CAN_SHARE_PARKING")
-                .antMatchers(HttpMethod.GET, "/parking/available").hasAnyRole("CAN_ATTEND_PARKING", "CAN_SHARE_PARKING")
-                .antMatchers(HttpMethod.PUT, "/profile/password").hasRole("CAN_ATTEND_PARKING")
-                .antMatchers(HttpMethod.POST, "/admin/user/create").hasRole("CAN_CREATE_NEW_USER")
-                .antMatchers(HttpMethod.POST, "/admin/user/edit").hasRole("CAN_CREATE_NEW_USER")
                 .antMatchers(HttpMethod.GET, "/admin/users").hasAnyRole("CAN_CREATE_NEW_USER")
-                .antMatchers(HttpMethod.DELETE, "/admin/users").hasAnyRole("CAN_CREATE_NEW_USER")
-
-                .antMatchers(HttpMethod.PUT, "/v2/parking/{lotNumber}/reservation").hasRole("CAN_ATTEND_PARKING")
-                .antMatchers(HttpMethod.DELETE, "/v2/parking/{lotNumber}/reservation").hasRole("CAN_ATTEND_PARKING")
-                .antMatchers(HttpMethod.POST, "/v2/user/profile").hasRole("CAN_ATTEND_PARKING")
-                .antMatchers(HttpMethod.PUT, "/v2/admin/users").hasRole("CAN_CREATE_NEW_USER")
-                .antMatchers(HttpMethod.GET, "/v2/admin/users").hasRole("CAN_CREATE_NEW_USER")
-                .antMatchers(HttpMethod.POST, "/v2/admin/users/{username}").hasRole("CAN_CREATE_NEW_USER")
-                .antMatchers(HttpMethod.DELETE, "/v2/admin/users/{username}").hasRole("CAN_CREATE_NEW_USER");
+                .antMatchers(HttpMethod.PUT, "/admin/users").hasRole("CAN_CREATE_NEW_USER")
+                .antMatchers(HttpMethod.POST, "/admin/users/{username}").hasAnyRole("CAN_CREATE_NEW_USER")
+                .antMatchers(HttpMethod.DELETE, "/admin/users/{username}").hasAnyRole("CAN_CREATE_NEW_USER")
+                .antMatchers(HttpMethod.PUT, "/parking/availability").hasRole("CAN_SHARE_PARKING")
+                .antMatchers(HttpMethod.DELETE, "/parking/availability").hasRole("CAN_SHARE_PARKING")
+                .antMatchers(HttpMethod.GET, "/parking/available").hasAnyRole("CAN_ATTEND_PARKING", "CAN_SHARE_PARKING")
+                .antMatchers(HttpMethod.PUT, "/parking/{lotNumber}/reservation").hasRole("CAN_ATTEND_PARKING")
+                .antMatchers(HttpMethod.DELETE, "/parking/reservation").hasRole("CAN_SHARE_PARKING")
+                .antMatchers(HttpMethod.POST, "/profile").hasRole("CAN_ATTEND_PARKING");
     }
 
     @Override
