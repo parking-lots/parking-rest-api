@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
+import parking.beans.request.EditUserForm;
 import parking.beans.response.User;
 import parking.repositories.AccountRepository;
 import parking.repositories.LotsRepository;
@@ -30,9 +31,9 @@ public class AdminService {
 
     }
 
-    public void editUser(Account account, HttpServletRequest request) {
+    public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) {
 
-        accountRepository.editAccount(account);
+        accountRepository.editAccount(newAccount, username);
     }
 
     public Long deleteUser(String username) {

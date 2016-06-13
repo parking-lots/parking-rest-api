@@ -39,8 +39,7 @@ public class AdminController {
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, @PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
-        form.getAccount().setUsername(username);
-        adminService.editUser(form.getAccount(), request);
+        adminService.editUser(form, username, request);
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)

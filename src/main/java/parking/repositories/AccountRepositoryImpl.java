@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
 import parking.beans.document.Car;
 import parking.beans.document.ParkingLot;
+import parking.beans.request.EditUserForm;
 import parking.helper.ProfileHelper;
 
 import java.util.ArrayList;
@@ -28,23 +29,23 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public LotsRepository lotsRepository;
 
     @Override
-    public void editAccount(Account account) {
-        Query searchQuery = new Query(Criteria.where("username").is(account.getUsername()));
+    public void editAccount(EditUserForm newAccount, String username) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
 
         Update updateFields = new Update();
 
-        if (account.getFullName() != null) {
-            updateFields.set("fullName", account.getFullName());
+        if (newAccount.getFullName() != null) {
+            updateFields.set("fullName", newAccount.getFullName());
         }
-        if (account.getPassword() != null) {
-            updateFields.set("password", (ProfileHelper.encryptPassword(account.getPassword())));
+        if (newAccount.getPassword() != null) {
+            updateFields.set("password", (ProfileHelper.encryptPassword(newAccount.getPassword())));
         }
-        if (account.getEmail() != null) {
-            updateFields.set("email", account.getEmail());
+        if (newAccount.getEmail() != null) {
+            updateFields.set("email", newAccount.getEmail());
         }
 
-        if (account.getCarList().size() > 0) {
-            updateFields.set("carList", account.getCarList());
+        if (newAccount.getCarRegNoList().size() > 0) {
+            updateFields.set("carList", newAccount.getCarRegNoList());
         }
 
         operations.findAndModify(searchQuery, updateFields, Account.class);
