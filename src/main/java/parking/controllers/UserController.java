@@ -15,8 +15,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
 
-import static com.sun.javaws.JnlpxArgs.verify;
-
 
 @RestController
 @RequestMapping(value = "/user")
