@@ -15,7 +15,7 @@ public class Log {
     private Integer lotNumber;
     private Date from;
     private Date to;
-    private String metaData;
+    private LogMetaData metaData;
     private ObjectId user;
     private String userAgent;
     private Date timestamp;
@@ -77,11 +77,11 @@ public class Log {
         this.timestamp = timestamp;
     }
 
-    public String getMetaData() {
+    public LogMetaData getMetaData() {
         return metaData;
     }
 
-    public void setMetaData(String metaData) {
+    public void setMetaData(LogMetaData metaData) {
         this.metaData = metaData;
     }
 
