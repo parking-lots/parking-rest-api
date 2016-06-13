@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
@@ -91,7 +90,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenEditUserShouldCallService() throws ApplicationException{
+    public void whenEditUserShouldCallService() throws ApplicationException {
         EditUserForm editUserForm = new EditUserForm();
         editUserForm.setAccount(new AccountBuilder().build());
         adminController.editUser(editUserForm, "username", mock(HttpServletRequest.class));
@@ -105,7 +104,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenGettingParkingsCallService(){
+    public void whenGettingParkingsCallService() {
         adminController.getParkings(any(ParkingType.class));
         verify(adminService, times(1)).getParkings(any(ParkingType.class));
     }

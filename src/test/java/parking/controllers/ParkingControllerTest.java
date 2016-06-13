@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.SetUnusedRequest;
@@ -24,16 +23,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.sun.javaws.JnlpxArgs.verify;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.*;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -72,21 +66,39 @@ public class ParkingControllerTest {
                 .collect(Collectors.<Parking>toList());
 
         when(exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest)).thenReturn(new ApplicationException("message"));
-
     }
 
     @Test
-    public void whenAvailableShouldReturnAvailableItems() throws ApplicationException {
+    public void whenAvailableShouldReturnList() throws ApplicationException {
         given(service.getAvailable(httpRequest)).willReturn(mockedParkingLotList);
 
-        assertThat(controller.getAllAvailable(httpRequest).get(0), instanceOf(Parking.class));
+        assertThat(controller.getAllAvailable(httpRequest), instanceOf(List.class));
     }
 
     @Test
     public void whenFreeOwnersParkingShouldCallService() throws ApplicationException {
-        ObjectId ownerId = new ObjectId();
         when(parkingService.getParkingNumberByUser()).thenReturn(mockedParkingLot);
         controller.freeOwnersParking(setUnusedRequest, httpRequest);
         parkingService.freeOwnersParking(any(ObjectId.class), any(Integer.class), any(Date.class), any(Date.class), eq(httpRequest));
+    }
+
+    @Test
+    public void whenRecallParkingShoulCallService() throws ApplicationException {
+        List<Date> dateList = new ArrayList<>();
+        dateList.add(new Date());
+        parkingService.recallParking(dateList, httpRequest);
+        verify(parkingService, times(1)).recallParking(dateList, httpRequest);
+    }
+
+    @Test
+    public void whenReserveShouldCallService() throws ApplicationException {
+        parkingService.reserve(mockedParkingLot.getNumber(), httpRequest);
+        verify(parkingService, times(1)).reserve(mockedParkingLot.getNumber(), httpRequest);
+    }
+
+    @Test
+    public void whenCancelReservationShouldRecallParking() throws ApplicationException {
+        parkingService.cancelReservation(httpRequest);
+        verify(parkingService, times(1)).cancelReservation(httpRequest);
     }
 }

@@ -3,30 +3,25 @@ package parking.controllers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
-import parking.beans.response.Response;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.service.UserService;
 
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.NoSuchElementException;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -65,14 +60,14 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenLoggingShouldCallServiceMethod() throws ApplicationException{
+    public void whenLoggingShouldCallServiceMethod() throws ApplicationException {
         controller.login(mockedLoginForm, servletRequest);
 
         verify(userService, times(1)).login(mockedLoginForm.getUsername(), mockedLoginForm.getPassword(), mockedLoginForm.getRemember(), servletRequest);
     }
 
     @Test
-    public void whenLogOutShouldCallServiceMethod() throws ApplicationException{
+    public void whenLogOutShouldCallServiceMethod() throws ApplicationException {
         controller.logout(mockedLoginForm.getUsername(), mockedLoginForm.getPassword(), session, principal, servletRequest);
 
         verify(userService, times(1)).deleteCookies(mockedLoginForm.getUsername(), mockedLoginForm.getPassword());
