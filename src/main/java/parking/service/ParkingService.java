@@ -12,6 +12,7 @@ import parking.exceptions.ApplicationException;
 import parking.helper.AvailableDatesConverter;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
+import parking.helper.ToolHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
@@ -127,6 +128,12 @@ public class ParkingService {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
         } else {
             lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest), httpRequest);
+
+            ObjectId targetUserId = lot.getOwner().getId();
+            Date currentDate = ToolHelper.getCurrentDate();
+            Account user = userService.getCurrentUser(httpRequest);
+            ObjectId userId = user.getId();
+            logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, null);
         }
     }
 
@@ -154,6 +161,14 @@ public class ParkingService {
 
     public void cancelReservation(HttpServletRequest request) throws ApplicationException {
         lotsRepository.cancelReservation(userService.getCurrentUser(request));
+
+
+        ParkingLot lot = getParkingNumberByUser();
+        ObjectId targetUserId = lot.getOwner().getId();
+        Date currentDate = ToolHelper.getCurrentDate();
+        Account user = userService.getCurrentUser(request);
+        ObjectId userId = user.getId();
+        logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, null);
     }
 
     public ParkingLot setOwner(Account account, ParkingLot parkingLot) {
