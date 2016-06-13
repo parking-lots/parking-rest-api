@@ -168,7 +168,7 @@ public class ParkingService {
         Date currentDate = ToolHelper.getCurrentDate();
         Account user = userService.getCurrentUser(request);
         ObjectId userId = user.getId();
-        logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, null);
+        logRepository.insertActionLog(ActionType.UNRESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, null);
     }
 
     public ParkingLot setOwner(Account account, ParkingLot parkingLot) {
