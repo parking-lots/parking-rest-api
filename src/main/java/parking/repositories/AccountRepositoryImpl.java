@@ -45,7 +45,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         }
 
         if (newAccount.getCarRegNoList().size() > 0) {
-            updateFields.set("carList", newAccount.getCarRegNoList());
+            updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
         operations.findAndModify(searchQuery, updateFields, Account.class);

@@ -17,6 +17,8 @@ import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,50 +45,47 @@ public class AdminService {
 
     }
 
-    public void editUser(Account account, HttpServletRequest request) throws ApplicationException {
+    public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) throws ApplicationException {
 
-        Account oldAccount = accountRepository.findByUsername(account.getUsername());
-    public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) {
+        Account oldAccount = accountRepository.findByUsername(username);
 
-        accountRepository.editAccount(account);
+        accountRepository.editAccount(newAccount, username);
 
         Account user = userService.getCurrentUser(request);
         LogMetaData metaData = new LogMetaData();
 
-        if (!oldAccount.getFullName().equals(account.getFullName())) {
+        if (!oldAccount.getFullName().equals(newAccount.getFullName())) {
             ArrayList<String> arrayList = new ArrayList<>();
             metaData.setFullName(arrayList);
             arrayList.add(oldAccount.getFullName());
-            arrayList.add(account.getFullName());
+            arrayList.add(newAccount.getFullName());
         }
-        if (!oldAccount.getPassword().equals(account.getPassword())) {
+        if (!oldAccount.getPassword().equals(newAccount.getPassword())) {
             metaData.setPasswordChanged(true);
         }
-        if (!oldAccount.getParking().getNumber().equals(account.getParking().getNumber())) {
-            metaData.setPasswordChanged(true);
-        }
-        if (!(oldAccount.getCarList().containsAll(account.getCarList())) || !(account.getCarList().containsAll(oldAccount.getCarList()))) {
+
+        if (!oldAccount.getCarRegNOList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNOList()))) {
 
             String[][] carNumbers = new String[2][2];
 
-            for (int i = 0; i < oldAccount.getCarList().size(); i++) {
-                carNumbers[0][i] = oldAccount.getCarList().get(i).getRegNo();
+            for (int i = 0; i < oldAccount.getCarRegNOList().size(); i++) {
+                carNumbers[0][i] = oldAccount.getCarRegNOList().get(i);
             }
 
-            for (int i = 0; i < account.getCarList().size(); i++) {
-                carNumbers[1][i] = account.getCarList().get(i).getRegNo();
+            for (int i = 0; i < newAccount.getCarRegNoList().size(); i++) {
+                carNumbers[1][i] = newAccount.getCarRegNoList().get(i);
             }
 
             metaData.setCars(carNumbers);
         }
-        if(!oldAccount.getEmail().equals(account.getEmail())){
+        if(!oldAccount.getEmail().equals(newAccount.getEmail())){
             ArrayList<String> arrayList = new ArrayList<>();
             metaData.setEmail(arrayList);
             arrayList.add(oldAccount.getEmail());
-            arrayList.add(account.getEmail());
+            arrayList.add(newAccount.getEmail());
         }
 
-        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, metaData, user.getId(), null);
+        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount.getId(), oldAccount.getParking().getNumber(), null, null, metaData, user.getId(), null);
 
     }
 
