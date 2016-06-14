@@ -1,19 +1,18 @@
 package parking.beans.document;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 public class LogMetaData {
-    ArrayList<String> fullName;
+    Map<String, String> fullName;
     boolean passwordChanged;
-    ArrayList<String> email;
-    String[][] cars;
+    Map<String, String> email;
+    Map<String, String[]> cars;
 
-
-    public ArrayList<String> getFullName() {
+    public Map<String, String> getFullName() {
         return fullName;
     }
 
-    public void setFullName(ArrayList<String> fullName) {
+    public void setFullName(Map<String, String> fullName) {
         this.fullName = fullName;
     }
 
@@ -25,19 +24,27 @@ public class LogMetaData {
         this.passwordChanged = passwordChanged;
     }
 
-    public ArrayList<String> getEmail() {
+    public Map<String, String> getEmail() {
         return email;
     }
 
-    public void setEmail(ArrayList<String> email) {
+    public void setEmail(Map<String, String> email) {
         this.email = email;
     }
 
-    public String[][] getCars() {
+    public Map<String, String[]> getCars() {
         return cars;
     }
 
-    public void setCars(String[][] cars) {
+    public void setCars(Map<String, String[]> cars) {
         this.cars = cars;
     }
+
+    //    public String[][] getCars() {
+//        return cars;
+//    }
+//
+//    public void setCars(String[][] cars) {
+//        this.cars = cars;
+//    }
 }

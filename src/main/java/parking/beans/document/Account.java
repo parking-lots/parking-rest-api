@@ -100,11 +100,11 @@ public class Account {
         this.email = email;
     }
 
-    public List<String> getCarRegNOList() {
+    public List<String> getCarRegNoList() {
         return carRegNoList;
     }
 
-    public void setCarRegNOList(List<String> carRegNOList) {
+    public void setCarRegNoList(List<String> carRegNOList) {
         this.carRegNoList = carRegNOList;
     }
 }

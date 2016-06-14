@@ -20,7 +20,7 @@ public class User extends Response {
         this.username = account.getUsername();
         this.email = account.getEmail();
         this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
-        this.carList = account.getCarRegNOList();
+        this.carList = account.getCarRegNoList();
 
         if (!account.getRoles().isEmpty()) {
             for (Role role : account.getRoles()) {
