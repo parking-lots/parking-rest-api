@@ -26,6 +26,8 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.ActionType;
+import parking.utils.Browser;
+import parking.utils.Os;
 
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.Cookie;
@@ -176,7 +178,10 @@ public class UserService {
 
         LogMetaData logMetaData = new LogMetaData();
         logMetaData.setPasswordChanged(true);
-        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, logMetaData, account.getId(), null);
+
+        String userAgent = getUserAgent(request);
+
+        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, logMetaData, account.getId(), userAgent);
     }
 
 
@@ -227,8 +232,8 @@ public class UserService {
         accountRepository.insert(newAccount);
 
         Account user = getCurrentUser(request);
-
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), null);
+        String userAgent = getUserAgent(request);
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), userAgent);
 
         return newAccount;
     }
@@ -295,6 +300,40 @@ public class UserService {
                 }
             }
         }
+    }
+
+    public String getUserAgent(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        Browser browser;
+        Os os;
+
+        if (userAgent.indexOf(String.valueOf(Browser.Mozilla)) >= 0) {
+            browser = Browser.Mozilla;
+        } else if (userAgent.indexOf(String.valueOf(Browser.Safari)) >= 0) {
+            browser = Browser.Safari;
+        } else if (userAgent.indexOf(String.valueOf(Browser.Chrome)) >= 0) {
+            browser = Browser.Chrome;
+        } else if (userAgent.indexOf(String.valueOf(Browser.IE)) >= 0) {
+            browser = Browser.IE;
+        } else if (userAgent.indexOf(String.valueOf(Browser.Opera)) >= 0) {
+            browser = Browser.Opera;
+        } else {
+            browser = Browser.unknown;
+        }
+
+        if (userAgent.indexOf(String.valueOf(Os.Windows)) >= 0) {
+            os = Os.Windows;
+        } else if (userAgent.indexOf(String.valueOf(Os.Mac)) >= 0) {
+            os = Os.Mac;
+        } else if (userAgent.indexOf(String.valueOf(Os.Ubuntu)) >= 0) {
+            os = Os.Ubuntu;
+        } else if (userAgent.indexOf(String.valueOf(Os.Android)) >= 0) {
+            os = Os.Android;
+        } else {
+            os = Os.unknown;
+        }
+
+        return os + " " + browser;
     }
 
 
