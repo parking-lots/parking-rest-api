@@ -92,15 +92,14 @@ public class AdminControllerTest {
     @Test
     public void whenEditUserShouldCallService() throws ApplicationException {
         EditUserForm editUserForm = new EditUserForm();
-        editUserForm.setAccount(new AccountBuilder().build());
         adminController.editUser(editUserForm, "username", mock(HttpServletRequest.class));
     }
 
     @Test
-    public void whenDeleteUserCallService() {
+    public void whenDeleteUserCallService() throws ApplicationException{
 
-        adminController.deleteUser("username");
-        verify(adminService, times(1)).deleteUser(any(String.class));
+        adminController.deleteUser("username", httpRequest);
+        verify(adminService, times(1)).deleteUser(eq("username"), eq(httpRequest));
     }
 
     @Test

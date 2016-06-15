@@ -164,7 +164,8 @@ public class ParkingService {
 
 
         ParkingLot lot = getParkingNumberByUser();
-        ObjectId targetUserId = lot.getOwner().getId();
+        ObjectId targetUserId;
+        targetUserId =   lot.getOwner().getId();
         Date currentDate = ToolHelper.getCurrentDate();
         Account user = userService.getCurrentUser(request);
         ObjectId userId = user.getId();
@@ -177,10 +178,11 @@ public class ParkingService {
     }
 
     public ParkingLot getParkingNumberByUser() {
-        return accountRepository.findByUsername(getCurrentUserName()).getParking();
+        String username = getCurrentUserName();
+        return accountRepository.findByUsername(username).getParking();
     }
 
-    private String getCurrentUserName() {
+    public String getCurrentUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }

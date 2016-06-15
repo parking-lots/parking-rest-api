@@ -6,13 +6,16 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.EditUserForm;
+import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
+import parking.repositories.LogRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,6 +35,12 @@ public class AdminServiceTest {
 
     @Mock
     private AccountRepository accountRepository;
+    @Mock
+    private EditUserForm editUserForm;
+    @Mock
+    private UserService userService;
+    @Mock
+    private LogRepository logRepository;
 
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
@@ -47,37 +57,42 @@ public class AdminServiceTest {
 
         mockedAccount = new Account();
         mockedAccount.setFullName("Tom Tomsson");
-        mockedAccount.setUsername("tom111");
+        mockedAccount.setUsername("username");
         mockedAccount.setParking(mockedParkingLot);
+        mockedAccount.setEmail("name@mail.com");
         mockedAccountList.add(mockedAccount);
 
         given(accountRepository.findAll()).willReturn(mockedAccountList);
     }
 
     @Test
-    public void whenGettingAllUsers(){
+    public void whenGettingAllUsers() {
         assertEquals(mockedAccountList.get(0).getUsername(), service.getUsers().get(0).getUsername());
     }
 
     @Test
-    public void whenEditUser(){
-        service.editUser(mockedAccount, request);
-        verify(accountRepository).editAccount(any(Account.class));
+    public void whenEditUser() throws ApplicationException {
+        given(userService.getCurrentUser(request)).willReturn(mockedAccount);
+        given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
+        service.editUser(editUserForm, mockedAccount.getUsername(), request);
+        verify(accountRepository).editAccount(any(EditUserForm.class), any(String.class));
     }
 
     @Test
-    public void whenDeleteUser(){
-        service.deleteUser(mockedAccount.getUsername());
+    public void whenDeleteUser() throws ApplicationException {
+        given(userService.getCurrentUser(request)).willReturn(mockedAccount);
+        given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
+        service.deleteUser("username", request);
         verify(accountRepository).deleteByUsername(any(String.class));
     }
 
     @Test
-    public void whenAttachParking(){
+    public void whenAttachParking() {
         service.attachParking(mockedAccount.getParking().getNumber(), mockedAccount.getUsername());
     }
 
     @Test
-    public void whenRemoveParkingFromUser(){
+    public void whenRemoveParkingFromUser() {
 
         service.removeParkingFromUser(mockedAccount.getUsername());
     }

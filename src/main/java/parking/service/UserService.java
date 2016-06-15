@@ -54,9 +54,6 @@ public class UserService {
     private ParkingService parkingService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ExceptionHandler exceptionHandler;
 
     @Autowired
@@ -85,7 +82,6 @@ public class UserService {
         if (!currentUser.isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         }
-
         return getLoggedUser().get();
     }
 
@@ -221,8 +217,6 @@ public class UserService {
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
-            String msg;
-
             throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
         }
 
@@ -232,8 +226,9 @@ public class UserService {
 
         accountRepository.insert(newAccount);
 
-        Account user = userService.getCurrentUser(request);
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), newAccount.getParking().getNumber(), null, null, null, user.getId(), null);
+        Account user = getCurrentUser(request);
+
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), null);
 
         return newAccount;
     }

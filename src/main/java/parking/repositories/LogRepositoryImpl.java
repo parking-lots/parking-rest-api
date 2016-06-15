@@ -10,7 +10,7 @@ import parking.utils.ActionType;
 
 import java.util.Date;
 
-public class LogRepositoryImpl implements CustomLogRepository{
+public class LogRepositoryImpl implements CustomLogRepository {
     private final MongoOperations operations;
 
     @Autowired
@@ -19,7 +19,7 @@ public class LogRepositoryImpl implements CustomLogRepository{
         this.operations = operations;
     }
 
-    public void insertActionLog(ActionType actionType, ObjectId targetUserId, Integer lotNumber, Date from, Date to, LogMetaData metaData, ObjectId userId, String channel){
+    public void insertActionLog(ActionType actionType, ObjectId targetUserId, Integer lotNumber, Date from, Date to, LogMetaData metaData, ObjectId userId, String channel) {
         BasicDBObject dbObject = new BasicDBObject();
 
         dbObject.put("actionType", actionType);
@@ -28,15 +28,15 @@ public class LogRepositoryImpl implements CustomLogRepository{
         dbObject.put("from", from);
         dbObject.put("to", to);
 
-        if(metaData != null) {
-
-                dbObject.put("metadata", metaData);
+        if (metaData != null) {
+            dbObject.put("metadata", metaData);
         }
-
 
         dbObject.put("userAgent", channel);
         dbObject.put("timestamp", new Date());
 
         operations.insert(dbObject, "log");
-  };
+    }
+
+    ;
 }
