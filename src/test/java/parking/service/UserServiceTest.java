@@ -99,6 +99,7 @@ public class UserServiceTest {
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
+        when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");

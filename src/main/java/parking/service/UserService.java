@@ -26,6 +26,8 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.ActionType;
+import parking.utils.Browser;
+import parking.utils.Os;
 
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.Cookie;
@@ -176,7 +178,9 @@ public class UserService {
 
         LogMetaData logMetaData = new LogMetaData();
         logMetaData.setPasswordChanged(true);
-        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, logMetaData, account.getId(), null);
+
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, logMetaData, account.getId(), userAgent);
     }
 
 
@@ -227,8 +231,8 @@ public class UserService {
         accountRepository.insert(newAccount);
 
         Account user = getCurrentUser(request);
-
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), null);
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), userAgent);
 
         return newAccount;
     }

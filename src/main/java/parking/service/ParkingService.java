@@ -63,9 +63,8 @@ public class ParkingService {
 
         Account user = userService.getCurrentUser(httpRequest);
         ObjectId userId = user.getId();
-        if (userId != null) {
-            logRepository.insertActionLog(ActionType.SHARE, ownerId, lotNumber, freeFrom, freeTill, null, userId, null);
-        }
+        String userAgent = httpRequest.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.SHARE, ownerId, lotNumber, freeFrom, freeTill, null, userId, userAgent);
     }
 
     public void validatePeriod(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpServletRequest) throws ApplicationException {
@@ -73,11 +72,11 @@ public class ParkingService {
         EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
         Calendar cal = eliminateDateTimestamp.formatDateForDatabase(currentDate);
 
-            if (freeFrom.compareTo(freeTill) > 0)
-                throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpServletRequest);
+        if (freeFrom.compareTo(freeTill) > 0)
+            throw exceptionHandler.handleException(ExceptionMessage.START_DATE_LATER_THAN_END_DATE, httpServletRequest);
 
-            if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1))
-                throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpServletRequest);
+        if ((freeTill.compareTo(cal.getTime()) < 0) && (freeFrom.compareTo(freeTill) < 1))
+            throw exceptionHandler.handleException(ExceptionMessage.END_DATE_IN_THE_PAST, httpServletRequest);
 
         lotsRepository.checkPeriod(lotNumber, freeFrom, freeTill, httpServletRequest);
 
@@ -116,9 +115,10 @@ public class ParkingService {
         AvailableDatesConverter converter = new AvailableDatesConverter();
         availablePeriods = converter.convertToInterval(availableDates);
 
+        String userAgent = request.getHeader("User-Agent");
         for (AvailablePeriod availablePeriod : availablePeriods) {
-                logRepository.insertActionLog(ActionType.UNSHARE, targetUserId, parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, userId, null);
-            }
+            logRepository.insertActionLog(ActionType.UNSHARE, targetUserId, parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, userId, userAgent);
+        }
     }
 
     public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
@@ -133,7 +133,8 @@ public class ParkingService {
             Date currentDate = ToolHelper.getCurrentDate();
             Account user = userService.getCurrentUser(httpRequest);
             ObjectId userId = user.getId();
-            logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, null);
+            String userAgent = httpRequest.getHeader("User-Agent");
+            logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, userAgent);
         }
     }
 
@@ -165,11 +166,12 @@ public class ParkingService {
 
         ParkingLot lot = getParkingNumberByUser();
         ObjectId targetUserId;
-        targetUserId =   lot.getOwner().getId();
+        targetUserId = lot.getOwner().getId();
         Date currentDate = ToolHelper.getCurrentDate();
         Account user = userService.getCurrentUser(request);
         ObjectId userId = user.getId();
-        logRepository.insertActionLog(ActionType.UNRESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, null);
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.UNRESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, userAgent);
     }
 
     public ParkingLot setOwner(Account account, ParkingLot parkingLot) {
