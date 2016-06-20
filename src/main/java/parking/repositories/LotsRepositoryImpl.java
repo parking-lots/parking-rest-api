@@ -52,30 +52,32 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
-        for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
+        if (lots.get(0).getAvailablePeriods() != null) {
+            for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
 
-            if ((int) ((freeFrom.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
-                for (AvailablePeriod availablePeriod1 : lots.get(0).getAvailablePeriods()) {
-                    if ((int) ((availablePeriod1.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
-                        updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), availablePeriod1.getFreeFrom(), availablePeriod1.getFreeTill(), searchQuery, freeFrom, freeTill);
-                        return;
+                if ((int) ((freeFrom.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                    for (AvailablePeriod availablePeriod1 : lots.get(0).getAvailablePeriods()) {
+                        if ((int) ((availablePeriod1.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                            updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), availablePeriod1.getFreeFrom(), availablePeriod1.getFreeTill(), searchQuery, freeFrom, freeTill);
+                            return;
+                        }
                     }
+
+                    updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
+                    return;
                 }
 
-                updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
-                return;
-            }
-
-            if ((int) ((availablePeriod.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
-                for (AvailablePeriod availablePeriod1 : lots.get(0).getAvailablePeriods()) {
-                    if ((int) ((freeFrom.getTime() - availablePeriod1.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
-                        updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), availablePeriod1.getFreeFrom(), availablePeriod1.getFreeTill(), searchQuery, freeFrom, freeTill);
-                        return;
+                if ((int) ((availablePeriod.getFreeFrom().getTime() - freeTill.getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                    for (AvailablePeriod availablePeriod1 : lots.get(0).getAvailablePeriods()) {
+                        if ((int) ((freeFrom.getTime() - availablePeriod1.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
+                            updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), availablePeriod1.getFreeFrom(), availablePeriod1.getFreeTill(), searchQuery, freeFrom, freeTill);
+                            return;
+                        }
                     }
-                }
 
-                updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
-                return;
+                    updateAvailablePeriods(availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), searchQuery, freeFrom, freeTill);
+                    return;
+                }
             }
         }
 
@@ -91,9 +93,11 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
 
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
-        for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
-            if (availablePeriod.getFreeFrom().compareTo(freeTill) <= 0 && availablePeriod.getFreeTill().compareTo(freeFrom) >= 0) {
-                throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
+        if (lots.get(0).getAvailablePeriods() != null) {
+            for (AvailablePeriod availablePeriod : lots.get(0).getAvailablePeriods()) {
+                if (availablePeriod.getFreeFrom().compareTo(freeTill) <= 0 && availablePeriod.getFreeTill().compareTo(freeFrom) >= 0) {
+                    throw exceptionHandler.handleException(ExceptionMessage.OVERLAPPING_PERIOD, httpRequest);
+                }
             }
         }
     }
