@@ -92,7 +92,7 @@ public class AdminService {
             map.put("new", newAccount.getEmail());
         }
 
-        String userAgent = userService.getUserAgent(request);
+        String userAgent = request.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount.getId(), oldAccount.getParking().getNumber(), null, null, metaData, user.getId(), userAgent);
 
     }
@@ -103,8 +103,8 @@ public class AdminService {
 
         Account deletedAccount = accountRepository.findByUsername(username);
         Account user = userService.getCurrentUser(request);
-        String userAgent = userService.getUserAgent(request);
-        logRepository.insertActionLog(ActionType.DELETE_USER, deletedAccount.getId(), deletedAccount.getParking().getNumber(), null, null, null, user.getId(), null);
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.DELETE_USER, deletedAccount.getId(), deletedAccount.getParking().getNumber(), null, null, null, user.getId(), userAgent);
 
         return numberOfDeletedAccounts;
     }

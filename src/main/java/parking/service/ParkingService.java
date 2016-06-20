@@ -63,7 +63,7 @@ public class ParkingService {
 
         Account user = userService.getCurrentUser(httpRequest);
         ObjectId userId = user.getId();
-        String userAgent = userService.getUserAgent(httpRequest);
+        String userAgent = httpRequest.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.SHARE, ownerId, lotNumber, freeFrom, freeTill, null, userId, userAgent);
     }
 
@@ -115,7 +115,7 @@ public class ParkingService {
         AvailableDatesConverter converter = new AvailableDatesConverter();
         availablePeriods = converter.convertToInterval(availableDates);
 
-        String userAgent = userService.getUserAgent(request);
+        String userAgent = request.getHeader("User-Agent");
         for (AvailablePeriod availablePeriod : availablePeriods) {
             logRepository.insertActionLog(ActionType.UNSHARE, targetUserId, parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, userId, userAgent);
         }
@@ -133,7 +133,7 @@ public class ParkingService {
             Date currentDate = ToolHelper.getCurrentDate();
             Account user = userService.getCurrentUser(httpRequest);
             ObjectId userId = user.getId();
-            String userAgent = userService.getUserAgent(httpRequest);
+            String userAgent = httpRequest.getHeader("User-Agent");
             logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, userAgent);
         }
     }
@@ -170,7 +170,7 @@ public class ParkingService {
         Date currentDate = ToolHelper.getCurrentDate();
         Account user = userService.getCurrentUser(request);
         ObjectId userId = user.getId();
-        String userAgent = userService.getUserAgent(request);
+        String userAgent = request.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.UNRESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, userAgent);
     }
 
