@@ -13,10 +13,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
-import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
-import parking.beans.document.Permission;
-import parking.beans.document.Role;
+import parking.beans.document.*;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
@@ -26,8 +23,13 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
+import parking.repositories.LogRepository;
 import parking.repositories.RoleRepository;
+import parking.utils.ActionType;
+import parking.utils.Browser;
+import parking.utils.Os;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +42,9 @@ public class UserService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private LogRepository logRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -79,7 +84,6 @@ public class UserService {
         if (!currentUser.isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         }
-
         return getLoggedUser().get();
     }
 
@@ -171,6 +175,12 @@ public class UserService {
         account.setPassword(ProfileHelper.encryptPassword(password.getNewPassword()));
 
         accountRepository.save(account);
+
+        LogMetaData logMetaData = new LogMetaData();
+        logMetaData.setPasswordChanged(true);
+
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, logMetaData, account.getId(), userAgent);
     }
 
 
@@ -211,8 +221,6 @@ public class UserService {
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
-            String msg;
-
             throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
         }
 
@@ -220,7 +228,13 @@ public class UserService {
         newAccount.setPassword(ProfileHelper.encryptPassword(newAccount.getPassword()));
         newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
 
-        return accountRepository.insert(newAccount);
+        accountRepository.insert(newAccount);
+
+        Account user = getCurrentUser(request);
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), userAgent);
+
+        return newAccount;
     }
 
     public void attachParking(Account user, Integer number, HttpServletRequest request) throws ApplicationException {

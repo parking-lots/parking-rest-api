@@ -43,8 +43,8 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
-    public Long deleteUser(@PathVariable(value = "username") String username) {
-        return adminService.deleteUser(username);
+    public Long deleteUser(@PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
+        return adminService.deleteUser(username, request);
     }
 
     @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)

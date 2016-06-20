@@ -55,6 +55,8 @@ public class ParkingServiceTest {
     @Mock
     private UserService userService;
     @Mock
+    private ParkingService parkingService;
+    @Mock
     private ExceptionHandler exceptionHandler;
 
 
@@ -75,7 +77,7 @@ public class ParkingServiceTest {
         SecurityContextHolder.setContext(mockSecurityContext);
 
         mockedAccount = new Account();
-        mockedAccount.setUsername("username");
+        mockedAccount.setUsername(CURRENT_USER_NAME);
 
         when(userService.getCurrentUser(httpRequest)).thenReturn(mockedAccount);
 
@@ -99,7 +101,6 @@ public class ParkingServiceTest {
     @Test
     public void whereGetAvailableReturnAllAvailableItems() throws ApplicationException {
         given(lotsRepository.searchAllFields(mockedAccount)).willReturn(mockedParkingLotList);
-
         assert (service.getAvailable(httpRequest)).containsAll(mockedParkingLotList);
     }
 
@@ -195,6 +196,10 @@ public class ParkingServiceTest {
 
     @Test
     public void whenCancelReservation() throws ApplicationException {
+        when(parkingService.getCurrentUserName()).thenReturn(mockedAccount.getUsername());
+        when(parkingService.getParkingByNumber(mockedParkingLot.getNumber(), httpRequest)).thenReturn(mockedParkingLot);
+        given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
+
         service.cancelReservation(httpRequest);
         verify(lotsRepository).cancelReservation(mockedAccount);
     }

@@ -1,16 +1,7 @@
 package parking.beans.request;
 
-import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.Email;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import parking.beans.document.Account;
-import parking.beans.document.Car;
-import parking.beans.document.ParkingLot;
-import parking.beans.document.Role;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;

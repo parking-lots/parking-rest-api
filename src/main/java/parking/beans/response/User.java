@@ -12,7 +12,7 @@ public class User extends Response {
     private String username;
     private String email;
     private String number;
-    private List<Car> carList = new ArrayList<>();
+    private List<String> carList = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
 
     public User(Account account) {
@@ -20,7 +20,7 @@ public class User extends Response {
         this.username = account.getUsername();
         this.email = account.getEmail();
         this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
-        this.carList = account.getCarList();
+        this.carList = account.getCarRegNoList();
 
         if (!account.getRoles().isEmpty()) {
             for (Role role : account.getRoles()) {
@@ -61,11 +61,11 @@ public class User extends Response {
         this.number = number;
     }
 
-    public List<Car> getCarList() {
+    public List<String> getCarList() {
         return carList;
     }
 
-    public void setCarList(List<Car> carList) {
+    public void setCarList(List<String> carList) {
         this.carList = carList;
     }
 

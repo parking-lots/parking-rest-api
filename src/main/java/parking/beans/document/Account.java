@@ -23,7 +23,7 @@ public class Account {
     @Size(min = 6, max = 10)
     private String password;
     private String email;
-    private List<Car> carList = new ArrayList<>();
+    private List<String> carRegNoList = new ArrayList<>();
     @DBRef
     private List<Role> roles = new ArrayList<Role>();
     @DBRef
@@ -100,11 +100,11 @@ public class Account {
         this.email = email;
     }
 
-    public List<Car> getCarList() {
-        return carList;
+    public List<String> getCarRegNoList() {
+        return carRegNoList;
     }
 
-    public void setCarList(List<Car> regNoList) {
-        this.carList = regNoList;
+    public void setCarRegNoList(List<String> carRegNOList) {
+        this.carRegNoList = carRegNOList;
     }
 }

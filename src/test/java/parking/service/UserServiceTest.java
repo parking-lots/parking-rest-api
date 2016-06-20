@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,6 +26,7 @@ import parking.exceptions.UserException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
+import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
@@ -48,6 +50,7 @@ import static org.mockito.Mockito.*;
 public class UserServiceTest {
 
     private static final String MOCKED_USER_NAME = "nickname";
+    private static final String MOCKED_ADMIN_USERNAME = "admin";
 
     @InjectMocks
     private UserService service;
@@ -59,11 +62,15 @@ public class UserServiceTest {
     @Mock
     private LotsRepository lotsRepository;
     @Mock
+    private LogRepository logRepository;
+    @Mock
     private SecurityContext mockSecurityContext;
     @Mock
     private Authentication authentication;
     @Mock
     private ParkingService parkingService;
+    @Mock
+    private UserService userService;
     @Mock
     private HttpServletResponse response;
     @Mock
@@ -76,6 +83,7 @@ public class UserServiceTest {
     private HttpSession session;
 
     private Account mockedUser;
+    private Account mockedAdmin;
     private ParkingLot mockedParking;
     private HashMap<String, Role> mockedRoles = new HashMap<String, Role>();
     private Cookie[] cookies = new Cookie[]{};
@@ -91,11 +99,16 @@ public class UserServiceTest {
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
+        when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
         SecurityContextHolder.setContext(mockSecurityContext);
 
-        mockedUser = new Account("Name Surname", "nickname", "****");
+        mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
         mockedParking = new ParkingLot(161, -1);
+        mockedUser.setParking(mockedParking);
         mockedRoles.put(Role.ROLE_USER, new Role(Role.ROLE_USER));
+
+        mockedAdmin = new Account("Admin admin", MOCKED_ADMIN_USERNAME, "*****");
+        mockedAdmin.setId(new ObjectId());
 
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(mockedUser);
     }
@@ -135,7 +148,10 @@ public class UserServiceTest {
 
     @Test
     public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException {
+        given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
+        given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
+        given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
         service.createUser(mockedUser, request);
 
@@ -148,9 +164,12 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserShouldRetrunAccountOnSuccess() throws ApplicationException {
+    public void whenCreateUserShouldReturnAccountOnSuccess() throws ApplicationException {
+        given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
+        given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(accountRepository.insert(mockedUser)).willReturn(mockedUser);
+        given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
         Account newAccount = service.createUser(mockedUser, request);
 
@@ -159,7 +178,10 @@ public class UserServiceTest {
 
     @Test
     public void whenCreateUserPasswordShouldBeEncrypted() throws ApplicationException {
+        given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
+        given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
+        given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
         service.createUser(mockedUser, request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
@@ -170,7 +192,10 @@ public class UserServiceTest {
 
     @Test
     public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException {
+        given(service.getCurrentUser(request)).willReturn(mockedAdmin);
+        given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
+        given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
         service.createUser(mockedUser, request);
@@ -184,14 +209,16 @@ public class UserServiceTest {
 
     @Test
     public void whenCreateUserWithCapitals() throws ApplicationException {
-        mockedUser = new Account("Name Surname", "NICKname", "****");
-
+        mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
+        given(service.getCurrentUser(request)).willReturn(mockedAdmin);
+        given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
+        given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
         service.createUser(mockedUser, request);
 
-        assertEquals("nickname", mockedUser.getUsername());//captor.getValue().getUsername());
+        assertEquals(MOCKED_USER_NAME, mockedUser.getUsername());//captor.getValue().getUsername());
     }
 
     @Test
@@ -213,7 +240,7 @@ public class UserServiceTest {
 
     @Test(expected = ParkingException.class)
     public void whenAttachParkingWhichOwnedByAnotherUserShouldThrowException() throws ApplicationException {
-        mockedParking.setOwner(new Account("Name surname", "name.surname", "******"));
+        mockedParking.setOwner(new Account("Name surname", MOCKED_USER_NAME, "******"));
         doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
         service.attachParking(mockedUser, 161, request);
     }
@@ -239,7 +266,7 @@ public class UserServiceTest {
 
     @Test
     public void whenLoginWithAnyRememberMeOptionShouldSucceed() throws ApplicationException {
-        String username = "nickname";
+        String username = MOCKED_USER_NAME;
         String password = "****";
 
         given(authentication.getName()).willReturn(null);
@@ -267,8 +294,8 @@ public class UserServiceTest {
         final List<Cookie> cookiesList = captor.getAllValues();
 
         for (Cookie cookie : cookiesList) {
-            if (cookie.getName().equals("username") && !cookie.getValue().equals(" ")) {
-                assertEquals(cookie.getName(), "username");
+            if (cookie.getName().equals(MOCKED_USER_NAME) && !cookie.getValue().equals(" ")) {
+                assertEquals(cookie.getName(), MOCKED_USER_NAME);
             }
             if (cookie.getName().equals("password") && !cookie.getValue().equals(" ")) {
                 assertEquals(cookie.getName(), "password");
@@ -278,7 +305,7 @@ public class UserServiceTest {
 
     @Test
     public void whenRememberMeCookiesCreatedUserAutomaticallyLoggedIn() throws ApplicationException {
-        cookies = new Cookie[]{new Cookie("username", mockedUser.getUsername()), new Cookie("password", mockedUser.getPassword())};
+        cookies = new Cookie[]{new Cookie(MOCKED_USER_NAME, mockedUser.getUsername()), new Cookie("password", mockedUser.getPassword())};
 
         given(request.getCookies()).willReturn(cookies);
 
@@ -301,7 +328,7 @@ public class UserServiceTest {
 
     @Test
     public void whenLogoutCookiesDeleted() {
-        cookies = new Cookie[]{new Cookie("username", mockedUser.getUsername()), new Cookie("password", mockedUser.getPassword())};
+        cookies = new Cookie[]{new Cookie(MOCKED_USER_NAME, mockedUser.getUsername()), new Cookie("password", mockedUser.getPassword())};
 
         given(request.getCookies()).willReturn(cookies);
 

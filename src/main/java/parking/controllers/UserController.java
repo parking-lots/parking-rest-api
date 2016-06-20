@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
 
-
 @RestController
 @RequestMapping(value = "/user")
 public class UserController {
