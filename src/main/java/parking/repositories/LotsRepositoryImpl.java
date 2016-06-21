@@ -14,6 +14,7 @@ import parking.beans.request.RecallSingleParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.helper.ToolHelper;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     @Override
     public List<ParkingLot> searchAllFields(final Account user) {
         Query searchQuery = new Query();
+        List<ParkingLot> goodLots = new ArrayList<>();
 
         Date currentDate = ToolHelper.getCurrentDate();
 
@@ -38,8 +40,19 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
                 Criteria.where("reserved").is(null),
                 Criteria.where("user.$id").is(user.getId()))
         );
+
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-        return lots;
+
+        // TODO must be improved in the future
+        for (ParkingLot lot : lots) {
+            for (AvailablePeriod availablePeriod : lot.getAvailablePeriods()) {
+                if (availablePeriod.getFreeFrom().compareTo(currentDate) <= 0 && availablePeriod.getFreeTill().compareTo(currentDate) >= 0) {
+                    goodLots.add(lot);
+                }
+            }
+        }
+
+        return goodLots;
     }
 
     @Override
