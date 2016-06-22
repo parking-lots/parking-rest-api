@@ -3,12 +3,13 @@ package parking.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
-import parking.beans.document.Car;
 import parking.beans.document.LogMetaData;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
@@ -16,7 +17,9 @@ import parking.utils.ActionType;
 import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +36,9 @@ public class AdminService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ExceptionHandler exceptionHandler;
 
     public List<User> getUsers() {
 
@@ -97,16 +103,19 @@ public class AdminService {
 
     }
 
-    public Long deleteUser(String username, HttpServletRequest request) throws ApplicationException {
+    public void deleteUser(String username, HttpServletRequest request) throws ApplicationException {
+        Account accountToDelete = accountRepository.findByUsername(username);
 
-        Long numberOfDeletedAccounts = accountRepository.deleteByUsername(username);
+        if (accountToDelete == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+        } else {
+            Account user = userService.getCurrentUser(request);
+            Integer lotNum = accountToDelete.getParking() == null ? null : accountToDelete.getParking().getNumber();
+            String userAgent = request.getHeader("User-Agent");
+            logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete.getId(), lotNum, null, null, null, user.getId(), userAgent);
 
-        Account deletedAccount = accountRepository.findByUsername(username);
-        Account user = userService.getCurrentUser(request);
-        String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.DELETE_USER, deletedAccount.getId(), deletedAccount.getParking().getNumber(), null, null, null, user.getId(), userAgent);
-
-        return numberOfDeletedAccounts;
+            accountRepository.deleteByUsername(username);
+        }
     }
 
     public void attachParking(Integer lotNumber, String username) {
