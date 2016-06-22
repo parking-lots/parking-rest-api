@@ -2,14 +2,12 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.Profile;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.UserException;
 import parking.service.AdminService;
 import parking.service.RegistrationService;
 import parking.utils.ParkingType;
@@ -42,9 +40,9 @@ public class AdminController {
         adminService.editUser(form, username, request);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
-    public Long deleteUser(@PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
-        return adminService.deleteUser(username, request);
+    @RequestMapping(value = "/users/{username:.+}", method = RequestMethod.DELETE)
+    public void deleteUser(@PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
+        adminService.deleteUser(username, request);
     }
 
     @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)
