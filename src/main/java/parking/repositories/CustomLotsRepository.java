@@ -6,7 +6,6 @@ import parking.exceptions.ApplicationException;
 import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

@@ -16,7 +16,10 @@ import parking.helper.ToolHelper;
 import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class LotsRepositoryImpl implements CustomLotsRepository {
 

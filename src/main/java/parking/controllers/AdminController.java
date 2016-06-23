@@ -2,9 +2,9 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
+import parking.beans.response.FreeParkingLot;
 import parking.beans.response.Profile;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
@@ -27,9 +27,9 @@ public class AdminController {
 
     @RequestMapping(value = "/users", method = RequestMethod.PUT)
     public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws ApplicationException {
-        boolean parkingLot = form.getParking() == null ? false : true;
+        boolean parkingLot = form.getNumber() == null ? false : true;
 
-        return new Profile(registrationService.registerUser(form.getAccount(), form.getParking(), request), parkingLot);
+        return new Profile(registrationService.registerUser(form.getAccount(), form.getNumber(), request), parkingLot);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
@@ -48,7 +48,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)
-    public List<ParkingLot> getParkings(@PathVariable(value = "type") ParkingType type){
+    public List<FreeParkingLot> getParkings(@PathVariable(value = "type") ParkingType type){
         return adminService.getParkings(type);
     }
 }
