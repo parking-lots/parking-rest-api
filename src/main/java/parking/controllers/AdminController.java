@@ -37,7 +37,7 @@ public class AdminController {
         return adminService.getUsers();
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
+    @RequestMapping(value = "/users/{username:.+}", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, @PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
         adminService.editUser(form, username, request);
     }
