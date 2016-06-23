@@ -30,6 +30,7 @@ public class ExceptionHandler {
 
         switch (message) {
             case USER_ALREADY_LOGGED:
+            case USER_ALREADY_EXIST:
             case USER_NOT_FOUND:
             case WRONG_CREDENTIALS:
             case NOT_LOGGED:
