@@ -5,6 +5,7 @@ package parking.helper;
  */
 public enum ExceptionMessage {
     USER_ALREADY_LOGGED("user_already_logged"),
+    USER_ALREADY_EXIST("user_already_exist"),
     WRONG_CREDENTIALS("wrong_credentials"),
     PARKING_OWNED_BY_ANOTHER("parking_owned_by_another"),
     PARKING_NOT_AVAILABLE("parking_not_available"),

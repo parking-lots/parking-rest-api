@@ -26,10 +26,7 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.ActionType;
-import parking.utils.Browser;
-import parking.utils.Os;
 
-import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -221,7 +218,7 @@ public class UserService {
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
-            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
+            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request);
         }
 
         newAccount.setId(new ObjectId());

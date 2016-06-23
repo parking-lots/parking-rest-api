@@ -27,7 +27,9 @@ public class AdminController {
 
     @RequestMapping(value = "/users", method = RequestMethod.PUT)
     public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws ApplicationException {
-        return new Profile(registrationService.registerUser(form.getAccount(), form.getParking(), request));
+        boolean parkingLot = form.getParking() == null ? false : true;
+
+        return new Profile(registrationService.registerUser(form.getAccount(), form.getParking(), request), parkingLot);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
