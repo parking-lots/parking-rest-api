@@ -114,6 +114,7 @@ public class AdminService {
             String userAgent = request.getHeader("User-Agent");
             logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete.getId(), lotNum, null, null, null, user.getId(), userAgent);
 
+            detachParking(accountToDelete.getParking().getNumber());
             accountRepository.deleteByUsername(username);
         }
     }
@@ -122,8 +123,8 @@ public class AdminService {
         accountRepository.attachParking(lotNumber, username);
     }
 
-    public void removeParkingFromUser(String username) {
-        accountRepository.removeParking(username);
+    public void detachParking(int lotNumber) {
+        accountRepository.detachParking(lotNumber);
     }
 
     public List<FreeParkingLot> getParkings(ParkingType type) {

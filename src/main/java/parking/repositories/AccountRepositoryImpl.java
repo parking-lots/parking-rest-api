@@ -6,15 +6,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
-import parking.beans.document.Car;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.helper.ProfileHelper;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class AccountRepositoryImpl implements CustomAccountRepository {
 
@@ -61,11 +55,11 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 
-    public void removeParking(String username) {
-        Query searchQuery = new Query(Criteria.where("username").is(username));
+    public void detachParking(int lotNumber) {
+        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
         Update updateFields = new Update();
 
-        updateFields.unset("parking");
-        operations.findAndModify(searchQuery, updateFields, Account.class);
+        updateFields.unset("owner");
+        operations.findAndModify(searchQuery, updateFields, ParkingLot.class);
     }
 }

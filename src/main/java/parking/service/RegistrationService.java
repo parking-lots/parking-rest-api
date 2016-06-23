@@ -19,7 +19,7 @@ public class RegistrationService {
     @Autowired
     private ParkingService parkingService;
 
-    public Account registerUser(Account user, int number, HttpServletRequest request) throws ApplicationException {
+    public Account registerUser(Account user, Integer number, HttpServletRequest request) throws ApplicationException {
         Account createdAccount = userService.createUser(user, request);
 
         if (Optional.ofNullable(number).isPresent()) {
