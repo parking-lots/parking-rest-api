@@ -19,13 +19,13 @@ public class RegistrationService {
     @Autowired
     private ParkingService parkingService;
 
-    public Account registerUser(Account user, ParkingLot parking, HttpServletRequest request) throws ApplicationException {
+    public Account registerUser(Account user, int number, HttpServletRequest request) throws ApplicationException {
         Account createdAccount = userService.createUser(user, request);
 
-        if (Optional.ofNullable(parking).isPresent()) {
-            ParkingLot createdParking = parkingService.createLot(parking, request);
-            userService.attachParking(createdAccount, createdParking.getNumber(), request);
-            parkingService.setOwner(createdAccount, createdParking);
+        if (Optional.ofNullable(number).isPresent()) {
+            userService.attachParking(createdAccount, number, request);
+            ParkingLot attachedParking = parkingService.getParkingByNumber(number, request);
+            parkingService.setOwner(createdAccount, attachedParking);
         }
 
         return createdAccount;
