@@ -4,7 +4,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import parking.beans.response.Response;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -13,7 +12,7 @@ import java.util.Date;
 import java.util.LinkedList;
 
 @Document(collection = "lots")
-public class ParkingLot extends Response {
+public class ParkingLot {
 
     @Id
     private ObjectId id;

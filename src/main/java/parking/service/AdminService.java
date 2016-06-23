@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.LogMetaData;
-import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
+import parking.beans.response.FreeParkingLot;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -126,9 +126,9 @@ public class AdminService {
         accountRepository.removeParking(username);
     }
 
-    public List<ParkingLot> getParkings(ParkingType type) {
-
-        if (type == null) return lotsRepository.findAll();
-        return lotsRepository.findParking(type);
+    public List<FreeParkingLot> getParkings(ParkingType type) {
+        return lotsRepository.findParking(type).stream()
+                .map(FreeParkingLot::new)
+                .collect(Collectors.toList());
     }
 }
