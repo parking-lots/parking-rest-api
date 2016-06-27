@@ -115,7 +115,7 @@ public class AdminService {
             logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete.getId(), lotNum, null, null, null, user.getId(), userAgent);
 
             if(lotNum != null) {
-                detachParking(accountToDelete.getParking().getNumber());
+                lotsRepository.removeParkingOwner(accountToDelete.getParking().getNumber());
             }
 
             accountRepository.deleteByUsername(username);
@@ -126,8 +126,8 @@ public class AdminService {
         accountRepository.attachParking(lotNumber, username);
     }
 
-    public void detachParking(Integer lotNumber) {
-        accountRepository.detachParking(lotNumber);
+    public void detachParking(String username, Integer lotNumber) {
+        accountRepository.detachParking(username);
     }
 
     public List<FreeParkingLot> getParkings(ParkingType type) {

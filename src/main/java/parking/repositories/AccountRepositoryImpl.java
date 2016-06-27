@@ -55,11 +55,11 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 
-    public void detachParking(int lotNumber) {
-        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
+    public void detachParking(String username) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
         Update updateFields = new Update();
 
-        updateFields.unset("owner");
-        operations.findAndModify(searchQuery, updateFields, ParkingLot.class);
+        updateFields.unset("parking");
+        operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 }
