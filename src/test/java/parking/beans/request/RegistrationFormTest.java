@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class RegistrationFormTest {
     @Before
     public void initMock() {
         parameters.add(new Parameter<Account>("account", Account.class));
-        parameters.add(new Parameter<ParkingLot>("parking", ParkingLot.class));
+        parameters.add(new Parameter<Integer>("number", Integer.class));
     }
 
     @Test

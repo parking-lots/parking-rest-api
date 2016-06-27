@@ -8,11 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.User;
-import parking.builders.AccountBuilder;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
@@ -67,13 +65,13 @@ public class AdminControllerTest {
     public void whenCreatingUserShouldReturnNewAccount() throws ApplicationException {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
-        form.setParking(null);
+        form.setNumber(null);
 
-        when(registrationService.registerUser(any(Account.class), any(ParkingLot.class), eq(httpRequest))).thenReturn(mockedAccount);
+        when(registrationService.registerUser(any(Account.class), eq(form.getNumber()), eq(httpRequest))).thenReturn(mockedAccount);
 
         adminController.createUser(form, httpRequest);
 
-        verify(registrationService, times(1)).registerUser(any(Account.class), any(ParkingLot.class), eq(httpRequest));
+        verify(registrationService, times(1)).registerUser(any(Account.class), eq(form.getNumber()), eq(httpRequest));
     }
 
     @Test
