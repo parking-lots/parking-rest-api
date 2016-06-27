@@ -4,7 +4,10 @@ package parking.helper;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ToolHelper {
 
@@ -26,5 +29,15 @@ public class ToolHelper {
         }
 
         return date;
+    }
+
+    public static boolean hasDuplicates(Collection<?> c) {
+        Set<Object> set = new HashSet<>();
+
+        for (Object o: c)
+            if (!set.add(o))
+                return true;
+
+        return false;
     }
 }

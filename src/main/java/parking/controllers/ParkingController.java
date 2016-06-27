@@ -13,7 +13,6 @@ import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,6 +39,10 @@ public class ParkingController {
 
         if (parking == null) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
+        }
+
+        if (ToolHelper.hasDuplicates(request.getAvailableDates())){
+            throw exceptionHandler.handleException(ExceptionMessage.DUBLICATE_DATES, httpRequest);
         }
 
         AvailableDatesConverter converter = new AvailableDatesConverter();

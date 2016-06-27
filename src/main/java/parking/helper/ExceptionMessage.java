@@ -1,8 +1,5 @@
 package parking.helper;
 
-/**
- * Created by Lina on 05/04/16.
- */
 public enum ExceptionMessage {
     USER_ALREADY_LOGGED("user_already_logged"),
     USER_ALREADY_EXIST("user_already_exist"),
@@ -18,7 +15,8 @@ public enum ExceptionMessage {
     START_DATE_LATER_THAN_END_DATE("start_date_later_than_end_date"),
     DATE_IN_THE_PAST("date_in_the_past"),
     DATE_DOES_NOT_EXIST("date_does_not_exist"),
-    OVERLAPPING_PERIOD("overlapping_period");
+    OVERLAPPING_PERIOD("overlapping_period"),
+    DUBLICATE_DATES("dublicate_dates");
 
     private String msg;
 
