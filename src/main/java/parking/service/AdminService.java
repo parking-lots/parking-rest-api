@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
 import parking.beans.document.LogMetaData;
+import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.response.FreeParkingLot;
 import parking.beans.response.User;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,7 +116,7 @@ public class AdminService {
             String userAgent = request.getHeader("User-Agent");
             logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete.getId(), lotNum, null, null, null, user.getId(), userAgent);
 
-            if(lotNum != null) {
+            if (lotNum != null) {
                 lotsRepository.removeParkingOwner(accountToDelete.getParking().getNumber());
             }
 
@@ -126,8 +128,16 @@ public class AdminService {
         accountRepository.attachParking(lotNumber, username);
     }
 
-    public void detachParking(String username, Integer lotNumber) {
-        accountRepository.detachParking(username);
+    public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
+        ParkingLot parkingLot = accountRepository.findByUsername(username).getParking();
+
+        if (parkingLot == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
+        }
+
+        accountRepository.detachParking(username, httpRequest);
+        lotsRepository.removeParkingOwner(parkingLot.getNumber());
+
     }
 
     public List<FreeParkingLot> getParkings(ParkingType type) {

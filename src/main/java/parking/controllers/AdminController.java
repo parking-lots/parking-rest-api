@@ -9,6 +9,7 @@ import parking.beans.response.Profile;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
 import parking.service.AdminService;
+import parking.service.ParkingService;
 import parking.service.RegistrationService;
 import parking.utils.ParkingType;
 
@@ -24,6 +25,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private ParkingService parkingService;
 
     @RequestMapping(value = "/users", method = RequestMethod.PUT)
     public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws ApplicationException {
@@ -50,5 +54,10 @@ public class AdminController {
     @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)
     public List<FreeParkingLot> getParkings(@PathVariable(value = "type") ParkingType type){
         return adminService.getParkings(type);
+    }
+
+    @RequestMapping(value = "/users/{username}/parking/detach", method = RequestMethod.POST)
+    public void detachParking(@PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException{
+        adminService.detachParking(username, httpRequest);
     }
 }

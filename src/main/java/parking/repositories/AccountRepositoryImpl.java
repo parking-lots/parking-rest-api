@@ -8,7 +8,15 @@ import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
+import parking.exceptions.ApplicationException;
+import parking.helper.ExceptionHandler;
+import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class AccountRepositoryImpl implements CustomAccountRepository {
 
@@ -21,6 +29,9 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
     @Autowired
     public LotsRepository lotsRepository;
+
+    @Autowired
+    public ExceptionHandler exceptionHandler;
 
     @Override
     public void editAccount(EditUserForm newAccount, String username) {
@@ -55,10 +66,15 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 
-    public void detachParking(String username) {
+    public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
         Query searchQuery = new Query(Criteria.where("username").is(username));
-        Update updateFields = new Update();
+        List<Account> accounts = operations.find(searchQuery, Account.class);
 
+        if (accounts.size() == 0) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, httpRequest);
+        }
+
+        Update updateFields = new Update();
         updateFields.unset("parking");
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
