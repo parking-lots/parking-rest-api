@@ -14,6 +14,7 @@ import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
+import parking.repositories.RoleRepository;
 import parking.utils.ActionType;
 import parking.utils.ParkingType;
 
@@ -41,6 +42,9 @@ public class AdminService {
 
     @Autowired
     private ExceptionHandler exceptionHandler;
+
+    @Autowired
+    public RoleRepository roleRepository;
 
     public List<User> getUsers() {
 

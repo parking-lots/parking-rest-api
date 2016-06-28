@@ -14,6 +14,15 @@ public class EditUserForm {
     @Email
     private String email;
     private List<String> carRegNoList = new ArrayList<>();
+    private Integer lotNumber;
+
+    public Integer getLotNumber() {
+        return lotNumber;
+    }
+
+    public void setLotNumber(Integer lotNumber) {
+        this.lotNumber = lotNumber;
+    }
 
     public String getFullName() {
         return fullName;

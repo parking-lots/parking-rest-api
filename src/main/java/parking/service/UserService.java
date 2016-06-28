@@ -240,7 +240,10 @@ public class UserService {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, request);
 
         }
-        user.addRole(roleRepository.findByName(Role.ROLE_OWNER));
+        Role ownerRole = roleRepository.findByName(Role.ROLE_OWNER);
+        if (user.getRoles().contains(ownerRole)) {
+            user.addRole(ownerRole);
+        }
         user.setParking(parking.get());
 
         accountRepository.save(user);

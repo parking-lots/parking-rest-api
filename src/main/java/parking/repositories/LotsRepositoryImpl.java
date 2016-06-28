@@ -348,6 +348,15 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         return lots;
     }
 
+   public void setParkingOwner(Integer lotNumber, String username){
+       Query query = new Query (Criteria.where("number").is(lotNumber));
+
+       Update update = new Update();
+       update.set("owner", username);
+
+       operations.updateFirst(query, update, ParkingLot.class);
+   }
+
     public void removeParkingOwner(Integer lotNumber){
         Query query = new Query (Criteria.where("number").is(lotNumber));
 

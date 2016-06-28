@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
+import parking.beans.document.Role;
 import parking.beans.request.EditUserForm;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -33,6 +34,9 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     @Autowired
     public ExceptionHandler exceptionHandler;
 
+    @Autowired
+    public RoleRepository roleRepository;
+
     @Override
     public void editAccount(EditUserForm newAccount, String username) {
         Query searchQuery = new Query(Criteria.where("username").is(username));
@@ -53,6 +57,18 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
+        if (newAccount.getLotNumber() != null) {
+            attachParking(newAccount.getLotNumber(), username);
+
+            Role ownerRole = roleRepository.findByName(Role.ROLE_OWNER);
+            List<Account> selectedAccounts = operations.find(searchQuery, Account.class);
+
+            if (selectedAccounts.get(0).getRoles().contains(ownerRole)) {
+                updateFields.set("roles", ownerRole);
+            }
+
+        }
+
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 
@@ -64,6 +80,8 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         updateFields.set("parking", parking);
         operations.findAndModify(searchQuery, updateFields, Account.class);
+
+        lotsRepository.setParkingOwner(lotNumber, username);
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
