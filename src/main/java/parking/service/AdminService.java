@@ -128,8 +128,8 @@ public class AdminService {
         }
     }
 
-    public void attachParking(Integer lotNumber, String username) {
-        accountRepository.attachParking(lotNumber, username);
+    public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
+        accountRepository.attachParking(lotNumber, username, httpRequest);
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {

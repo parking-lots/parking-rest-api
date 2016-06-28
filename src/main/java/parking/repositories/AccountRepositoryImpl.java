@@ -57,31 +57,34 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
-        if (newAccount.getLotNumber() != null) {
-            attachParking(newAccount.getLotNumber(), username);
-
-            Role ownerRole = roleRepository.findByName(Role.ROLE_OWNER);
-            List<Account> selectedAccounts = operations.find(searchQuery, Account.class);
-
-            if (selectedAccounts.get(0).getRoles().contains(ownerRole)) {
-                updateFields.set("roles", ownerRole);
-            }
-
-        }
-
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 
-    public void attachParking(Integer lotNumber, String username) {
+    public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
+        Optional<ParkingLot> parkingLot = Optional.ofNullable(lotsRepository.findByNumber(lotNumber));
+        if (Optional.ofNullable(parkingLot.get().getOwner()).isPresent()) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, httpRequest);
+
+        }
         Query searchQuery = new Query(Criteria.where("username").is(username));
 
         Update updateFields = new Update();
         ParkingLot parking = lotsRepository.findByNumber(lotNumber);
 
         updateFields.set("parking", parking);
+
+        Role ownerRole = roleRepository.findByName(Role.ROLE_OWNER);
+        List<Account> selectedAccounts = operations.find(searchQuery, Account.class);
+
+        if (!selectedAccounts.get(0).getRoles().contains(ownerRole)) {
+            updateFields.addToSet("roles", ownerRole);
+        }
+
         operations.findAndModify(searchQuery, updateFields, Account.class);
 
         lotsRepository.setParkingOwner(lotNumber, username);
+
+
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
@@ -94,6 +97,10 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         Update updateFields = new Update();
         updateFields.unset("parking");
+
+        Role ownerRole = roleRepository.findByName(Role.ROLE_OWNER);
+        updateFields.pull("roles", ownerRole);
+
         operations.findAndModify(searchQuery, updateFields, Account.class);
     }
 }

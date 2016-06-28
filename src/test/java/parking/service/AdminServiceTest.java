@@ -90,11 +90,6 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void whenAttachParking() {
-        service.attachParking(mockedAccount.getParking().getNumber(), mockedAccount.getUsername());
-    }
-
-    @Test
     public void whenDetachParkingFromUser() throws ApplicationException {
         given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
         service.detachParking(mockedAccount.getUsername(), request);

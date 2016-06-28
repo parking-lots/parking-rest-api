@@ -234,21 +234,6 @@ public class UserService {
         return newAccount;
     }
 
-    public void attachParking(Account user, Integer number, HttpServletRequest request) throws ApplicationException {
-        Optional<ParkingLot> parking = Optional.ofNullable(parkingService.getParkingByNumber(number, request));
-        if (Optional.ofNullable(parking.get().getOwner()).isPresent()) {
-            throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, request);
-
-        }
-        Role ownerRole = roleRepository.findByName(Role.ROLE_OWNER);
-        if (user.getRoles().contains(ownerRole)) {
-            user.addRole(ownerRole);
-        }
-        user.setParking(parking.get());
-
-        accountRepository.save(user);
-    }
-
     public void deleteCookies(String username, String password) {
 
         if (username != "" && password != "") {
