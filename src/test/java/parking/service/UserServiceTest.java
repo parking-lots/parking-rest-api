@@ -97,6 +97,7 @@ public class UserServiceTest {
         when(authentication.getName()).thenReturn(MOCKED_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
         when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
@@ -143,6 +144,7 @@ public class UserServiceTest {
 
     @Test(expected = ApplicationException.class)
     public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException {
+        given(accountRepository.findByUsername(mockedUser.getUsername())).willReturn(mockedUser);
         service.createUser(mockedUser, request);
     }
 

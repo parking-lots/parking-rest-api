@@ -16,6 +16,7 @@ import parking.beans.request.EditUserForm;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
+import parking.repositories.LotsRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class AdminServiceTest {
     private UserService userService;
     @Mock
     private LogRepository logRepository;
+    @Mock
+    private LotsRepository lotsRepository;
 
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
@@ -92,8 +95,8 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void whenRemoveParkingFromUser() {
-
-        service.removeParkingFromUser(mockedAccount.getUsername());
+    public void whenDetachParkingFromUser() throws ApplicationException {
+        given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
+        service.detachParking(mockedAccount.getUsername(), request);
     }
 }

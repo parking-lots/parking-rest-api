@@ -41,7 +41,7 @@ public class RegistrationServiceTest {
 
     @Test
     public void registerMustBeDefineAndAcceptRegisterObject() throws NoSuchMethodException {
-        assertEquals(RegistrationService.class.getMethod("registerUser", Account.class, ParkingLot.class, HttpServletRequest.class).getName(), "registerUser");
+        assertEquals(RegistrationService.class.getMethod("registerUser", Account.class, Integer.class, HttpServletRequest.class).getName(), "registerUser");
     }
 
     @Test
@@ -49,23 +49,26 @@ public class RegistrationServiceTest {
         given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
 
-        assertTrue(Account.class.isInstance(registrationService.registerUser(mockedAccount, mockedParking, request)));
+        assertTrue(Account.class.isInstance(registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request)));
     }
 
     @Test
     public void whenRegisterUserShouldCallCreateParkingMethod() throws ApplicationException {
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
         given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+        given(parkingService.getParkingByNumber(mockedParking.getNumber(), request)).willReturn(mockedParking);
 
-        registrationService.registerUser(mockedAccount, mockedParking, request);
-        verify(parkingService).createLot(mockedParking, request);
+        registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
+        verify(userService).attachParking(mockedAccount, mockedParking.getNumber(), request);
+        verify(parkingService).setOwner(mockedAccount, mockedParking);
+
     }
 
     @Test
     public void whenRegisterUserShouldCallAttachParkingMethod() throws ApplicationException {
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
         given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
-        registrationService.registerUser(mockedAccount, mockedParking, request);
+        registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
 
         verify(userService).attachParking(mockedAccount, mockedParking.getNumber(), request);
     }
@@ -74,8 +77,9 @@ public class RegistrationServiceTest {
     public void whenRegisterUserShouldCallSetOwnerMethod() throws ApplicationException {
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
         given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+        given(parkingService.getParkingByNumber(mockedParking.getNumber(), request)).willReturn(mockedParking);
 
-        registrationService.registerUser(mockedAccount, mockedParking, request);
+        registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
 
         verify(parkingService).setOwner(mockedAccount, mockedParking);
     }

@@ -27,7 +27,8 @@ public class RegistrationFormTest {
     @Before
     public void initMock() {
         parameters.add(new Parameter<Account>("account", Account.class));
-        parameters.add(new Parameter<ParkingLot>("parking", ParkingLot.class));
+        parameters.add(new Parameter<Integer>("number", Integer.class));
+
     }
 
     @Test
