@@ -105,7 +105,7 @@ public class AdminService {
         }
 
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount.getId(), oldAccount.getParking().getNumber(), null, null, metaData, user.getId(), userAgent);
+        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount, oldAccount.getParking().getNumber(), null, null, metaData, user, userAgent);
 
     }
 
@@ -118,7 +118,7 @@ public class AdminService {
             Account user = userService.getCurrentUser(request);
             Integer lotNum = accountToDelete.getParking() == null ? null : accountToDelete.getParking().getNumber();
             String userAgent = request.getHeader("User-Agent");
-            logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete.getId(), lotNum, null, null, null, user.getId(), userAgent);
+            logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete, lotNum, null, null, null, user, userAgent);
 
             if (lotNum != null) {
                 lotsRepository.removeParkingOwner(accountToDelete.getParking().getNumber());

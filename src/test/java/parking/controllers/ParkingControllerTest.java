@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
@@ -79,7 +80,7 @@ public class ParkingControllerTest {
     public void whenFreeOwnersParkingShouldCallService() throws ApplicationException {
         when(parkingService.getParkingNumberByUser()).thenReturn(mockedParkingLot);
         controller.freeOwnersParking(setUnusedRequest, httpRequest);
-        parkingService.freeOwnersParking(any(ObjectId.class), any(Integer.class), any(Date.class), any(Date.class), eq(httpRequest));
+        parkingService.freeOwnersParking(any(Account.class), any(Integer.class), any(Date.class), any(Date.class), eq(httpRequest));
     }
 
     @Test

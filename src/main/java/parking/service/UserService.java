@@ -177,7 +177,7 @@ public class UserService {
         logMetaData.setPasswordChanged(true);
 
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.EDIT_USER, account.getId(), account.getParking().getNumber(), null, null, logMetaData, account.getId(), userAgent);
+        logRepository.insertActionLog(ActionType.EDIT_USER, account, account.getParking().getNumber(), null, null, logMetaData, account, userAgent);
     }
 
 
@@ -229,7 +229,7 @@ public class UserService {
 
         Account user = getCurrentUser(request);
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount.getId(), null, null, null, null, user.getId(), userAgent);
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, user, userAgent);
 
         return newAccount;
     }
