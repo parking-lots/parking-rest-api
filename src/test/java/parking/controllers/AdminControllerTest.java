@@ -67,13 +67,13 @@ public class AdminControllerTest {
     public void whenCreatingUserShouldReturnNewAccount() throws ApplicationException {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
-        form.setParking(null);
+        form.setNumber(null);
 
-        when(registrationService.registerUser(any(Account.class), any(ParkingLot.class), eq(httpRequest))).thenReturn(mockedAccount);
+        when(registrationService.registerUser(any(Account.class), any(Integer.class), eq(httpRequest))).thenReturn(mockedAccount);
 
         adminController.createUser(form, httpRequest);
 
-        verify(registrationService, times(1)).registerUser(any(Account.class), any(ParkingLot.class), eq(httpRequest));
+        verify(registrationService, times(1)).registerUser(any(Account.class), any(Integer.class), eq(httpRequest));
     }
 
     @Test
