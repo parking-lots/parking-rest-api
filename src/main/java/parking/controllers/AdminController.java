@@ -56,7 +56,7 @@ public class AdminController {
         return adminService.getParkings(type);
     }
 
-    @RequestMapping(value = "/users/{username}/parking/detach", method = RequestMethod.POST)
+    @RequestMapping(value = "/users/{username:.+}/parking/detach", method = RequestMethod.POST)
     public void detachParking(@PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException{
         adminService.detachParking(username, httpRequest);
     }

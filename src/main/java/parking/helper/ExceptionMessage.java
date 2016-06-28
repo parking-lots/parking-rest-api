@@ -16,7 +16,8 @@ public enum ExceptionMessage {
     DATE_IN_THE_PAST("date_in_the_past"),
     DATE_DOES_NOT_EXIST("date_does_not_exist"),
     OVERLAPPING_PERIOD("overlapping_period"),
-    DUBLICATE_DATES("dublicate_dates");
+    DUBLICATE_DATES("dublicate_dates"),
+    DOES_NOT_HAVE_PARKING("does_not_have_parking");
 
     private String msg;
 

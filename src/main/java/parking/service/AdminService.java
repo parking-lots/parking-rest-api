@@ -132,7 +132,7 @@ public class AdminService {
         ParkingLot parkingLot = accountRepository.findByUsername(username).getParking();
 
         if (parkingLot == null) {
-            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
+            throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest);
         }
 
         accountRepository.detachParking(username, httpRequest);
