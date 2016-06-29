@@ -23,14 +23,22 @@ public class LogRepositoryImpl implements CustomLogRepository {
 
         dbObject.put("actionType", actionType);
         dbObject.put("targetUser", targetUser);
-        dbObject.put("lotNumber", lotNumber);
-        dbObject.put("from", from);
-        dbObject.put("to", to);
+
+        if(lotNumber != null) {
+            dbObject.put("lotNumber", lotNumber);
+        }
+        if (from != null) {
+            dbObject.put("from", from);
+        }
+        if (to != null) {
+            dbObject.put("to", to);
+        }
 
         if (metaData != null) {
             dbObject.put("metadata", metaData);
         }
 
+        dbObject.put("user", user);
         dbObject.put("userAgent", channel);
         dbObject.put("timestamp", new Date());
 

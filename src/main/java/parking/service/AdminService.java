@@ -19,10 +19,7 @@ import parking.utils.ActionType;
 import parking.utils.ParkingType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +55,7 @@ public class AdminService {
 
         Account oldAccount = accountRepository.findByUsername(username);
 
-        accountRepository.editAccount(newAccount, username);
+        accountRepository.editAccount(newAccount, oldAccount, username);
 
         Account user = userService.getCurrentUser(request);
         LogMetaData metaData = new LogMetaData();
@@ -69,12 +66,19 @@ public class AdminService {
             map.put("old", oldAccount.getFullName());
             map.put("new", newAccount.getFullName());
         }
-        if (newAccount.getPassword() != null && !oldAccount.getPassword().equals(newAccount.getPassword())) {
+        //if received password is null - means it hasn't been changed
+        if (newAccount.getPassword() != null) {
             metaData.setPasswordChanged(true);
         }
 
-        if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
+        Collections.sort(oldAccount.getCarRegNoList());
+        Collections.sort(newAccount.getCarRegNoList());
 
+        checkCars:
+        if (oldAccount.getCarRegNoList() == null && newAccount.getCarRegNoList() == null) {
+            break checkCars;
+        } else if ((oldAccount.getCarRegNoList() == null ^ newAccount.getCarRegNoList() == null) || !(oldAccount.getCarRegNoList().equals(newAccount.getCarRegNoList())))
+        {
             Map<String, String[]> carMap = new HashMap<>();
             String[] oldCarArr = new String[oldAccount.getCarRegNoList().size()];
             String[] newCarArr = new String[newAccount.getCarRegNoList().size()];
@@ -97,7 +101,13 @@ public class AdminService {
 
             metaData.setCars(carMap);
         }
-        if (!oldAccount.getEmail().equals(newAccount.getEmail())) {
+
+        if (newAccount.getEmail() == null) {
+            Map<String, String> map = new HashMap<>();
+            metaData.setEmail(map);
+            map.put("old", oldAccount.getEmail());
+            map.put("new", null);
+        } else if (!newAccount.getEmail().equals(oldAccount.getEmail())) {
             Map<String, String> map = new HashMap<>();
             metaData.setEmail(map);
             map.put("old", oldAccount.getEmail());
@@ -105,7 +115,7 @@ public class AdminService {
         }
 
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount, oldAccount.getParking().getNumber(), null, null, metaData, user, userAgent);
+        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount, null, null, null, metaData, user, userAgent);
 
     }
 
