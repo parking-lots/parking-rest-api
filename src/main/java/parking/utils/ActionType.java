@@ -7,5 +7,9 @@ public enum ActionType {
     UNRESERVE,
     EDIT_USER,
     REGISTER_USER,
-    DELETE_USER;
+    DELETE_USER,
+    ATTACH_PARKING,
+    DETACH_PARKING,
+    LOG_IN,
+    LOG_OUT;
 }

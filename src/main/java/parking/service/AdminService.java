@@ -153,6 +153,8 @@ public class AdminService {
 
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
         accountRepository.attachParking(lotNumber, username, httpRequest);
+        String userAgent = httpRequest.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.ATTACH_PARKING, accountRepository.findByUsername(username), lotNumber, null, null, null, userService.getCurrentUser(httpRequest), userAgent);
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
@@ -164,7 +166,8 @@ public class AdminService {
 
         accountRepository.detachParking(username, httpRequest);
         lotsRepository.removeParkingOwner(parkingLot.getNumber());
-
+        String userAgent = httpRequest.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.DETACH_PARKING, accountRepository.findByUsername(username), parkingLot.getNumber(), null, null, null, userService.getCurrentUser(httpRequest), userAgent);
     }
 
     public List<FreeParkingLot> getParkings(ParkingType type) {

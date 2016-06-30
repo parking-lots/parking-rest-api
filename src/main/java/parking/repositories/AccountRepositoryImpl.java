@@ -13,6 +13,7 @@ import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
+import parking.utils.ActionType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -29,6 +30,9 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
     @Autowired
     public LotsRepository lotsRepository;
+
+    @Autowired
+    private LogRepository logRepository;
 
     @Autowired
     public ExceptionHandler exceptionHandler;
@@ -88,8 +92,6 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         operations.findAndModify(searchQuery, updateFields, Account.class);
 
         lotsRepository.setParkingOwner(lotNumber, username);
-
-
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
