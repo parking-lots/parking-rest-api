@@ -56,7 +56,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("email", newAccount.getEmail());
         }
 
-        if (newAccount.getCarRegNoList().size() == 0) {
+        if (newAccount.getCarRegNoList() == null || newAccount.getCarRegNoList().size() == 0) {
             updateFields.unset("carRegNoList");
         } else if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());

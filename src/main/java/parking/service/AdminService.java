@@ -71,31 +71,44 @@ public class AdminService {
             metaData.setPasswordChanged(true);
         }
 
-        Collections.sort(oldAccount.getCarRegNoList());
-        Collections.sort(newAccount.getCarRegNoList());
+        if (oldAccount.getCarRegNoList() != null) {
+            Collections.sort(oldAccount.getCarRegNoList());
+        }
+        if (newAccount.getCarRegNoList() != null) {
+            Collections.sort(newAccount.getCarRegNoList());
+        }
 
         checkCars:
         if (oldAccount.getCarRegNoList() == null && newAccount.getCarRegNoList() == null) {
             break checkCars;
-        } else if ((oldAccount.getCarRegNoList() == null ^ newAccount.getCarRegNoList() == null) || !(oldAccount.getCarRegNoList().equals(newAccount.getCarRegNoList())))
-        {
+        } else if ((oldAccount.getCarRegNoList() == null ^ newAccount.getCarRegNoList() == null) || !(oldAccount.getCarRegNoList().equals(newAccount.getCarRegNoList()))) {
             Map<String, String[]> carMap = new HashMap<>();
-            String[] oldCarArr = new String[oldAccount.getCarRegNoList().size()];
-            String[] newCarArr = new String[newAccount.getCarRegNoList().size()];
+            String[] oldCarArr;
+            String[] newCarArr;
 
-            for (int i = 0; i < oldAccount.getCarRegNoList().size(); i++) {
-                oldCarArr[i] = oldAccount.getCarRegNoList().get(i);
+            if (oldAccount.getCarRegNoList().size() == 0) {
+                carMap.put("old", null);
+            } else {
+                oldCarArr = new String[oldAccount.getCarRegNoList().size()];
+                for (int i = 0; i < oldAccount.getCarRegNoList().size(); i++) {
+                    oldCarArr[i] = oldAccount.getCarRegNoList().get(i);
 
-                if (i == oldAccount.getCarRegNoList().size() - 1) {
-                    carMap.put("old", oldCarArr);
+                    if (i == oldAccount.getCarRegNoList().size() - 1) {
+                        carMap.put("old", oldCarArr);
+                    }
                 }
             }
 
-            for (int i = 0; i < newAccount.getCarRegNoList().size(); i++) {
-                newCarArr[i] = newAccount.getCarRegNoList().get(i);
+            if (newAccount.getCarRegNoList() == null || newAccount.getCarRegNoList().size() == 0) {
+                carMap.put("new", null);
+            } else {
+                newCarArr = new String[newAccount.getCarRegNoList().size()];
+                for (int i = 0; i < newAccount.getCarRegNoList().size(); i++) {
+                    newCarArr[i] = newAccount.getCarRegNoList().get(i);
 
-                if (i == newAccount.getCarRegNoList().size() - 1) {
-                    carMap.put("new", newCarArr);
+                    if (i == newAccount.getCarRegNoList().size() - 1) {
+                        carMap.put("new", newCarArr);
+                    }
                 }
             }
 
