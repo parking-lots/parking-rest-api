@@ -57,6 +57,7 @@ public class ParkingController {
             }
 
             for (AvailablePeriod p : availablePeriods) {
+                parkingService.freeOwnersParking(parking.getOwner(), parking.getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
             }
         }
     }
