@@ -47,6 +47,7 @@ public class ExceptionHandler {
             case OVERLAPPING_PERIOD:
             case DUBLICATE_DATES:
             case DOES_NOT_HAVE_PARKING:
+            case EMPTY_CAR_REG_NO:
                 return new ParkingException(getMessage(message.getMsg(), request));
             default:
                 return (ApplicationException) new Exception(message.getMsg());

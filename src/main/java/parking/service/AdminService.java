@@ -53,7 +53,15 @@ public class AdminService {
 
     public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) throws ApplicationException {
 
+        if(newAccount.getCarRegNoList() != null && newAccount.getCarRegNoList().contains("")){
+            throw exceptionHandler.handleException(ExceptionMessage.EMPTY_CAR_REG_NO, request);
+        }
+
         Account oldAccount = accountRepository.findByUsername(username);
+
+        if(oldAccount == null){
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+        }
 
         accountRepository.editAccount(newAccount, oldAccount, username);
 
