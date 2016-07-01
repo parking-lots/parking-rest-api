@@ -1,7 +1,6 @@
 package parking.beans.response;
 
 import parking.beans.document.Account;
-import parking.beans.document.Car;
 import parking.beans.document.Role;
 
 import java.util.ArrayList;
