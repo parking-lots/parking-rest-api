@@ -66,7 +66,8 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
-        operations.findAndModify(searchQuery, updateFields, Account.class);
+        operations.updateFirst(searchQuery, updateFields, Account.class);
+
     }
 
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
