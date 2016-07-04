@@ -17,6 +17,10 @@ war {
     version =  '0.1.0'
 }
 
+bootRun {
+    systemProperties System.properties
+}
+
 repositories {
     mavenCentral()
     maven { url "http://repo.spring.io/libs-snapshot" }
