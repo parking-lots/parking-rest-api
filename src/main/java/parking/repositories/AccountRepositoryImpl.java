@@ -13,6 +13,7 @@ import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
+import parking.utils.AccountStatus;
 import parking.utils.ActionType;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,8 +67,21 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
-        operations.updateFirst(searchQuery, updateFields, Account.class);
+        if (newAccount.getAccountStatus() != null && newAccount.getAccountStatus().toString() != "") {
+            if (oldAccount.getStatus() != null && !oldAccount.getStatus().equals(newAccount.getAccountStatus())) {
+                updateFields.set("status", newAccount.getAccountStatus());
+            } else if (oldAccount.getStatus() == null) {
+                updateFields.set("status", newAccount.getAccountStatus());
+            }
+        }
 
+        //to avoid the whole document to be deleted in case nothing is updated
+        if (updateFields.modifies("fullName") || updateFields.modifies("password") || updateFields.modifies("email")
+                || updateFields.modifies("carRegNoList") || updateFields.modifies("status")) {
+            operations.updateFirst(searchQuery, updateFields, Account.class);
+        } else {
+            return;
+        }
     }
 
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {

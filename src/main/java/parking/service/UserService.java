@@ -25,8 +25,10 @@ import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.RoleRepository;
+import parking.utils.AccountStatus;
 import parking.utils.ActionType;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -127,6 +129,10 @@ public class UserService {
         Account userAccount = accountRepository.findByUsername(username);
 
         if (userAccount != null) {
+            if(userAccount.getStatus() == AccountStatus.INACTIVE){
+                throw exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request);
+
+            }
             if (password != null) {
                 if (!ProfileHelper.checkPassword(password, userAccount.getPassword())) {
                     throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
@@ -218,7 +224,7 @@ public class UserService {
         return authorities;
     }
 
-    public Account createUser(Account newAccount, HttpServletRequest request) throws ApplicationException {
+    public Account createUser(Account newAccount, HttpServletRequest request) throws ApplicationException, MessagingException {
 
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
@@ -229,8 +235,15 @@ public class UserService {
         newAccount.setId(new ObjectId());
         newAccount.setPassword(ProfileHelper.encryptPassword(newAccount.getPassword()));
         newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
+        newAccount.setStatus(AccountStatus.INACTIVE);
 
         accountRepository.insert(newAccount);
+
+        try {
+            MailService.sendEmail(newAccount.getEmail(), "Parkinger registration", "Your account will be shortly activated by administrator.");
+        } catch (Exception e) {
+            throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
+        }
 
         Account user = getCurrentUser(request);
         String userAgent = request.getHeader("User-Agent");

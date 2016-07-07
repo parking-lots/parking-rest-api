@@ -30,6 +30,7 @@ import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -143,13 +144,13 @@ public class UserServiceTest {
     }
 
     @Test(expected = ApplicationException.class)
-    public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException {
+    public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException, MessagingException {
         given(accountRepository.findByUsername(mockedUser.getUsername())).willReturn(mockedUser);
         service.createUser(mockedUser, request);
     }
 
     @Test
-    public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException {
+    public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
@@ -166,7 +167,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserShouldReturnAccountOnSuccess() throws ApplicationException {
+    public void whenCreateUserShouldReturnAccountOnSuccess() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
@@ -179,7 +180,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserPasswordShouldBeEncrypted() throws ApplicationException {
+    public void whenCreateUserPasswordShouldBeEncrypted() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
@@ -193,7 +194,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException {
+    public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException, MessagingException {
         given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
@@ -210,7 +211,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserWithCapitals() throws ApplicationException {
+    public void whenCreateUserWithCapitals() throws ApplicationException, MessagingException {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
         given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);

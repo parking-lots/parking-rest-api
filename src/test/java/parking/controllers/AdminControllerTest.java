@@ -20,6 +20,7 @@ import parking.service.AdminService;
 import parking.service.RegistrationService;
 import parking.utils.ParkingType;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenCreatingUserShouldReturnNewAccount() throws ApplicationException {
+    public void whenCreatingUserShouldReturnNewAccount() throws ApplicationException, MessagingException {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
         form.setNumber(null);
@@ -90,7 +91,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenEditUserShouldCallService() throws ApplicationException {
+    public void whenEditUserShouldCallService() throws ApplicationException, MessagingException {
         EditUserForm editUserForm = new EditUserForm();
         adminController.editUser(editUserForm, "username", mock(HttpServletRequest.class));
     }

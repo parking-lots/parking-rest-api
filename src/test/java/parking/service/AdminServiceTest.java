@@ -14,6 +14,7 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void whenEditUser() throws ApplicationException {
+    public void whenEditUser() throws ApplicationException, MessagingException {
         given(userService.getCurrentUser(request)).willReturn(mockedAccount);
         given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
         service.editUser(editUserForm, mockedAccount.getUsername(), request);

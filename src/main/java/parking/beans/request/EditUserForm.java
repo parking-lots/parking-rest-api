@@ -1,6 +1,7 @@
 package parking.beans.request;
 
 import org.hibernate.validator.constraints.Email;
+import parking.utils.AccountStatus;
 
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class EditUserForm {
     @Email
     private String email;
     private List<String> carRegNoList = new ArrayList<>();
+    private AccountStatus accountStatus;
 
     public String getFullName() {
         return fullName;
@@ -47,4 +49,11 @@ public class EditUserForm {
         this.carRegNoList = carRegNoList;
     }
 
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
 }

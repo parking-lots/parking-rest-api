@@ -8,6 +8,7 @@ import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.repositories.AccountRepositoryImpl;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public class RegistrationService {
     @Autowired
     private ParkingService parkingService;
 
-    public Account registerUser(Account user, Integer number, HttpServletRequest request) throws ApplicationException {
+    public Account registerUser(Account user, Integer number, HttpServletRequest request) throws ApplicationException, MessagingException {
         Account createdAccount = userService.createUser(user, request);
 
         if (Optional.ofNullable(number).isPresent()) {
