@@ -53,10 +53,6 @@ public class AdminService {
 
     }
 
-    public void activateAccount(String username, HttpServletRequest request) {
-
-    }
-
     public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) throws ApplicationException, MessagingException {
 
         if (newAccount.getCarRegNoList() != null && newAccount.getCarRegNoList().contains("")) {
@@ -93,7 +89,7 @@ public class AdminService {
         }
 
         if (oldAccount.getStatus() != null && oldAccount.getStatus().equals(AccountStatus.INACTIVE)) {
-            if (newAccount.getAccountStatus() != null && newAccount.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+            if (newAccount.getStatus() != null && newAccount.getStatus().equals(AccountStatus.ACTIVE)) {
                 try {
                     MailService.sendEmail(newAccount.getEmail(), "Account activation", "Your account has been activated");
                 } catch (Exception e) {

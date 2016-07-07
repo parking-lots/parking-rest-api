@@ -15,7 +15,7 @@ public class EditUserForm {
     @Email
     private String email;
     private List<String> carRegNoList = new ArrayList<>();
-    private AccountStatus accountStatus;
+    private AccountStatus status;
 
     public String getFullName() {
         return fullName;
@@ -49,11 +49,11 @@ public class EditUserForm {
         this.carRegNoList = carRegNoList;
     }
 
-    public AccountStatus getAccountStatus() {
-        return accountStatus;
+    public AccountStatus getStatus() {
+        return status;
     }
 
-    public void setAccountStatus(AccountStatus accountStatus) {
-        this.accountStatus = accountStatus;
+    public void setStatus(AccountStatus status) {
+        this.status = status;
     }
 }

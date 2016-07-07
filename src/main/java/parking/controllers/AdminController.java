@@ -44,11 +44,6 @@ public class AdminController {
         return adminService.getUsers();
     }
 
-    @RequestMapping(value = "/users/{username:.+}/activate", method = RequestMethod.POST)
-    public void confirmAccount(@PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
-        adminService.activateAccount(username, request);
-    }
-
     @RequestMapping(value = "/users/{username:.+}", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, @PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException, MessagingException {
         adminService.editUser(form, username, request);
