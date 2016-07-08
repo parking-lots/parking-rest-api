@@ -25,10 +25,6 @@ public class RegistrationService {
     public Account registerUser(Account user, Integer number, HttpServletRequest request) throws ApplicationException, MessagingException {
         Account createdAccount = userService.createUser(user, number, request);
 
-//        if (Optional.ofNullable(number).isPresent()) {
-//            accountRepository.attachParking(number, createdAccount.getUsername(), request);
-//        }
-
         return accountRepository.findByUsername(createdAccount.getUsername());
     }
 }

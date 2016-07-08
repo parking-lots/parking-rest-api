@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
-import parking.beans.request.ChangePassword;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.LoginForm;
 import parking.exceptions.ApplicationException;

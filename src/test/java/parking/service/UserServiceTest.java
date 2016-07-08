@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
-import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
@@ -119,24 +118,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenChangePasswordCallRepositoryWithNewPassword() throws ApplicationException {
-        ChangePassword changePassword = new ChangePassword();
-        changePassword.setNewPassword("password");
-
-        mockedUser.setPassword(changePassword.getNewPassword());
-        service.changePassword(changePassword, request);
-
-        ArgumentCaptor captor = ArgumentCaptor.forClass(Account.class);
-
-        verify(accountRepository).save((Account) captor.capture());
-
-        Account value = (Account) captor.getValue();
-        assertEquals(value.getPassword(), mockedUser.getPassword());
-    }
-
-    @Test
     public void createMethodMustBeDefiedAndAcceptAccountObject() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("createUser", Account.class, HttpServletRequest.class).getName(), "createUser");
+        assertEquals(UserService.class.getMethod("createUser", Account.class, Integer.class, HttpServletRequest.class).getName(), "createUser");
     }
 
     @Test(expected = ApplicationException.class)

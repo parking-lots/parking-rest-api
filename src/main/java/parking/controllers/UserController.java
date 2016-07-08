@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -63,7 +64,7 @@ public class UserController {
 
         userService.deleteCookies(username, password);
 
-        Account user = userService.getCurrentUser(request);
+        Optional<Account> user = userService.getLoggedUser();
         session.invalidate();
 
         String userAgent = request.getHeader("User-Agent");

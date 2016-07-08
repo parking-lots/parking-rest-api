@@ -14,9 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import parking.beans.document.*;
-import parking.beans.request.ChangePassword;
-import parking.beans.request.LoginForm;
-import parking.beans.response.FreeParkingLot;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
@@ -29,7 +26,6 @@ import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.AccountStatus;
 import parking.utils.ActionType;
-import parking.utils.ParkingType;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -99,7 +95,7 @@ public class UserService {
         rememberMeLogin(username.toLowerCase(), password, request);
 
         String userAgent = request.getHeader("User-Agent");
-        Account user = accountRepository.findByUsername(username);
+        Optional<Account> user = getLoggedUser();
         logRepository.insertActionLog(ActionType.LOG_IN, null, null, null, null, null, user, userAgent);
 
         if (remember) {
@@ -172,34 +168,6 @@ public class UserService {
         return context;
     }
 
-    public Account validateUser(LoginForm loginForm, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
-        if (getLoggedUser().isPresent()) {
-            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
-        }
-
-        Account account = accountRepository.findByUsername(loginForm.getUsername());
-
-        if (account == null || !ProfileHelper.checkPassword(loginForm.getPassword(), account.getPassword())) {
-            throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
-        }
-
-        return account;
-    }
-
-    public void changePassword(ChangePassword password, HttpServletRequest request) throws ApplicationException {
-        Account account = getCurrentUser(request);
-
-        account.setPassword(ProfileHelper.encryptPassword(password.getNewPassword()));
-
-        accountRepository.save(account);
-
-        LogMetaData logMetaData = new LogMetaData();
-        logMetaData.setPasswordChanged(true);
-
-        String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.EDIT_USER, account, account.getParking().getNumber(), null, null, logMetaData, account, userAgent);
-    }
-
 
     public Optional<Account> getUserByUsername(String username) {
         Account userName = accountRepository.findByUsername(username);
@@ -267,15 +235,15 @@ public class UserService {
             accountRepository.attachParking(lotNumber, newAccount.getUsername(), request);
         }
 
+        Optional<Account> loggedUser = getLoggedUser();
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
+
         try {
             MailService.sendEmail(newAccount.getEmail(), "Parkinger registration", "Your account will be shortly activated by administrator.");
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }
-
-        Account user = getCurrentUser(request);
-        String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, user, userAgent);
 
         return newAccount;
     }

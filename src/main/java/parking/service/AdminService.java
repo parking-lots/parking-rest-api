@@ -67,7 +67,7 @@ public class AdminService {
 
         accountRepository.editAccount(newAccount, oldAccount, username);
 
-        Account user = userService.getCurrentUser(request);
+        Optional<Account> user = userService.getLoggedUser();
         LogMetaData metaData = new LogMetaData();
 
         if (!oldAccount.getFullName().equals(newAccount.getFullName())) {
@@ -158,7 +158,7 @@ public class AdminService {
         if (accountToDelete == null) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         } else {
-            Account user = userService.getCurrentUser(request);
+            Optional<Account> user = userService.getLoggedUser();
             Integer lotNum = accountToDelete.getParking() == null ? null : accountToDelete.getParking().getNumber();
             String userAgent = request.getHeader("User-Agent");
             logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete, lotNum, null, null, null, user, userAgent);
@@ -174,7 +174,7 @@ public class AdminService {
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
         accountRepository.attachParking(lotNumber, username, httpRequest);
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.ATTACH_PARKING, accountRepository.findByUsername(username), lotNumber, null, null, null, userService.getCurrentUser(httpRequest), userAgent);
+        logRepository.insertActionLog(ActionType.ATTACH_PARKING, accountRepository.findByUsername(username), lotNumber, null, null, null, userService.getLoggedUser(), userAgent);
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
@@ -187,7 +187,7 @@ public class AdminService {
         accountRepository.detachParking(username, httpRequest);
         lotsRepository.removeParkingOwner(parkingLot.getNumber());
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.DETACH_PARKING, accountRepository.findByUsername(username), parkingLot.getNumber(), null, null, null, userService.getCurrentUser(httpRequest), userAgent);
+        logRepository.insertActionLog(ActionType.DETACH_PARKING, accountRepository.findByUsername(username), parkingLot.getNumber(), null, null, null, userService.getLoggedUser(), userAgent);
     }
 
     public List<FreeParkingLot> getParkings(ParkingType type) {
