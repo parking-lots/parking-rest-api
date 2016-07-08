@@ -129,7 +129,7 @@ public class UserService {
         Account userAccount = accountRepository.findByUsername(username);
 
         if (userAccount != null) {
-            if(userAccount.getStatus() == AccountStatus.INACTIVE){
+            if (userAccount.getStatus() == AccountStatus.INACTIVE) {
                 throw exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request);
 
             }

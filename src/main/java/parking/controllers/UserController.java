@@ -3,17 +3,22 @@ package parking.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.Account;
+import parking.beans.request.AttachParking;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
+import parking.beans.request.RegistrationForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
+import parking.service.AdminService;
+import parking.service.RegistrationService;
 import parking.service.UserService;
 import parking.utils.ActionType;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -34,6 +39,16 @@ public class UserController {
 
     @Autowired
     private LogRepository logRepository;
+
+    @Autowired
+    private RegistrationService registrationService;
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws ApplicationException, MessagingException {
+        boolean parkingLot = form.getNumber() == null ? false : true;
+
+        return new Profile(registrationService.registerUser(form.getAccount(), form.getNumber(), request), parkingLot);
+    }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public void login(@Valid @RequestBody LoginForm user, HttpServletRequest request) throws ApplicationException {
