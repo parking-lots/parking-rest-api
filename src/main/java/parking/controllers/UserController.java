@@ -3,10 +3,7 @@ package parking.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.Account;
-import parking.beans.request.AttachParking;
-import parking.beans.request.ChangePassword;
-import parking.beans.request.LoginForm;
-import parking.beans.request.RegistrationForm;
+import parking.beans.request.*;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -43,6 +40,9 @@ public class UserController {
     @Autowired
     private RegistrationService registrationService;
 
+    @Autowired
+    private AdminService adminService;
+
     @RequestMapping(method = RequestMethod.PUT)
     public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws ApplicationException, MessagingException {
         boolean parkingLot = form.getNumber() == null ? false : true;
@@ -75,8 +75,15 @@ public class UserController {
         return userService.getCurrentUserProfile(request);
     }
 
+//    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+//    public void changePassword(@Valid @RequestBody ChangePassword password, HttpServletRequest request) throws ApplicationException {
+//        userService.changePassword(password, request);
+//    }
+
     @RequestMapping(value = "/profile", method = RequestMethod.POST)
-    public void changePassword(@Valid @RequestBody ChangePassword password, HttpServletRequest request) throws ApplicationException {
-        userService.changePassword(password, request);
+    public void editUser(@Valid @RequestBody EditUserForm form, HttpServletRequest request) throws ApplicationException, MessagingException {
+        String username = userService.getCurrentUser(request).getUsername();
+        adminService.editUser(form, username, request);
+
     }
 }
