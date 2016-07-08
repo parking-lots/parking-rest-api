@@ -224,7 +224,7 @@ public class UserService {
         return authorities;
     }
 
-    public Account createUser(Account newAccount, HttpServletRequest request) throws ApplicationException, MessagingException {
+    public Account createUser(Account newAccount, Integer lotNumber, HttpServletRequest request) throws ApplicationException, MessagingException {
 
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
@@ -238,6 +238,10 @@ public class UserService {
         newAccount.setStatus(AccountStatus.INACTIVE);
 
         accountRepository.insert(newAccount);
+
+        if (Optional.ofNullable(lotNumber).isPresent()) {
+            accountRepository.attachParking(lotNumber, newAccount.getUsername(), request);
+        }
 
         try {
             MailService.sendEmail(newAccount.getEmail(), "Parkinger registration", "Your account will be shortly activated by administrator.");

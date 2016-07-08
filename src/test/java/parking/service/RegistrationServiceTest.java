@@ -50,7 +50,7 @@ public class RegistrationServiceTest {
 
     @Test
     public void whenRegistreationSuccessShouldReturnAccount() throws ApplicationException, MessagingException {
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+        given(userService.createUser(mockedAccount, mockedParking.getNumber(), request)).willReturn(mockedAccount);
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
         given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
 
@@ -61,7 +61,7 @@ public class RegistrationServiceTest {
     @Test
     public void whenRegisterUserShouldCallAttachParkingMethod() throws ApplicationException, MessagingException {
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+        given(userService.createUser(mockedAccount,mockedParking.getNumber() , request)).willReturn(mockedAccount);
 
         registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
         verify(accountRepository).attachParking(mockedParking.getNumber(), mockedAccount.getUsername(), request);
@@ -69,7 +69,7 @@ public class RegistrationServiceTest {
 
     @Test
     public void whenRegisterUserWithoutParkingShouldNotCallAttachParking() throws ApplicationException, MessagingException {
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+        given(userService.createUser(mockedAccount,mockedParking.getNumber() , request)).willReturn(mockedAccount);
 
         registrationService.registerUser(mockedAccount, null, request);
 
