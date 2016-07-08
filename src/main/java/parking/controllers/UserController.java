@@ -75,11 +75,6 @@ public class UserController {
         return userService.getCurrentUserProfile(request);
     }
 
-//    @RequestMapping(value = "/profile", method = RequestMethod.POST)
-//    public void changePassword(@Valid @RequestBody ChangePassword password, HttpServletRequest request) throws ApplicationException {
-//        userService.changePassword(password, request);
-//    }
-
     @RequestMapping(value = "/profile", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, HttpServletRequest request) throws ApplicationException, MessagingException {
         String username = userService.getCurrentUser(request).getUsername();

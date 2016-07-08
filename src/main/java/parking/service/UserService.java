@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import parking.beans.document.*;
 import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
+import parking.beans.response.FreeParkingLot;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
@@ -24,9 +25,11 @@ import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
+import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.AccountStatus;
 import parking.utils.ActionType;
+import parking.utils.ParkingType;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -43,6 +46,9 @@ public class UserService {
     private AccountRepository accountRepository;
 
     @Autowired
+    private LotsRepository lotsRepository;
+
+    @Autowired
     private LogRepository logRepository;
 
     @Autowired
@@ -53,6 +59,9 @@ public class UserService {
 
     @Autowired
     private ParkingService parkingService;
+
+    @Autowired
+    private AdminService adminService;
 
     @Autowired
     private ExceptionHandler exceptionHandler;
@@ -237,8 +246,23 @@ public class UserService {
         newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
         newAccount.setStatus(AccountStatus.INACTIVE);
 
+
+        //if cannot attach requested parking, the whole account must not be saved
+        if (Optional.ofNullable(lotNumber).isPresent()) {
+            ParkingLot parkingLot = lotsRepository.findByNumber(lotNumber);
+            if (!Optional.ofNullable(parkingLot).isPresent()) {
+                throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, request);
+            }
+
+            if (Optional.ofNullable(parkingLot.getOwner()).isPresent()) {
+                throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, request);
+
+            }
+        }
+
         accountRepository.insert(newAccount);
 
+        //if admin edits user, argument of lotNumber will be null - seperate attach/detach services are available for admin
         if (Optional.ofNullable(lotNumber).isPresent()) {
             accountRepository.attachParking(lotNumber, newAccount.getUsername(), request);
         }
