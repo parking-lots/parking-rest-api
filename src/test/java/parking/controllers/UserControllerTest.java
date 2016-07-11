@@ -7,15 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
-import parking.beans.request.ChangePassword;
+import parking.beans.request.EditUserForm;
 import parking.beans.request.LoginForm;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
+import parking.service.AdminService;
 import parking.service.UserService;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -48,15 +50,22 @@ public class UserControllerTest {
     @Mock
     private AccountRepository accountRepository;
     @Mock
+    private AdminService adminService;
+    @Mock
     private LogRepository logRepository;
     @Mock
     private Account mockedUser;
+    @Mock
+    private EditUserForm mockedEditUserForm;
 
     @Before
     public void initMock() throws ApplicationException {
         mockedLoginForm.setUsername("username");
         mockedLoginForm.setPassword("password");
         mockedLoginForm.setRemember(true);
+
+        mockedEditUserForm.setFullName("Full Name");
+        mockedEditUserForm.setPassword("password");
 
         mockedUser.setUsername(mockedLoginForm.getUsername());
         mockedUser.setPassword(mockedLoginForm.getPassword());
@@ -99,10 +108,8 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenChangePasswordShouldCallServiceMethod() throws ApplicationException {
-        ChangePassword changePassword = new ChangePassword();
-        controller.changePassword(changePassword, servletRequest);
-
-        verify(userService, times(1)).changePassword(changePassword, servletRequest);
+    public void whenEditingProfileShouldCallService() throws ApplicationException, MessagingException {
+        given(userService.getCurrentUser(servletRequest)).willReturn(mockedUser);
+        controller.editUser(mockedEditUserForm, servletRequest);
     }
 }

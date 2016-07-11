@@ -14,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import parking.beans.document.*;
-import parking.beans.request.ChangePassword;
-import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
@@ -24,9 +22,11 @@ import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
+import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.AccountStatus;
 import parking.utils.ActionType;
+import parking.utils.EmailDomain;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -43,6 +43,9 @@ public class UserService {
     private AccountRepository accountRepository;
 
     @Autowired
+    private LotsRepository lotsRepository;
+
+    @Autowired
     private LogRepository logRepository;
 
     @Autowired
@@ -53,6 +56,9 @@ public class UserService {
 
     @Autowired
     private ParkingService parkingService;
+
+    @Autowired
+    private AdminService adminService;
 
     @Autowired
     private ExceptionHandler exceptionHandler;
@@ -90,7 +96,7 @@ public class UserService {
         rememberMeLogin(username.toLowerCase(), password, request);
 
         String userAgent = request.getHeader("User-Agent");
-        Account user = accountRepository.findByUsername(username);
+        Optional<Account> user = getLoggedUser();
         logRepository.insertActionLog(ActionType.LOG_IN, null, null, null, null, null, user, userAgent);
 
         if (remember) {
@@ -129,7 +135,7 @@ public class UserService {
         Account userAccount = accountRepository.findByUsername(username);
 
         if (userAccount != null) {
-            if(userAccount.getStatus() == AccountStatus.INACTIVE){
+            if (userAccount.getStatus() == AccountStatus.INACTIVE) {
                 throw exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request);
 
             }
@@ -161,34 +167,6 @@ public class UserService {
                 )
         );
         return context;
-    }
-
-    public Account validateUser(LoginForm loginForm, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
-        if (getLoggedUser().isPresent()) {
-            throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request);
-        }
-
-        Account account = accountRepository.findByUsername(loginForm.getUsername());
-
-        if (account == null || !ProfileHelper.checkPassword(loginForm.getPassword(), account.getPassword())) {
-            throw exceptionHandler.handleException(ExceptionMessage.WRONG_CREDENTIALS, request);
-        }
-
-        return account;
-    }
-
-    public void changePassword(ChangePassword password, HttpServletRequest request) throws ApplicationException {
-        Account account = getCurrentUser(request);
-
-        account.setPassword(ProfileHelper.encryptPassword(password.getNewPassword()));
-
-        accountRepository.save(account);
-
-        LogMetaData logMetaData = new LogMetaData();
-        logMetaData.setPasswordChanged(true);
-
-        String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.EDIT_USER, account, account.getParking().getNumber(), null, null, logMetaData, account, userAgent);
     }
 
 
@@ -224,9 +202,14 @@ public class UserService {
         return authorities;
     }
 
-    public Account createUser(Account newAccount, HttpServletRequest request) throws ApplicationException, MessagingException {
+    public Account createUser(Account newAccount, Integer lotNumber, HttpServletRequest request) throws ApplicationException, MessagingException {
 
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
+
+        String email = newAccount.getEmail();
+        if(email != null && !email.substring(email.indexOf("@")+1).equals(EmailDomain.SWEDBANK_LT.getDomain())){
+            throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
+        }
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request);
@@ -237,17 +220,36 @@ public class UserService {
         newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
         newAccount.setStatus(AccountStatus.INACTIVE);
 
+
+        //if cannot attach requested parking, the whole account must not be saved
+        if (Optional.ofNullable(lotNumber).isPresent()) {
+            ParkingLot parkingLot = lotsRepository.findByNumber(lotNumber);
+            if (!Optional.ofNullable(parkingLot).isPresent()) {
+                throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, request);
+            }
+
+            if (Optional.ofNullable(parkingLot.getOwner()).isPresent()) {
+                throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, request);
+
+            }
+        }
+
         accountRepository.insert(newAccount);
+
+        //if admin edits user, argument of lotNumber will be null - seperate attach/detach services are available for admin
+        if (Optional.ofNullable(lotNumber).isPresent()) {
+            accountRepository.attachParking(lotNumber, newAccount.getUsername(), request);
+        }
+
+        Optional<Account> loggedUser = getLoggedUser();
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
 
         try {
             MailService.sendEmail(newAccount.getEmail(), "Parkinger registration", "Your account will be shortly activated by administrator.");
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }
-
-        Account user = getCurrentUser(request);
-        String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, user, userAgent);
 
         return newAccount;
     }

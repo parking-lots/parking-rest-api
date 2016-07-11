@@ -8,6 +8,7 @@ import parking.beans.document.LogMetaData;
 import parking.utils.ActionType;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class LogRepositoryImpl implements CustomLogRepository {
     private final MongoOperations operations;
@@ -18,7 +19,7 @@ public class LogRepositoryImpl implements CustomLogRepository {
         this.operations = operations;
     }
 
-    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Account user, String channel) {
+    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Optional<Account> user, String channel) {
         BasicDBObject dbObject = new BasicDBObject();
 
         dbObject.put("actionType", actionType);

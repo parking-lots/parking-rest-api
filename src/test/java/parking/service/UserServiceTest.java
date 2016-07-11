@@ -8,21 +8,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import parking.Application;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
-import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.ParkingException;
-import parking.exceptions.UserException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
@@ -123,30 +118,14 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenChangePasswordCallRepositoryWithNewPassword() throws ApplicationException {
-        ChangePassword changePassword = new ChangePassword();
-        changePassword.setNewPassword("password");
-
-        mockedUser.setPassword(changePassword.getNewPassword());
-        service.changePassword(changePassword, request);
-
-        ArgumentCaptor captor = ArgumentCaptor.forClass(Account.class);
-
-        verify(accountRepository).save((Account) captor.capture());
-
-        Account value = (Account) captor.getValue();
-        assertEquals(value.getPassword(), mockedUser.getPassword());
-    }
-
-    @Test
     public void createMethodMustBeDefiedAndAcceptAccountObject() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("createUser", Account.class, HttpServletRequest.class).getName(), "createUser");
+        assertEquals(UserService.class.getMethod("createUser", Account.class, Integer.class, HttpServletRequest.class).getName(), "createUser");
     }
 
     @Test(expected = ApplicationException.class)
     public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException, MessagingException {
         given(accountRepository.findByUsername(mockedUser.getUsername())).willReturn(mockedUser);
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
     }
 
     @Test
@@ -156,7 +135,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -174,7 +153,7 @@ public class UserServiceTest {
         given(accountRepository.insert(mockedUser)).willReturn(mockedUser);
         given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
-        Account newAccount = service.createUser(mockedUser, request);
+        Account newAccount = service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         assertTrue(Account.class.isInstance(newAccount));
     }
@@ -185,7 +164,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -201,7 +180,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -219,7 +198,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         assertEquals(MOCKED_USER_NAME, mockedUser.getUsername());//captor.getValue().getUsername());
     }
