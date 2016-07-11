@@ -46,6 +46,7 @@ public class ExceptionHandler {
             case DATE_DOES_NOT_EXIST:
             case OVERLAPPING_PERIOD:
             case DUBLICATE_DATES:
+            case DOES_NOT_HAVE_PARKING:
                 return new ParkingException(getMessage(message.getMsg(), request));
             default:
                 return (ApplicationException) new Exception(message.getMsg());

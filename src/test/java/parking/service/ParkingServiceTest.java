@@ -121,7 +121,7 @@ public class ParkingServiceTest {
         Date to = new Date();
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(mockedParkingLot.getOwner().getId(), mockedParkingLot.getNumber(), from, to, httpRequest);
+        service.freeOwnersParking(mockedParkingLot.getOwner(), mockedParkingLot.getNumber(), from, to, httpRequest);
 
         verify(lotsRepository).freeOwnersParking(
                 eq(mockedAccount.getParking().getNumber()),

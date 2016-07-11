@@ -97,6 +97,7 @@ public class UserServiceTest {
         when(authentication.getName()).thenReturn(MOCKED_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
         when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
@@ -143,6 +144,7 @@ public class UserServiceTest {
 
     @Test(expected = ApplicationException.class)
     public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException {
+        given(accountRepository.findByUsername(mockedUser.getUsername())).willReturn(mockedUser);
         service.createUser(mockedUser, request);
     }
 
@@ -219,49 +221,6 @@ public class UserServiceTest {
         service.createUser(mockedUser, request);
 
         assertEquals(MOCKED_USER_NAME, mockedUser.getUsername());//captor.getValue().getUsername());
-    }
-
-    @Test
-    public void attachParkingMethodShouldBeDefined() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("attachParking", Account.class, Integer.class, HttpServletRequest.class).getName(), "attachParking");
-    }
-
-    @Test
-    public void whenAttachParkingToUserSuccessShouldCallUpdateServiceMethod() throws ApplicationException {
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
-        service.attachParking(mockedUser, 161, request);
-
-        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-
-        verify(accountRepository).save(captor.capture());
-
-        assertTrue(captor.getValue().getParking().getNumber() == 161);
-    }
-
-    @Test(expected = ParkingException.class)
-    public void whenAttachParkingWhichOwnedByAnotherUserShouldThrowException() throws ApplicationException {
-        mockedParking.setOwner(new Account("Name surname", MOCKED_USER_NAME, "******"));
-        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
-        service.attachParking(mockedUser, 161, request);
-    }
-
-    @Test(expected = ParkingException.class)
-    public void whenAttachParkingWhichDidNotExistShouldThrowException() throws ApplicationException {
-        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
-        service.attachParking(mockedUser, 161, request);
-    }
-
-    @Test
-    public void whenAttachParkingShouldAddOwnerRole() throws ApplicationException {
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
-        given(roleRepository.findByName(Role.ROLE_OWNER)).willReturn(new Role(Role.ROLE_OWNER));
-
-        service.attachParking(mockedUser, 161, request);
-
-        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepository).save(captor.capture());
-
-        assertEquals(captor.getValue().getRoles().get(0).getName(), Role.ROLE_OWNER);
     }
 
     @Test

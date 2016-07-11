@@ -31,6 +31,9 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
     }
 
     @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
     private ExceptionHandler exceptionHandler;
 
     @Override
@@ -348,8 +351,19 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         return lots;
     }
 
-    public void removeParkingOwner(Integer lotNumber){
-        Query query = new Query (Criteria.where("number").is(lotNumber));
+    public void setParkingOwner(Integer lotNumber, String username) {
+        Query query = new Query(Criteria.where("number").is(lotNumber));
+
+        Account owner = accountRepository.findByUsername(username);
+
+        Update update = new Update();
+        update.set("owner", owner);
+
+        operations.updateFirst(query, update, ParkingLot.class);
+    }
+
+    public void removeParkingOwner(Integer lotNumber) {
+        Query query = new Query(Criteria.where("number").is(lotNumber));
 
         Update update = new Update();
         update.unset("owner");
