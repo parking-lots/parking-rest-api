@@ -67,7 +67,7 @@ public class AdminService {
         }
 
         String email = newAccount.getEmail();
-        if(email != null && !email.substring(email.indexOf("@")+1).equals(EmailDomain.SWEDBANK_LT.getDomain())){
+        if (email != null && !email.substring(email.indexOf("@") + 1).equals(EmailDomain.SWEDBANK_LT.getDomain())) {
             throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
         }
 
