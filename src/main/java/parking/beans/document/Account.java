@@ -1,10 +1,12 @@
 package parking.beans.document;
 
 import org.bson.types.ObjectId;
+import org.hibernate.validator.constraints.Email;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import parking.helper.ProfileHelper;
+import parking.utils.AccountStatus;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -22,12 +24,14 @@ public class Account {
     private String username;
     @Size(min = 6, max = 10)
     private String password;
+    @Email
     private String email;
     private List<String> carRegNoList = new ArrayList<>();
     @DBRef
     private List<Role> roles = new ArrayList<Role>();
     @DBRef
     private ParkingLot parking;
+    private AccountStatus status;
 
     public Account() {
     }
@@ -106,5 +110,13 @@ public class Account {
 
     public void setCarRegNoList(List<String> carRegNOList) {
         this.carRegNoList = carRegNOList;
+    }
+
+    public AccountStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AccountStatus status) {
+        this.status = status;
     }
 }

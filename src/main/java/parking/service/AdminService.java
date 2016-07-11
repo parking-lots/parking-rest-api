@@ -15,9 +15,12 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
+import parking.utils.AccountStatus;
 import parking.utils.ActionType;
+import parking.utils.EmailDomain;
 import parking.utils.ParkingType;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,21 +54,26 @@ public class AdminService {
 
     }
 
-    public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) throws ApplicationException {
+    public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) throws ApplicationException, MessagingException {
 
-        if(newAccount.getCarRegNoList() != null && newAccount.getCarRegNoList().contains("")){
+        if (newAccount.getCarRegNoList() != null && newAccount.getCarRegNoList().contains("")) {
             throw exceptionHandler.handleException(ExceptionMessage.EMPTY_CAR_REG_NO, request);
         }
 
         Account oldAccount = accountRepository.findByUsername(username);
 
-        if(oldAccount == null){
+        if (oldAccount == null) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+        }
+
+        String email = newAccount.getEmail();
+        if(email != null && !email.substring(email.indexOf("@")+1).equals(EmailDomain.SWEDBANK_LT.getDomain())){
+            throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
         }
 
         accountRepository.editAccount(newAccount, oldAccount, username);
 
-        Account user = userService.getCurrentUser(request);
+        Optional<Account> user = userService.getLoggedUser();
         LogMetaData metaData = new LogMetaData();
 
         if (!oldAccount.getFullName().equals(newAccount.getFullName())) {
@@ -84,6 +92,16 @@ public class AdminService {
         }
         if (newAccount.getCarRegNoList() != null) {
             Collections.sort(newAccount.getCarRegNoList());
+        }
+
+        if (oldAccount.getStatus() != null && oldAccount.getStatus().equals(AccountStatus.INACTIVE)) {
+            if (newAccount.getStatus() != null && newAccount.getStatus().equals(AccountStatus.ACTIVE)) {
+                try {
+                    MailService.sendEmail(newAccount.getEmail(), "Account activation", "Your account has been activated");
+                } catch (Exception e) {
+                    throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
+                }
+            }
         }
 
         checkCars:
@@ -146,7 +164,7 @@ public class AdminService {
         if (accountToDelete == null) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         } else {
-            Account user = userService.getCurrentUser(request);
+            Optional<Account> user = userService.getLoggedUser();
             Integer lotNum = accountToDelete.getParking() == null ? null : accountToDelete.getParking().getNumber();
             String userAgent = request.getHeader("User-Agent");
             logRepository.insertActionLog(ActionType.DELETE_USER, accountToDelete, lotNum, null, null, null, user, userAgent);
@@ -162,7 +180,7 @@ public class AdminService {
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
         accountRepository.attachParking(lotNumber, username, httpRequest);
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.ATTACH_PARKING, accountRepository.findByUsername(username), lotNumber, null, null, null, userService.getCurrentUser(httpRequest), userAgent);
+        logRepository.insertActionLog(ActionType.ATTACH_PARKING, accountRepository.findByUsername(username), lotNumber, null, null, null, userService.getLoggedUser(), userAgent);
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {
@@ -175,7 +193,7 @@ public class AdminService {
         accountRepository.detachParking(username, httpRequest);
         lotsRepository.removeParkingOwner(parkingLot.getNumber());
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.DETACH_PARKING, accountRepository.findByUsername(username), parkingLot.getNumber(), null, null, null, userService.getCurrentUser(httpRequest), userAgent);
+        logRepository.insertActionLog(ActionType.DETACH_PARKING, accountRepository.findByUsername(username), parkingLot.getNumber(), null, null, null, userService.getLoggedUser(), userAgent);
     }
 
     public List<FreeParkingLot> getParkings(ParkingType type) {

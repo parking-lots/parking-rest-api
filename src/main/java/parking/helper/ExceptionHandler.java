@@ -35,6 +35,9 @@ public class ExceptionHandler {
             case WRONG_CREDENTIALS:
             case NOT_LOGGED:
             case NO_COOKIE_DATA:
+            case COULD_NOT_SEND_EMAIL:
+            case USER_INACTIVE:
+            case INVALID_EMAIL:
                 return new UserException(getMessage(message.getMsg(), request));
             case PARKING_ALREADY_EXISTS:
             case PARKING_DOES_NOT_EXIST:

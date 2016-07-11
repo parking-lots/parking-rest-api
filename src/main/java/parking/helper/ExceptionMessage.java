@@ -18,7 +18,10 @@ public enum ExceptionMessage {
     OVERLAPPING_PERIOD("overlapping_period"),
     DUBLICATE_DATES("dublicate_dates"),
     DOES_NOT_HAVE_PARKING("does_not_have_parking"),
-    EMPTY_CAR_REG_NO("empty_car_reg_no");
+    EMPTY_CAR_REG_NO("empty_car_reg_no"),
+    COULD_NOT_SEND_EMAIL("could_not_send_email"),
+    USER_INACTIVE("user_inactive"),
+    INVALID_EMAIL("invalid_email");
 
     private String msg;
 
