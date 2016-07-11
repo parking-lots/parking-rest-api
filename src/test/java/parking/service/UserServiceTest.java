@@ -224,49 +224,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void attachParkingMethodShouldBeDefined() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("attachParking", Account.class, Integer.class, HttpServletRequest.class).getName(), "attachParking");
-    }
-
-    @Test
-    public void whenAttachParkingToUserSuccessShouldCallUpdateServiceMethod() throws ApplicationException {
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
-        service.attachParking(mockedUser, 161, request);
-
-        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-
-        verify(accountRepository).save(captor.capture());
-
-        assertTrue(captor.getValue().getParking().getNumber() == 161);
-    }
-
-    @Test(expected = ParkingException.class)
-    public void whenAttachParkingWhichOwnedByAnotherUserShouldThrowException() throws ApplicationException {
-        mockedParking.setOwner(new Account("Name surname", MOCKED_USER_NAME, "******"));
-        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
-        service.attachParking(mockedUser, 161, request);
-    }
-
-    @Test(expected = ParkingException.class)
-    public void whenAttachParkingWhichDidNotExistShouldThrowException() throws ApplicationException {
-        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
-        service.attachParking(mockedUser, 161, request);
-    }
-
-    @Test
-    public void whenAttachParkingShouldAddOwnerRole() throws ApplicationException {
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
-        given(roleRepository.findByName(Role.ROLE_OWNER)).willReturn(new Role(Role.ROLE_OWNER));
-
-        service.attachParking(mockedUser, 161, request);
-
-        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepository).save(captor.capture());
-
-        assertEquals(captor.getValue().getRoles().get(0).getName(), Role.ROLE_OWNER);
-    }
-
-    @Test
     public void whenLoginWithAnyRememberMeOptionShouldSucceed() throws ApplicationException {
         String username = MOCKED_USER_NAME;
         String password = "****";

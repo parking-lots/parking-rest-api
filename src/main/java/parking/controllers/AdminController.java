@@ -2,6 +2,7 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import parking.beans.request.AttachParking;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.FreeParkingLot;
@@ -54,6 +55,11 @@ public class AdminController {
     @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)
     public List<FreeParkingLot> getParkings(@PathVariable(value = "type") ParkingType type){
         return adminService.getParkings(type);
+    }
+
+    @RequestMapping(value = "/users/{username:.+}/parking/attach", method = RequestMethod.POST)
+    public void attachParking(@Valid @RequestBody AttachParking attachParking, @PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException{
+        adminService.attachParking(attachParking.getLotNumber(), username, httpRequest);
     }
 
     @RequestMapping(value = "/users/{username:.+}/parking/detach", method = RequestMethod.POST)

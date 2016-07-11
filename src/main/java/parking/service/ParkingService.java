@@ -55,16 +55,15 @@ public class ParkingService {
         return parkingLots;
     }
 
-    public void freeOwnersParking(ObjectId ownerId, Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
+    public void freeOwnersParking(Account owner, Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpRequest) throws ApplicationException {
 
         validatePeriod(lotNumber, freeFrom, freeTill, httpRequest);
 
         lotsRepository.freeOwnersParking(lotNumber, freeFrom, freeTill, httpRequest);
 
         Account user = userService.getCurrentUser(httpRequest);
-        ObjectId userId = user.getId();
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.SHARE, ownerId, lotNumber, freeFrom, freeTill, null, userId, userAgent);
+        logRepository.insertActionLog(ActionType.SHARE, owner, lotNumber, freeFrom, freeTill, null, user, userAgent);
     }
 
     public void validatePeriod(Integer lotNumber, Date freeFrom, Date freeTill, HttpServletRequest httpServletRequest) throws ApplicationException {
@@ -108,8 +107,6 @@ public class ParkingService {
         }
 
         Account user = userService.getCurrentUser(request);
-        ObjectId userId = user.getId();
-        ObjectId targetUserId = parking.getOwner().getId();
 
         List<AvailablePeriod> availablePeriods;
         AvailableDatesConverter converter = new AvailableDatesConverter();
@@ -117,7 +114,7 @@ public class ParkingService {
 
         String userAgent = request.getHeader("User-Agent");
         for (AvailablePeriod availablePeriod : availablePeriods) {
-            logRepository.insertActionLog(ActionType.UNSHARE, targetUserId, parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, userId, userAgent);
+            logRepository.insertActionLog(ActionType.UNSHARE, parking.getOwner(), parking.getNumber(), availablePeriod.getFreeFrom(), availablePeriod.getFreeTill(), null, user, userAgent);
         }
     }
 
@@ -129,12 +126,10 @@ public class ParkingService {
         } else {
             lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest), httpRequest);
 
-            ObjectId targetUserId = lot.getOwner().getId();
             Date currentDate = ToolHelper.getCurrentDate();
             Account user = userService.getCurrentUser(httpRequest);
-            ObjectId userId = user.getId();
             String userAgent = httpRequest.getHeader("User-Agent");
-            logRepository.insertActionLog(ActionType.RESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, userAgent);
+            logRepository.insertActionLog(ActionType.RESERVE, lot.getOwner(), lot.getNumber(), currentDate, currentDate, null, user, userAgent);
         }
     }
 
@@ -165,13 +160,10 @@ public class ParkingService {
 
 
         ParkingLot lot = getParkingNumberByUser();
-        ObjectId targetUserId;
-        targetUserId = lot.getOwner().getId();
         Date currentDate = ToolHelper.getCurrentDate();
         Account user = userService.getCurrentUser(request);
-        ObjectId userId = user.getId();
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.UNRESERVE, targetUserId, lot.getNumber(), currentDate, currentDate, null, userId, userAgent);
+        logRepository.insertActionLog(ActionType.UNRESERVE, lot.getOwner(), lot.getNumber(), currentDate, currentDate, null, user, userAgent);
     }
 
     public ParkingLot setOwner(Account account, ParkingLot parkingLot) {
