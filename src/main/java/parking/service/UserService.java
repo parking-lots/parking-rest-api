@@ -86,6 +86,11 @@ public class UserService {
 
     public void login(String username, String password, Boolean remember, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, ApplicationException {
         rememberMeLogin(username.toLowerCase(), password, request);
+
+        String userAgent = request.getHeader("User-Agent");
+        Account user = accountRepository.findByUsername(username);
+        logRepository.insertActionLog(ActionType.LOG_IN, null, null, null, null, null, user, userAgent);
+
         if (remember) {
             Account account = accountRepository.findByUsername(username);
             if (account == null) {

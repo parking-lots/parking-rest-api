@@ -22,9 +22,11 @@ public class LogRepositoryImpl implements CustomLogRepository {
         BasicDBObject dbObject = new BasicDBObject();
 
         dbObject.put("actionType", actionType);
-        dbObject.put("targetUser", targetUser);
 
-        if(lotNumber != null) {
+        if (targetUser != null) {
+            dbObject.put("targetUser", targetUser);
+        }
+        if (lotNumber != null) {
             dbObject.put("lotNumber", lotNumber);
         }
         if (from != null) {
