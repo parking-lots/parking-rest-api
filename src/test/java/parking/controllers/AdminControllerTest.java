@@ -8,9 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.User;
+import parking.builders.AccountBuilder;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
@@ -18,6 +20,7 @@ import parking.service.AdminService;
 import parking.service.RegistrationService;
 import parking.utils.ParkingType;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,16 +65,16 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenCreatingUserShouldReturnNewAccount() throws ApplicationException {
+    public void whenCreatingUserShouldReturnNewAccount() throws ApplicationException, MessagingException {
         RegistrationForm form = new RegistrationForm();
         form.setAccount(new Account("fullName", "username", "passwrod"));
         form.setNumber(null);
 
-        when(registrationService.registerUser(any(Account.class), eq(form.getNumber()), eq(httpRequest))).thenReturn(mockedAccount);
+        when(registrationService.registerUser(any(Account.class), any(Integer.class), eq(httpRequest))).thenReturn(mockedAccount);
 
         adminController.createUser(form, httpRequest);
 
-        verify(registrationService, times(1)).registerUser(any(Account.class), eq(form.getNumber()), eq(httpRequest));
+        verify(registrationService, times(1)).registerUser(any(Account.class), any(Integer.class), eq(httpRequest));
     }
 
     @Test
@@ -88,7 +91,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenEditUserShouldCallService() throws ApplicationException {
+    public void whenEditUserShouldCallService() throws ApplicationException, MessagingException {
         EditUserForm editUserForm = new EditUserForm();
         adminController.editUser(editUserForm, "username", mock(HttpServletRequest.class));
     }

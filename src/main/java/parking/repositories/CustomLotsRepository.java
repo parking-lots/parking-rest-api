@@ -27,4 +27,8 @@ public interface CustomLotsRepository {
     public void cancelReservation(Account user);
 
     public List<ParkingLot> findParking(ParkingType type);
+
+    public void setParkingOwner(Integer lotNumber, String username);
+
+    public void removeParkingOwner(Integer lotNumber);
 }

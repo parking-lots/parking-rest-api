@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import parking.beans.document.Account;
+import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
@@ -19,6 +21,7 @@ import parking.service.ParkingService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +31,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import parking.helper.*;
+import parking.utils.EliminateDateTimestamp;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,19 +47,32 @@ public class ParkingControllerTest {
     @Mock
     private HttpServletRequest httpRequest;
     @Mock
-    SetUnusedRequest setUnusedRequest;
-    @Mock
     ExceptionHandler exceptionHandler;
+    @Mock
+    AvailableDatesConverter availableDatesConverter;
     @Mock
     ParkingService parkingService;
     @Mock
     ParkingLot mockedParkingLot;
+    @Mock
+    Account mockedAccount;
 
     private List<ParkingLot> mockedParkingLotList = new ArrayList<ParkingLot>();
     private List<Parking> mockedParkingList = new ArrayList<Parking>();
+    private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
+    private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+    private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();;
+
 
     @Before
     public void initMockData() {
+        mockedAccount.setUsername("username");
+        mockedAccount.setParking(mockedParkingLot);
+
+        LinkedList<Date> dateList = new LinkedList<>();
+        dateList.add(today);
+        setUnusedRequest.setAvailableDates(dateList);
+
         mockedParkingLotList.add(new LotsBuilder().number(100).build());
         mockedParkingLotList.add(new LotsBuilder().number(101).build());
         mockedParkingLotList.add(new LotsBuilder().number(103).build());
@@ -77,9 +95,15 @@ public class ParkingControllerTest {
 
     @Test
     public void whenFreeOwnersParkingShouldCallService() throws ApplicationException {
+        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
+        AvailablePeriod availablePeriod = new AvailablePeriod(today, today);
+        availablePeriods.add(availablePeriod);
+        given(mockedParkingLot.getOwner()).willReturn(mockedAccount);
+
         when(parkingService.getParkingNumberByUser()).thenReturn(mockedParkingLot);
         controller.freeOwnersParking(setUnusedRequest, httpRequest);
-        parkingService.freeOwnersParking(any(ObjectId.class), any(Integer.class), any(Date.class), any(Date.class), eq(httpRequest));
+        verify(parkingService).validatePeriod(mockedParkingLot.getNumber(), today, today, httpRequest);
+        verify(parkingService).freeOwnersParking(mockedAccount, mockedParkingLot.getNumber(), today, today, httpRequest);
     }
 
     @Test

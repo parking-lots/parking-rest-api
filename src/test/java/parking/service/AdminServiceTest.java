@@ -12,7 +12,9 @@ import parking.beans.request.EditUserForm;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
+import parking.repositories.LotsRepository;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,8 @@ public class AdminServiceTest {
     private UserService userService;
     @Mock
     private LogRepository logRepository;
+    @Mock
+    private LotsRepository lotsRepository;
 
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
@@ -66,11 +70,11 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void whenEditUser() throws ApplicationException {
+    public void whenEditUser() throws ApplicationException, MessagingException {
         given(userService.getCurrentUser(request)).willReturn(mockedAccount);
         given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
         service.editUser(editUserForm, mockedAccount.getUsername(), request);
-        verify(accountRepository).editAccount(any(EditUserForm.class), any(String.class));
+        verify(accountRepository).editAccount(any(EditUserForm.class), any(Account.class), any(String.class));
     }
 
     @Test
@@ -82,12 +86,8 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void whenAttachParking() {
-        service.attachParking(mockedAccount.getParking().getNumber(), mockedAccount.getUsername());
-    }
-
-    @Test
-    public void whenRemoveParkingFromUser() {
-        service.detachParking(mockedAccount.getParking().getNumber());
+    public void whenDetachParkingFromUser() throws ApplicationException {
+        given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
+        service.detachParking(mockedAccount.getUsername(), request);
     }
 }

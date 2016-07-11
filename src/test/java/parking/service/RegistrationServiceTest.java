@@ -10,7 +10,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.exceptions.ApplicationException;
+import parking.repositories.AccountRepository;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
@@ -29,16 +31,16 @@ public class RegistrationServiceTest {
     private ParkingService parkingService;
     @Mock
     private HttpServletRequest request;
+    @Mock
+    private AccountRepository accountRepository;
 
     private Account mockedAccount;
     private ParkingLot mockedParking;
-    private Integer mockedParkingLotNumber;
 
     @Before
     public void initMock() {
         mockedAccount = new Account("Name Surname", "username", "******");
         mockedParking = new ParkingLot(161, -2);
-//        mockedParkingLotNumber = mockedParking.getNumber();
     }
 
     @Test
@@ -47,42 +49,30 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    public void whenRegistrationSuccessShouldReturnAccount() throws ApplicationException {
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+    public void whenRegistreationSuccessShouldReturnAccount() throws ApplicationException, MessagingException {
+        given(userService.createUser(mockedAccount, mockedParking.getNumber(), request)).willReturn(mockedAccount);
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
+        given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
 
-        assertTrue(Account.class.isInstance(registrationService.registerUser(mockedAccount, mockedParkingLotNumber, request)));
+        assertTrue(Account.class.isInstance(registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request)));
+
     }
 
     @Test
-    public void whenRegisterUserShouldCallAttachParkingMethod() throws ApplicationException {
+    public void whenRegisterUserShouldCallAttachParkingMethod() throws ApplicationException, MessagingException {
         given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
-        registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
-
-        verify(userService).attachParking(mockedAccount, mockedParking.getNumber(), request);
-    }
-
-    @Test
-    public void whenRegisterUserShouldCallSetOwnerMethod() throws ApplicationException {
-        given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+        given(userService.createUser(mockedAccount,mockedParking.getNumber() , request)).willReturn(mockedAccount);
 
         registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
-
-        ParkingLot parkingLot = parkingService.getParkingByNumber(mockedParking.getNumber(), request);
-
-        verify(parkingService).setOwner(mockedAccount, parkingLot);
+        verify(accountRepository).attachParking(mockedParking.getNumber(), mockedAccount.getUsername(), request);
     }
 
     @Test
-    public void whenRegisterUsesWithoutParkingShouldNotCallAttachAndSetOwnerMethods() throws ApplicationException {
-        given(userService.createUser(mockedAccount, request)).willReturn(mockedAccount);
+    public void whenRegisterUserWithoutParkingShouldNotCallAttachParking() throws ApplicationException, MessagingException {
+        given(userService.createUser(mockedAccount,mockedParking.getNumber() , request)).willReturn(mockedAccount);
 
         registrationService.registerUser(mockedAccount, null, request);
 
-        verify(parkingService, never()).createLot(mockedParking, request);
-        verify(parkingService, never()).setOwner(mockedAccount, mockedParking);
-        verify(userService, never()).attachParking(mockedAccount, mockedParking.getNumber(), request);
+        verify(accountRepository, never()).attachParking(mockedParking.getNumber(), mockedAccount.getUsername(), request);
     }
 }

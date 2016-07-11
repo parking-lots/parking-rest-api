@@ -3,11 +3,11 @@ package parking.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
 import parking.exceptions.ApplicationException;
+import parking.repositories.AccountRepository;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @Service
 public class RegistrationService {
@@ -17,17 +17,14 @@ public class RegistrationService {
     private UserService userService;
 
     @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
     private ParkingService parkingService;
 
-    public Account registerUser(Account user, Integer number, HttpServletRequest request) throws ApplicationException {
-        Account createdAccount = userService.createUser(user, request);
+    public Account registerUser(Account user, Integer number, HttpServletRequest request) throws ApplicationException, MessagingException {
+        Account createdAccount = userService.createUser(user, number, request);
 
-        if (Optional.ofNullable(number).isPresent()) {
-            userService.attachParking(createdAccount, number, request);
-            ParkingLot attachedParking = parkingService.getParkingByNumber(number, request);
-            parkingService.setOwner(createdAccount, attachedParking);
-        }
-
-        return createdAccount;
+        return accountRepository.findByUsername(createdAccount.getUsername());
     }
 }

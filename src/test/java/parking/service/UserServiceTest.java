@@ -15,11 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.document.Role;
-import parking.beans.request.ChangePassword;
 import parking.beans.request.LoginForm;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
-import parking.exceptions.ParkingException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
@@ -27,6 +25,7 @@ import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -119,39 +118,24 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenChangePasswordCallRepositoryWithNewPassword() throws ApplicationException {
-        ChangePassword changePassword = new ChangePassword();
-        changePassword.setNewPassword("password");
-
-        mockedUser.setPassword(changePassword.getNewPassword());
-        service.changePassword(changePassword, request);
-
-        ArgumentCaptor captor = ArgumentCaptor.forClass(Account.class);
-
-        verify(accountRepository).save((Account) captor.capture());
-
-        Account value = (Account) captor.getValue();
-        assertEquals(value.getPassword(), mockedUser.getPassword());
-    }
-
-    @Test
     public void createMethodMustBeDefiedAndAcceptAccountObject() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("createUser", Account.class, HttpServletRequest.class).getName(), "createUser");
+        assertEquals(UserService.class.getMethod("createUser", Account.class, Integer.class, HttpServletRequest.class).getName(), "createUser");
     }
 
     @Test(expected = ApplicationException.class)
-    public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException {
-        service.createUser(mockedUser, request);
+    public void whenTryCreateUserWithExistUsernameShouldThrowException() throws ApplicationException, MessagingException {
+        given(accountRepository.findByUsername(mockedUser.getUsername())).willReturn(mockedUser);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
     }
 
     @Test
-    public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException {
+    public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -162,25 +146,25 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserShouldReturnAccountOnSuccess() throws ApplicationException {
+    public void whenCreateUserShouldReturnAccountOnSuccess() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(accountRepository.insert(mockedUser)).willReturn(mockedUser);
         given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
-        Account newAccount = service.createUser(mockedUser, request);
+        Account newAccount = service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         assertTrue(Account.class.isInstance(newAccount));
     }
 
     @Test
-    public void whenCreateUserPasswordShouldBeEncrypted() throws ApplicationException {
+    public void whenCreateUserPasswordShouldBeEncrypted() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -189,14 +173,14 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException {
+    public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException, MessagingException {
         given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -206,7 +190,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenCreateUserWithCapitals() throws ApplicationException {
+    public void whenCreateUserWithCapitals() throws ApplicationException, MessagingException {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
         given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
@@ -214,52 +198,9 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
-        service.createUser(mockedUser, request);
+        service.createUser(mockedUser,mockedParking.getNumber() , request);
 
         assertEquals(MOCKED_USER_NAME, mockedUser.getUsername());//captor.getValue().getUsername());
-    }
-
-    @Test
-    public void attachParkingMethodShouldBeDefined() throws NoSuchMethodException {
-        assertEquals(UserService.class.getMethod("attachParking", Account.class, Integer.class, HttpServletRequest.class).getName(), "attachParking");
-    }
-
-    @Test
-    public void whenAttachParkingToUserSuccessShouldCallUpdateServiceMethod() throws ApplicationException {
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
-        service.attachParking(mockedUser, 161, request);
-
-        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-
-        verify(accountRepository).save(captor.capture());
-
-        assertTrue(captor.getValue().getParking().getNumber() == 161);
-    }
-
-    @Test(expected = ParkingException.class)
-    public void whenAttachParkingWhichOwnedByAnotherUserShouldThrowException() throws ApplicationException {
-        mockedParking.setOwner(new Account("Name surname", MOCKED_USER_NAME, "******"));
-        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
-        service.attachParking(mockedUser, 161, request);
-    }
-
-    @Test(expected = ParkingException.class)
-    public void whenAttachParkingWhichDidNotExistShouldThrowException() throws ApplicationException {
-        doThrow(new ParkingException("")).when(parkingService).getParkingByNumber(161, request);
-        service.attachParking(mockedUser, 161, request);
-    }
-
-    @Test
-    public void whenAttachParkingShouldAddOwnerRole() throws ApplicationException {
-        given(parkingService.getParkingByNumber(161, request)).willReturn(mockedParking);
-        given(roleRepository.findByName(Role.ROLE_OWNER)).willReturn(new Role(Role.ROLE_OWNER));
-
-        service.attachParking(mockedUser, 161, request);
-
-        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
-        verify(accountRepository).save(captor.capture());
-
-        assertEquals(captor.getValue().getRoles().get(0).getName(), Role.ROLE_OWNER);
     }
 
     @Test

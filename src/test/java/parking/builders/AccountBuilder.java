@@ -1,7 +1,6 @@
 package parking.builders;
 
 import parking.beans.document.Account;
-import parking.beans.document.Car;
 import parking.beans.response.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +14,8 @@ public class AccountBuilder{
     private String username;
     private String password;
     private String email;
-    private List<Car> carList = new ArrayList<>();
     private List<Role> roles = new ArrayList<>();
+    private List<String> carRegNoList = new ArrayList<>();
 
     Account account;
 
@@ -59,14 +58,6 @@ public class AccountBuilder{
         this.email = email;
     }
 
-    public List<Car> getCarList() {
-        return carList;
-    }
-
-    public void setCarList(List<Car> carList) {
-        this.carList = carList;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }
@@ -79,5 +70,13 @@ public class AccountBuilder{
         Account account = new Account();
 
         return account;
+    }
+
+    public List<String> getCarRegNoList() {
+        return carRegNoList;
+    }
+
+    public void setCarRegNoList(List<String> carRegNoList) {
+        this.carRegNoList = carRegNoList;
     }
 }
