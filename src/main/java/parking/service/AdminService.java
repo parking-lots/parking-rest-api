@@ -17,6 +17,7 @@ import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.AccountStatus;
 import parking.utils.ActionType;
+import parking.utils.EmailDomain;
 import parking.utils.ParkingType;
 
 import javax.mail.MessagingException;
@@ -63,6 +64,11 @@ public class AdminService {
 
         if (oldAccount == null) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+        }
+
+        String email = newAccount.getEmail();
+        if(email != null && !email.substring(email.indexOf("@")+1).equals(EmailDomain.SWEDBANK_LT.getDomain())){
+            throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
         }
 
         accountRepository.editAccount(newAccount, oldAccount, username);

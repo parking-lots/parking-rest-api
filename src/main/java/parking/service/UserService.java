@@ -26,6 +26,7 @@ import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.AccountStatus;
 import parking.utils.ActionType;
+import parking.utils.EmailDomain;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -204,6 +205,11 @@ public class UserService {
     public Account createUser(Account newAccount, Integer lotNumber, HttpServletRequest request) throws ApplicationException, MessagingException {
 
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
+
+        String email = newAccount.getEmail();
+        if(email != null && !email.substring(email.indexOf("@")+1).equals(EmailDomain.SWEDBANK_LT.getDomain())){
+            throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
+        }
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request);
