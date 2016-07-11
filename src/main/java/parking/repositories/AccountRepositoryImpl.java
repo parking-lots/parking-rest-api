@@ -13,9 +13,9 @@ import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
+import parking.utils.ActionType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,32 +32,42 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public LotsRepository lotsRepository;
 
     @Autowired
+    private LogRepository logRepository;
+
+    @Autowired
     public ExceptionHandler exceptionHandler;
 
     @Autowired
     public RoleRepository roleRepository;
 
     @Override
-    public void editAccount(EditUserForm newAccount, String username) {
+    public void editAccount(EditUserForm newAccount, Account oldAccount, String username) {
         Query searchQuery = new Query(Criteria.where("username").is(username));
 
         Update updateFields = new Update();
 
-        if (newAccount.getFullName() != null) {
+        if (!newAccount.getFullName().equals(oldAccount.getFullName())) {
             updateFields.set("fullName", newAccount.getFullName());
         }
+        //if password received is not null - means it is changed
         if (newAccount.getPassword() != null) {
             updateFields.set("password", (ProfileHelper.encryptPassword(newAccount.getPassword())));
         }
-        if (newAccount.getEmail() != null) {
+
+        if (newAccount.getEmail() == null) {
+            updateFields.set("email", null);
+        } else if (!newAccount.getEmail().equals(oldAccount.getEmail())) {
             updateFields.set("email", newAccount.getEmail());
         }
 
-        if (newAccount.getCarRegNoList().size() > 0) {
+        if (newAccount.getCarRegNoList() == null || newAccount.getCarRegNoList().size() == 0) {
+            updateFields.unset("carRegNoList");
+        } else if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
-        operations.findAndModify(searchQuery, updateFields, Account.class);
+        operations.updateFirst(searchQuery, updateFields, Account.class);
+
     }
 
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
@@ -83,8 +93,6 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         operations.findAndModify(searchQuery, updateFields, Account.class);
 
         lotsRepository.setParkingOwner(lotNumber, username);
-
-
     }
 
     public void detachParking(String username, HttpServletRequest httpRequest) throws ApplicationException {

@@ -1,7 +1,6 @@
 package parking.repositories;
 
 import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import parking.beans.document.Account;
@@ -19,19 +18,29 @@ public class LogRepositoryImpl implements CustomLogRepository {
         this.operations = operations;
     }
 
-    public void insertActionLog(ActionType actionType, ObjectId targetUserId, Integer lotNumber, Date from, Date to, LogMetaData metaData, ObjectId userId, String channel) {
+    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Account user, String channel) {
         BasicDBObject dbObject = new BasicDBObject();
 
         dbObject.put("actionType", actionType);
-        dbObject.put("targetUser", targetUserId);
-        dbObject.put("lotNumber", lotNumber);
-        dbObject.put("from", from);
-        dbObject.put("to", to);
+
+        if (targetUser != null) {
+            dbObject.put("targetUser", targetUser);
+        }
+        if (lotNumber != null) {
+            dbObject.put("lotNumber", lotNumber);
+        }
+        if (from != null) {
+            dbObject.put("from", from);
+        }
+        if (to != null) {
+            dbObject.put("to", to);
+        }
 
         if (metaData != null) {
             dbObject.put("metadata", metaData);
         }
 
+        dbObject.put("user", user);
         dbObject.put("userAgent", channel);
         dbObject.put("timestamp", new Date());
 
