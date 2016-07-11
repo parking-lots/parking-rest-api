@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface AccountRepository extends MongoRepository<Account, String>, CustomAccountRepository {
     public Account findByUsername(String username);
+
     public List<Account> findAll();
+
     public Long deleteByUsername(String username);
 }

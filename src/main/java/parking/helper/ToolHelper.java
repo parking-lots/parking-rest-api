@@ -34,7 +34,7 @@ public class ToolHelper {
     public static boolean hasDuplicates(Collection<?> c) {
         Set<Object> set = new HashSet<>();
 
-        for (Object o: c)
+        for (Object o : c)
             if (!set.add(o))
                 return true;
 

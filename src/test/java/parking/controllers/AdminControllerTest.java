@@ -97,7 +97,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void whenDeleteUserCallService() throws ApplicationException{
+    public void whenDeleteUserCallService() throws ApplicationException {
 
         adminController.deleteUser("username", httpRequest);
         verify(adminService, times(1)).deleteUser(eq("username"), eq(httpRequest));

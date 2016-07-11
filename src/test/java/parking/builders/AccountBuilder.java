@@ -2,11 +2,13 @@ package parking.builders;
 
 import parking.beans.document.Account;
 import parking.beans.response.User;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import parking.beans.document.Role;
 
-public class AccountBuilder{
+public class AccountBuilder {
 
     private User user;
 
@@ -19,7 +21,7 @@ public class AccountBuilder{
 
     Account account;
 
-    public AccountBuilder(){
+    public AccountBuilder() {
         account = new Account();
         account.setUsername("nickname");
         account.setFullName("Nick Namesson");

@@ -19,7 +19,7 @@ public class AvailableDatesConverterTest {
     private AvailableDatesConverter availableDatesConverter;
 
     @Test
-    public void checkConversionWithGaps(){
+    public void checkConversionWithGaps() {
         List<AvailablePeriod> availablePeriods = new ArrayList<>();
         Date freeFrom = new Date(1478390400000L);//2016-11-06
         Date freeTill = new Date(1478822400000L);//2016-11-11
@@ -42,7 +42,7 @@ public class AvailableDatesConverterTest {
     }
 
     @Test
-    public void checkConversionWithoutGaps(){
+    public void checkConversionWithoutGaps() {
         List<AvailablePeriod> availablePeriods = new ArrayList<>();
         Date freeFrom = new Date(1478822400000L);//2016-11-11
         Date freeTill = new Date(1478908800000L);//2016-11-12
@@ -59,7 +59,7 @@ public class AvailableDatesConverterTest {
     }
 
     @Test
-    public void checkConversionWhenContainsNull(){
+    public void checkConversionWhenContainsNull() {
 
         List<Date> dateList = new ArrayList<>();
 

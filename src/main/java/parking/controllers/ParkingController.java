@@ -41,7 +41,7 @@ public class ParkingController {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
         }
 
-        if (ToolHelper.hasDuplicates(request.getAvailableDates())){
+        if (ToolHelper.hasDuplicates(request.getAvailableDates())) {
             throw exceptionHandler.handleException(ExceptionMessage.DUBLICATE_DATES, httpRequest);
         }
 

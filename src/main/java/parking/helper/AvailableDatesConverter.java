@@ -9,7 +9,7 @@ public class AvailableDatesConverter {
         AvailablePeriod availablePeriod = null;
         List<AvailablePeriod> availablePeriods = new ArrayList<>();
 
-        if(availableDates.contains(null)){
+        if (availableDates.contains(null)) {
             availablePeriod = new AvailablePeriod(new Date(), new Date());
             availablePeriods.add(availablePeriod);
             return availablePeriods;
@@ -18,14 +18,13 @@ public class AvailableDatesConverter {
         Collections.sort(availableDates);
 
         for (Date d : availableDates) {
-            if (availablePeriod == null){
+            if (availablePeriod == null) {
                 availablePeriod = new AvailablePeriod(d, d);
                 continue;
             }
-            if ((int)( (d.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24) ) == 1){
+            if ((int) ((d.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
                 availablePeriod.setFreeTill(d);
-            }
-            else{
+            } else {
                 availablePeriods.add(availablePeriod);
                 availablePeriod = new AvailablePeriod(d, d);
             }

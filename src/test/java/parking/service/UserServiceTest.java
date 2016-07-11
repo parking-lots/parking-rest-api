@@ -153,7 +153,7 @@ public class UserServiceTest {
         given(accountRepository.insert(mockedUser)).willReturn(mockedUser);
         given(userService.getCurrentUser(request)).willReturn(mockedUser);
 
-        Account newAccount = service.createUser(mockedUser,mockedParking.getNumber() , request);
+        Account newAccount = service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         assertTrue(Account.class.isInstance(newAccount));
     }
@@ -164,7 +164,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
-        service.createUser(mockedUser,mockedParking.getNumber() , request);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -180,7 +180,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
-        service.createUser(mockedUser,mockedParking.getNumber() , request);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).insert(captor.capture());
@@ -198,7 +198,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
 
-        service.createUser(mockedUser,mockedParking.getNumber() , request);
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         assertEquals(MOCKED_USER_NAME, mockedUser.getUsername());//captor.getValue().getUsername());
     }
