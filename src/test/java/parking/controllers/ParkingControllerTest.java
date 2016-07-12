@@ -63,8 +63,6 @@ public class ParkingControllerTest {
     private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
     private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
-    ;
-
 
     @Before
     public void initMockData() {
