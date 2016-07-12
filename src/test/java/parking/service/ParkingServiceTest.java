@@ -196,6 +196,7 @@ public class ParkingServiceTest {
 
     @Test
     public void whenCancelReservation() throws ApplicationException {
+        given(lotsRepository.findByUser(mockedAccount)).willReturn(mockedParkingLot);
         when(parkingService.getCurrentUserName()).thenReturn(mockedAccount.getUsername());
         when(parkingService.getParkingByNumber(mockedParkingLot.getNumber(), httpRequest)).thenReturn(mockedParkingLot);
         given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
