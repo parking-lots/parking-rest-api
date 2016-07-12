@@ -59,18 +59,8 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    public void whenRegisterUserShouldCallAttachParkingMethod() throws ApplicationException, MessagingException {
-        given(parkingService.createLot(mockedParking, request)).willReturn(mockedParking);
-        given(userService.createUser(mockedAccount, mockedParking.getNumber(), request)).willReturn(mockedAccount);
-
-        registrationService.registerUser(mockedAccount, mockedParking.getNumber(), request);
-        verify(accountRepository).attachParking(mockedParking.getNumber(), mockedAccount.getUsername(), request);
-    }
-
-    @Test
     public void whenRegisterUserWithoutParkingShouldNotCallAttachParking() throws ApplicationException, MessagingException {
-        given(userService.createUser(mockedAccount, mockedParking.getNumber(), request)).willReturn(mockedAccount);
-
+        given(userService.createUser(mockedAccount, null, request)).willReturn(mockedAccount);
         registrationService.registerUser(mockedAccount, null, request);
 
         verify(accountRepository, never()).attachParking(mockedParking.getNumber(), mockedAccount.getUsername(), request);

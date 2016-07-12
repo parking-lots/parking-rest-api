@@ -10,13 +10,13 @@ import javax.ws.rs.core.MediaType;
 
 public class MailService {
 
+    public final static HTTPBasicAuthFilter httpBasicAuthFilter = new HTTPBasicAuthFilter("api", "key-9b2644c1e5b2f81c9722b50c9b079433");
+    public final static String resourceDomain = "https://api.mailgun.net/v3/" + "parkinger.net" + "/messages";
+
     public static ClientResponse sendEmail(String emailTo, String subject, String message) {
         Client client = Client.create();
-        client.addFilter(new HTTPBasicAuthFilter("api",
-                "key-9b2644c1e5b2f81c9722b50c9b079433"));
-        WebResource webResource =
-                client.resource("https://api.mailgun.net/v3/parkinger.net" +
-                        "/messages");
+        client.addFilter(httpBasicAuthFilter);
+        WebResource webResource = client.resource(resourceDomain);
 
         FormDataMultiPart formData = new FormDataMultiPart();
         formData.field("from", "Parkinger team <info@parkinger.net>");

@@ -66,13 +66,13 @@ public class UserServiceTest {
     @Mock
     private ParkingService parkingService;
     @Mock
-    private UserService userService;
-    @Mock
     private HttpServletResponse response;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
     private RegistrationService registrationService;
+    @Mock
+    private MailService mailService;
     @Mock
     private ExceptionHandler exceptionHandler;
     @Mock
@@ -102,6 +102,7 @@ public class UserServiceTest {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
         mockedParking = new ParkingLot(161, -1);
         mockedUser.setParking(mockedParking);
+        mockedUser.setEmail("name.surname@swedbank.lt");
         mockedRoles.put(Role.ROLE_USER, new Role(Role.ROLE_USER));
 
         mockedAdmin = new Account("Admin admin", MOCKED_ADMIN_USERNAME, "*****");
@@ -129,11 +130,21 @@ public class UserServiceTest {
     }
 
     @Test
+    public void whenCreateUserWithParkingShouldCallAttachParkingMethod() throws ApplicationException, MessagingException {
+
+        given(service.getUserByUsername(mockedUser.getUsername())).willReturn(null);
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
+
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
+        verify(accountRepository).attachParking(mockedParking.getNumber(), mockedUser.getUsername(), request);
+    }
+
+    @Test
     public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
-        given(userService.getCurrentUser(request)).willReturn(mockedUser);
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -151,7 +162,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(accountRepository.insert(mockedUser)).willReturn(mockedUser);
-        given(userService.getCurrentUser(request)).willReturn(mockedUser);
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         Account newAccount = service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -164,6 +175,8 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
+
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
@@ -174,11 +187,11 @@ public class UserServiceTest {
 
     @Test
     public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException, MessagingException {
-        given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -192,11 +205,11 @@ public class UserServiceTest {
     @Test
     public void whenCreateUserWithCapitals() throws ApplicationException, MessagingException {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
-        given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
