@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by Lina on 15/04/16.
  */
-public class UserBuilder{
+public class UserBuilder {
 
     private User user;
 
@@ -20,7 +20,7 @@ public class UserBuilder{
     private String number;
     Account account;
 
-    public UserBuilder(){
+    public UserBuilder() {
         account = new Account();
         account.setUsername("nickname");
         account.setFullName("Nick Namesson");

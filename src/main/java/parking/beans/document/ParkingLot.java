@@ -96,7 +96,7 @@ public class ParkingLot {
         this.reserved = reserved;
     }
 
-        public LinkedList<AvailablePeriod> getAvailablePeriods() {
+    public LinkedList<AvailablePeriod> getAvailablePeriods() {
         return availablePeriods;
     }
 

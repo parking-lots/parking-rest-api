@@ -156,10 +156,10 @@ public class ParkingService {
     }
 
     public void cancelReservation(HttpServletRequest request) throws ApplicationException {
+        ParkingLot lot = lotsRepository.findByUser(userService.getCurrentUser(request));
+
         lotsRepository.cancelReservation(userService.getCurrentUser(request));
 
-
-        ParkingLot lot = getParkingNumberByUser();
         Date currentDate = ToolHelper.getCurrentDate();
         Optional<Account> user = userService.getLoggedUser();
         String userAgent = request.getHeader("User-Agent");

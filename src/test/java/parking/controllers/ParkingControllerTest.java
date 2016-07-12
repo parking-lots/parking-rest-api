@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+
 import parking.helper.*;
 import parking.utils.EliminateDateTimestamp;
 
@@ -61,8 +62,7 @@ public class ParkingControllerTest {
     private List<Parking> mockedParkingList = new ArrayList<Parking>();
     private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-    private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();;
-
+    private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
 
     @Before
     public void initMockData() {

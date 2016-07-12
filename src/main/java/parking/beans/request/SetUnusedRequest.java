@@ -20,7 +20,7 @@ public class SetUnusedRequest {
     }
 
     public void setAvailableDates(LinkedList<Date> availableDates) {
-        for(Date d: availableDates){
+        for (Date d : availableDates) {
             d = eliminateDateTimestamp.formatDateForDatabase(d).getTime();
         }
         this.availableDates = availableDates;

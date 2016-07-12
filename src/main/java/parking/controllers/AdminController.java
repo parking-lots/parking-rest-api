@@ -55,17 +55,17 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/parkings/{type}", method = RequestMethod.GET)
-    public List<FreeParkingLot> getParkings(@PathVariable(value = "type") ParkingType type){
+    public List<FreeParkingLot> getParkings(@PathVariable(value = "type") ParkingType type) {
         return adminService.getParkings(type);
     }
 
     @RequestMapping(value = "/users/{username:.+}/parking/attach", method = RequestMethod.POST)
-    public void attachParking(@Valid @RequestBody AttachParking attachParking, @PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException{
+    public void attachParking(@Valid @RequestBody AttachParking attachParking, @PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException {
         adminService.attachParking(attachParking.getLotNumber(), username, httpRequest);
     }
 
     @RequestMapping(value = "/users/{username:.+}/parking/detach", method = RequestMethod.POST)
-    public void detachParking(@PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException{
+    public void detachParking(@PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException {
         adminService.detachParking(username, httpRequest);
     }
 }

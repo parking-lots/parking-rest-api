@@ -14,7 +14,7 @@ public class AvailablePeriod {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
     private Date freeTill;
 
-    public AvailablePeriod(Date freeFrom, Date freeTill){
+    public AvailablePeriod(Date freeFrom, Date freeTill) {
         EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
         this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();
         this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();
