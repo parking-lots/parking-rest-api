@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import parking.helper.ProfileHelper;
-import parking.utils.AccountStatus;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -31,7 +30,9 @@ public class Account {
     private List<Role> roles = new ArrayList<Role>();
     @DBRef
     private ParkingLot parking;
-    private AccountStatus status;
+    private boolean active;
+    private boolean emailConfirmed;
+    private String confirmationKey;
 
     public Account() {
     }
@@ -112,11 +113,27 @@ public class Account {
         this.carRegNoList = carRegNOList;
     }
 
-    public AccountStatus getStatus() {
-        return status;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setStatus(AccountStatus status) {
-        this.status = status;
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isEmailConfirmed() {
+        return emailConfirmed;
+    }
+
+    public void setEmailConfirmed(boolean emailConfirmed) {
+        this.emailConfirmed = emailConfirmed;
+    }
+
+    public String getConfirmationKey() {
+        return confirmationKey;
+    }
+
+    public void setConfirmationKey(String confirmationKey) {
+        this.confirmationKey = confirmationKey;
     }
 }

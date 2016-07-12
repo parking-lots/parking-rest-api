@@ -1,7 +1,6 @@
 package parking.service;
 
 
-import com.sun.jersey.api.client.ClientResponse;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -25,7 +24,6 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
-import parking.utils.AccountStatus;
 import parking.utils.ActionType;
 import parking.utils.EmailDomain;
 
@@ -136,7 +134,7 @@ public class UserService {
         Account userAccount = accountRepository.findByUsername(username);
 
         if (userAccount != null) {
-            if (userAccount.getStatus() == AccountStatus.INACTIVE) {
+            if (userAccount.isActive() == false) {
                 throw exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request);
 
             }
@@ -219,7 +217,9 @@ public class UserService {
         newAccount.setId(new ObjectId());
         newAccount.setPassword(ProfileHelper.encryptPassword(newAccount.getPassword()));
         newAccount.addRole(roleRepository.findByName(Role.ROLE_USER));
-        newAccount.setStatus(AccountStatus.INACTIVE);
+        newAccount.setActive(false);
+        UUID key = UUID.randomUUID();
+        newAccount.setConfirmationKey(key.toString());
 
 
         //if cannot attach requested parking, the whole account must not be saved
@@ -247,7 +247,7 @@ public class UserService {
         logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
 
         try {
-            String message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net\">Click here to confirm your email address</a></p>" +
+            String message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/"+newAccount.getConfirmationKey()+"\">Click here to confirm your email address</a></p>" +
                     "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
 
             MailService.sendEmail(/*newAccount.getEmail()*/"lina.po@outlook.com", "Email confirmation", message);

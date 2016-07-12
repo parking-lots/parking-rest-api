@@ -82,4 +82,12 @@ public class UserController {
         adminService.editUser(form, username, request);
 
     }
+
+//    @RequestMapping(value = "/{confirmationKey}", method = RequestMethod.POST)
+//    public void editUser(@PathVariable String confirmationKey, HttpServletRequest request) throws ApplicationException {
+//        String username = userService.getCurrentUser(request).getUsername();
+//        userService.confirmEmail(confirmationKey, request);
+//
+//    }
+
 }

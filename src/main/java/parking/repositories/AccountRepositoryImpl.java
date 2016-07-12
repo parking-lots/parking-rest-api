@@ -65,12 +65,10 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
-        if (newAccount.getStatus() != null && newAccount.getStatus().toString() != "") {
-            if (oldAccount.getStatus() != null && !oldAccount.getStatus().equals(newAccount.getStatus())) {
-                updateFields.set("status", newAccount.getStatus());
-            } else if (oldAccount.getStatus() == null) {
-                updateFields.set("status", newAccount.getStatus());
-            }
+        if (!oldAccount.isActive() == (newAccount.isActive())) {
+            updateFields.set("status", newAccount.isActive());
+        } else if (oldAccount.isActive() == false) {
+            updateFields.set("status", newAccount.isActive());
         }
 
         //to avoid the whole document to be deleted in case nothing is updated
