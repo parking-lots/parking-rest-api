@@ -1,6 +1,7 @@
 package parking.service;
 
 
+import com.sun.jersey.api.client.ClientResponse;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -246,7 +247,10 @@ public class UserService {
         logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
 
         try {
-            MailService.sendEmail(newAccount.getEmail(), "Parkinger registration", "Your account will be shortly activated by administrator.");
+            String message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net\">Click here to confirm your email address</a></p>" +
+                    "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
+
+            MailService.sendEmail(/*newAccount.getEmail()*/"lina.po@outlook.com", "Email confirmation", message);
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }

@@ -50,6 +50,11 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:latest.release'
     compile 'com.fasterxml.jackson.core:jackson-core:latest.release'
 
+    compile 'com.sun.jersey:jersey-client:1.18.1'
+    compile 'com.sun.jersey:jersey-core:1.18.1'
+    compile 'com.sun.jersey.contribs:jersey-multipart:1.18.1'
+
+
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'junit:junit'
     testCompile 'org.mockito:mockito-core'
