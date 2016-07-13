@@ -288,7 +288,7 @@ public class UserService {
                         "<p><a href=\"http://www.parkinger.net\">Click here to log in</a></p>";
         }
         try {
-            MailService.sendEmail(/*newAccount.getEmail()*/"lina.po@outlook.com", subject, message);
+            MailService.sendEmail(user.getEmail(), subject, message);
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }
