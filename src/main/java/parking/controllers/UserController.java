@@ -82,4 +82,14 @@ public class UserController {
         adminService.editUser(form, username, request);
 
     }
+
+    @RequestMapping(value = "/{confirmationKey}", method = RequestMethod.POST)
+    public String confirmEmail(@PathVariable(value = "confirmationKey") String confirmationKey, HttpServletRequest request) throws ApplicationException {
+        if (userService.confirmEmail(confirmationKey, request)) {
+            return "Email is confirmed";
+        } else {
+            return "Email could not be confirmed. Please contact the administrator";
+        }
+    }
+
 }

@@ -13,6 +13,8 @@ public class User extends Response {
     private String number;
     private List<String> carList = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
+    private boolean active;
+    private boolean emailConfirmed;
 
     public User(Account account) {
         this.fullName = account.getFullName();
@@ -26,6 +28,9 @@ public class User extends Response {
                 this.roles.add(role.getName());
             }
         }
+
+        this.active = account.isActive();
+        this.emailConfirmed = account.isEmailConfirmed();
     }
 
     public String getFullName() {
@@ -74,5 +79,21 @@ public class User extends Response {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isEmailConfirmed() {
+        return emailConfirmed;
+    }
+
+    public void setEmailConfirmed(boolean emailConfirmed) {
+        this.emailConfirmed = emailConfirmed;
     }
 }

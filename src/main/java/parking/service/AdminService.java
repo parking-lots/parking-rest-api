@@ -15,7 +15,6 @@ import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
-import parking.utils.AccountStatus;
 import parking.utils.ActionType;
 import parking.utils.EmailDomain;
 import parking.utils.ParkingType;
@@ -71,7 +70,7 @@ public class AdminService {
             throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
         }
 
-        accountRepository.editAccount(newAccount, oldAccount, username);
+        accountRepository.editAccount(newAccount, oldAccount, username, request);
 
         Optional<Account> user = userService.getLoggedUser();
         LogMetaData metaData = new LogMetaData();
@@ -92,16 +91,6 @@ public class AdminService {
         }
         if (newAccount.getCarRegNoList() != null) {
             Collections.sort(newAccount.getCarRegNoList());
-        }
-
-        if (oldAccount.getStatus() != null && oldAccount.getStatus().equals(AccountStatus.INACTIVE)) {
-            if (newAccount.getStatus() != null && newAccount.getStatus().equals(AccountStatus.ACTIVE)) {
-                try {
-                    MailService.sendEmail(newAccount.getEmail(), "Account activation", "Your account has been activated");
-                } catch (Exception e) {
-                    throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
-                }
-            }
         }
 
         checkCars:

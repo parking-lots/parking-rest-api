@@ -19,7 +19,7 @@ public class LogRepositoryImpl implements CustomLogRepository {
         this.operations = operations;
     }
 
-    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Optional<Account> user, String channel) {
+    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Optional<Account> user, String userAgent) {
         BasicDBObject dbObject = new BasicDBObject();
 
         dbObject.put("actionType", actionType);
@@ -42,7 +42,7 @@ public class LogRepositoryImpl implements CustomLogRepository {
         }
 
         dbObject.put("user", user);
-        dbObject.put("userAgent", channel);
+        dbObject.put("userAgent", userAgent);
         dbObject.put("timestamp", new Date());
 
         operations.insert(dbObject, "log");
