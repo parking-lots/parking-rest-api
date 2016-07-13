@@ -15,6 +15,7 @@ import parking.helper.ExceptionMessage;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.service.AdminService;
+import parking.service.MailService;
 import parking.service.UserService;
 
 import javax.mail.MessagingException;

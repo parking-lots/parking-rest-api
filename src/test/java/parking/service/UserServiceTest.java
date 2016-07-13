@@ -115,6 +115,7 @@ public class UserServiceTest {
     }
 
 
+
     @Test
     public void whenGetingCurrentUser() throws ApplicationException {
         Profile profile = service.getCurrentUserProfile(request);

@@ -16,6 +16,7 @@ import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
+import parking.service.MailService;
 import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
