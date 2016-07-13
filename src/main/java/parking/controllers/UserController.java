@@ -83,11 +83,10 @@ public class UserController {
 
     }
 
-//    @RequestMapping(value = "/{confirmationKey}", method = RequestMethod.POST)
-//    public void editUser(@PathVariable String confirmationKey, HttpServletRequest request) throws ApplicationException {
-//        String username = userService.getCurrentUser(request).getUsername();
-//        userService.confirmEmail(confirmationKey, request);
-//
-//    }
+    @RequestMapping(value = "/{confirmationKey}", method = RequestMethod.POST)
+    public void confirmEmail(@PathVariable(value = "confirmationKey") String confirmationKey, HttpServletRequest request) throws ApplicationException {
+        userService.confirmEmail(confirmationKey, request);
+
+    }
 
 }

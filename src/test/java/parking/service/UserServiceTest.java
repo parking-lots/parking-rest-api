@@ -302,4 +302,13 @@ public class UserServiceTest {
 
         assertEquals(a.get(0), new Integer(604800));
     }
+
+    @Test
+    public void whenKeyCorrectShouldChangeFlag() {
+        mockedUser.setConfirmationKey("aaa333");
+        given(accountRepository.findByConfirmationKey(mockedUser.getConfirmationKey())).willReturn(mockedUser);
+        service.confirmEmail("aaa333", request);
+        assertTrue(accountRepository.changeConfirmationFlag(mockedUser.getUsername()) == true);
+
+    }
 }

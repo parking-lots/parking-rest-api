@@ -247,7 +247,7 @@ public class UserService {
         logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
 
         try {
-            String message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/"+newAccount.getConfirmationKey()+"\">Click here to confirm your email address</a></p>" +
+            String message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/" + newAccount.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
                     "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
 
             MailService.sendEmail(/*newAccount.getEmail()*/"lina.po@outlook.com", "Email confirmation", message);
@@ -256,6 +256,13 @@ public class UserService {
         }
 
         return newAccount;
+    }
+
+    public void confirmEmail(String confirmationKey, HttpServletRequest httpRequest) {
+        Account user = accountRepository.findByConfirmationKey(confirmationKey);
+        if (user != null) {
+            accountRepository.changeConfirmationFlag(user.getUsername());
+        }
     }
 
     public void deleteCookies(String username, String password) {

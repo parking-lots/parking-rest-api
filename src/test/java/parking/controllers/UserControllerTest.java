@@ -26,6 +26,7 @@ import java.security.Principal;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.when;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 
@@ -111,5 +112,10 @@ public class UserControllerTest {
     public void whenEditingProfileShouldCallService() throws ApplicationException, MessagingException {
         given(userService.getCurrentUser(servletRequest)).willReturn(mockedUser);
         controller.editUser(mockedEditUserForm, servletRequest);
+    }
+
+    @Test
+    public void whenConfirmEmail() throws ApplicationException{
+        controller.confirmEmail("erwerewr3232", servletRequest);
     }
 }

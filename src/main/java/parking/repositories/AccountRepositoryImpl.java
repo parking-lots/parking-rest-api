@@ -80,6 +80,14 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         }
     }
 
+    public boolean changeConfirmationFlag(String username) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
+        Update updateFields = new Update();
+        updateFields.set("confirmationKey", true);
+        operations.updateFirst(searchQuery, updateFields, Account.class);
+        return true;
+    }
+
     public void attachParking(Integer lotNumber, String username, HttpServletRequest httpRequest) throws ApplicationException {
         Optional<ParkingLot> parkingLot = Optional.ofNullable(lotsRepository.findByNumber(lotNumber));
         if (Optional.ofNullable(parkingLot.get().getOwner()).isPresent()) {
