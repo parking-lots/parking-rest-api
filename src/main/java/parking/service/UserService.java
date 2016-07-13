@@ -269,7 +269,7 @@ public class UserService {
         switch (messageType) {
             case CONFIRM_EMAIL_REQUEST:
                 subject = "Email confirmation";
-                message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/user" + user.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
+                message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/user/" + user.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
                         "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
                 break;
             case EMAIL_CONFIRMED:
