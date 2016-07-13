@@ -246,7 +246,12 @@ public class UserService {
         String userAgent = request.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
 
-        sendEmail(newAccount, EmailMsgType.CONFIRM_EMAIL_REQUEST, request);
+        //if admin is creating user, no email should be sent and email should be instantly verified
+        if (loggedUser.isPresent()) {
+            accountRepository.changeConfirmationFlag(newAccount.getUsername());
+        } else {
+            sendEmail(newAccount, EmailMsgType.CONFIRM_EMAIL_REQUEST, request);
+        }
 
         return newAccount;
     }
@@ -279,7 +284,7 @@ public class UserService {
                 break;
             case ACOUNT_ACTIVATED:
                 subject = "Your account is activated";
-                message = "<p>Hello "+user.getFullName()+",</p>"+"<p>We want to inform you that your account is now active and you can login to Parkinger.</p>"+
+                message = "<p>Hello " + user.getFullName() + ",</p>" + "<p>We want to inform you that your account is now active and you can login to Parkinger.</p>" +
                         "<p><a href=\"http://www.parkinger.net\">Click here to log in</a></p>";
         }
         try {
