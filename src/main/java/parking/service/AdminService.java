@@ -93,14 +93,6 @@ public class AdminService {
             Collections.sort(newAccount.getCarRegNoList());
         }
 
-        if (oldAccount.isActive() == false && newAccount.isActive() == true) {
-            try {
-                MailService.sendEmail(newAccount.getEmail(), "Account activation", "Your account has been activated");
-            } catch (Exception e) {
-                throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
-            }
-        }
-
         checkCars:
         if (oldAccount.getCarRegNoList() == null && newAccount.getCarRegNoList() == null) {
             break checkCars;
