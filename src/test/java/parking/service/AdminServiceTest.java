@@ -74,7 +74,7 @@ public class AdminServiceTest {
         given(userService.getCurrentUser(request)).willReturn(mockedAccount);
         given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
         service.editUser(editUserForm, mockedAccount.getUsername(), request);
-        verify(accountRepository).editAccount(any(EditUserForm.class), any(Account.class), any(String.class));
+        verify(accountRepository).editAccount(any(EditUserForm.class), any(Account.class), any(String.class), any(HttpServletRequest.class));
     }
 
     @Test

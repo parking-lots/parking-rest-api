@@ -70,7 +70,7 @@ public class AdminService {
             throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
         }
 
-        accountRepository.editAccount(newAccount, oldAccount, username);
+        accountRepository.editAccount(newAccount, oldAccount, username, request);
 
         Optional<Account> user = userService.getLoggedUser();
         LogMetaData metaData = new LogMetaData();
@@ -93,11 +93,11 @@ public class AdminService {
             Collections.sort(newAccount.getCarRegNoList());
         }
 
-        if (oldAccount.isActive()==false && newAccount.isActive()==true) {
-                try {
-                    MailService.sendEmail(newAccount.getEmail(), "Account activation", "Your account has been activated");
-                } catch (Exception e) {
-                    throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
+        if (oldAccount.isActive() == false && newAccount.isActive() == true) {
+            try {
+                MailService.sendEmail(newAccount.getEmail(), "Account activation", "Your account has been activated");
+            } catch (Exception e) {
+                throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
             }
         }
 

@@ -26,6 +26,7 @@ import parking.repositories.LotsRepository;
 import parking.repositories.RoleRepository;
 import parking.utils.ActionType;
 import parking.utils.EmailDomain;
+import parking.utils.EmailMsgType;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -231,7 +232,6 @@ public class UserService {
 
             if (Optional.ofNullable(parkingLot.getOwner()).isPresent()) {
                 throw exceptionHandler.handleException(ExceptionMessage.PARKING_OWNED_BY_ANOTHER, request);
-
             }
         }
 
@@ -246,22 +246,46 @@ public class UserService {
         String userAgent = request.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
 
-        try {
-            String message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/" + newAccount.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
-                    "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
-
-            MailService.sendEmail(/*newAccount.getEmail()*/"lina.po@outlook.com", "Email confirmation", message);
-        } catch (Exception e) {
-            throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
-        }
+        sendEmail(newAccount, EmailMsgType.CONFIRM_EMAIL_REQUEST, request);
 
         return newAccount;
     }
 
-    public void confirmEmail(String confirmationKey, HttpServletRequest httpRequest) {
+    public boolean confirmEmail(String confirmationKey, HttpServletRequest httpRequest) throws ApplicationException {
         Account user = accountRepository.findByConfirmationKey(confirmationKey);
         if (user != null) {
-            accountRepository.changeConfirmationFlag(user.getUsername());
+            if (accountRepository.changeConfirmationFlag(user.getUsername())) {
+                sendEmail(user, EmailMsgType.EMAIL_CONFIRMED, httpRequest);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void sendEmail(Account user, EmailMsgType messageType, HttpServletRequest request) throws ApplicationException {
+        String subject = "";
+        String message = "<p>We are sending you this e-mail without any reason. Don't pay attention</p>";
+
+        switch (messageType) {
+            case CONFIRM_EMAIL_REQUEST:
+                subject = "Email confirmation";
+                message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/" + user.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
+                        "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
+                break;
+            case EMAIL_CONFIRMED:
+                subject = "Your email confirmed";
+                message = "<p>We are happy to inform you that your e-mail has been successfully verified.</p>" +
+                        "<p>We will inform you when administrator will register your car numbers and activate your account.";
+                break;
+            case ACOUNT_ACTIVATED:
+                subject = "Your account is activated";
+                message = "<p>Hello "+user.getFullName()+",</p>"+"<p>We want to inform you that your account is now active and you can login to Parkinger.</p>"+
+                        "<p><a href=\"http://www.parkinger.net\">Click here to log in</a></p>";
+        }
+        try {
+            MailService.sendEmail(/*newAccount.getEmail()*/"lina.po@outlook.com", subject, message);
+        } catch (Exception e) {
+            throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }
     }
 

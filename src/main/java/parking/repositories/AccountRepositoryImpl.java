@@ -13,6 +13,8 @@ import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
+import parking.service.UserService;
+import parking.utils.EmailMsgType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -31,7 +33,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public LotsRepository lotsRepository;
 
     @Autowired
-    private LogRepository logRepository;
+    private UserService userService;
 
     @Autowired
     public ExceptionHandler exceptionHandler;
@@ -40,7 +42,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public RoleRepository roleRepository;
 
     @Override
-    public void editAccount(EditUserForm newAccount, Account oldAccount, String username) {
+    public void editAccount(EditUserForm newAccount, Account oldAccount, String username, HttpServletRequest httpRequest) throws ApplicationException {
         Query searchQuery = new Query(Criteria.where("username").is(username));
 
         Update updateFields = new Update();
@@ -65,10 +67,12 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
-        if (!oldAccount.isActive() == (newAccount.isActive())) {
-            updateFields.set("status", newAccount.isActive());
-        } else if (oldAccount.isActive() == false) {
-            updateFields.set("status", newAccount.isActive());
+        if (oldAccount.isEmailConfirmed() == true) {
+            if (newAccount.isActive()) {
+                updateFields.set("active", true);
+                List<Account> users = operations.find(searchQuery, Account.class);
+                userService.sendEmail(users.get(0), EmailMsgType.ACOUNT_ACTIVATED, httpRequest);
+            }
         }
 
         //to avoid the whole document to be deleted in case nothing is updated
@@ -83,7 +87,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
     public boolean changeConfirmationFlag(String username) {
         Query searchQuery = new Query(Criteria.where("username").is(username));
         Update updateFields = new Update();
-        updateFields.set("confirmationKey", true);
+        updateFields.set("emailConfirmed", true);
         operations.updateFirst(searchQuery, updateFields, Account.class);
         return true;
     }

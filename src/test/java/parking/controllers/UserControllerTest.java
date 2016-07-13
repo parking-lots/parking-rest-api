@@ -115,7 +115,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenConfirmEmail() throws ApplicationException{
+    public void whenConfirmEmail() throws ApplicationException {
         controller.confirmEmail("erwerewr3232", servletRequest);
     }
 }

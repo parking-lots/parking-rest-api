@@ -1,5 +1,6 @@
 package parking.service;
 
+import com.sun.jersey.core.impl.provider.entity.XMLJAXBElementProvider;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,6 +96,7 @@ public class UserServiceTest {
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request)).thenReturn(new ApplicationException("message"));
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
         when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
         SecurityContextHolder.setContext(mockSecurityContext);
@@ -103,6 +105,7 @@ public class UserServiceTest {
         mockedParking = new ParkingLot(161, -1);
         mockedUser.setParking(mockedParking);
         mockedUser.setEmail("name.surname@swedbank.lt");
+        mockedUser.setActive(true);
         mockedRoles.put(Role.ROLE_USER, new Role(Role.ROLE_USER));
 
         mockedAdmin = new Account("Admin admin", MOCKED_ADMIN_USERNAME, "*****");
@@ -236,6 +239,12 @@ public class UserServiceTest {
         service.login(loginForm.getUsername(), loginForm.getPassword(), loginForm.getRemember(), request);
     }
 
+    @Test(expected = ApplicationException.class)
+    public void whenInactiveAccountShouldRaiseException() throws ApplicationException {
+        mockedUser.setActive(false);
+        service.rememberMeLogin(mockedUser.getUsername(), mockedUser.getPassword(), request);
+    }
+
     @Test
     public void whenSettingCookiesTheyAreSavedToBrowser() throws ApplicationException {
         final ArgumentCaptor<Cookie> captor = ArgumentCaptor.forClass(Cookie.class);
@@ -304,11 +313,17 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenKeyCorrectShouldChangeFlag() {
+    public void whenKeyChangedShouldReturnTrue() throws ApplicationException {
         mockedUser.setConfirmationKey("aaa333");
         given(accountRepository.findByConfirmationKey(mockedUser.getConfirmationKey())).willReturn(mockedUser);
-        service.confirmEmail("aaa333", request);
-        assertTrue(accountRepository.changeConfirmationFlag(mockedUser.getUsername()) == true);
+        given(accountRepository.changeConfirmationFlag(mockedUser.getUsername())).willReturn(true);
+        service.confirmEmail(mockedUser.getConfirmationKey(), request);
+        assertTrue(service.confirmEmail(mockedUser.getConfirmationKey(), request) == true);
+    }
 
+    @Test
+    public void whenKeyNotChangedShouldReturnFalse() throws ApplicationException {
+        given(accountRepository.changeConfirmationFlag(mockedUser.getUsername())).willReturn(false);
+        assertTrue(service.confirmEmail(mockedUser.getConfirmationKey(), request) == false);
     }
 }
