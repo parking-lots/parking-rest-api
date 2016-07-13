@@ -40,6 +40,8 @@ public class AdminServiceTest {
     private LogRepository logRepository;
     @Mock
     private LotsRepository lotsRepository;
+    @Mock
+    private MailService mailService;
 
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
