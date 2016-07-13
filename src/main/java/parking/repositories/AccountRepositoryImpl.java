@@ -88,6 +88,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         Query searchQuery = new Query(Criteria.where("username").is(username));
         Update updateFields = new Update();
         updateFields.set("emailConfirmed", true);
+        updateFields.unset("confirmationKey");
         operations.updateFirst(searchQuery, updateFields, Account.class);
         return true;
     }
