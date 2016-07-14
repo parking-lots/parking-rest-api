@@ -73,6 +73,14 @@ public class AdminService {
         accountRepository.editAccount(newAccount, oldAccount, username, request);
 
         Optional<Account> user = userService.getLoggedUser();
+        LogMetaData metaData = getLogMetaData(newAccount, oldAccount);
+
+        String userAgent = request.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount, null, null, null, metaData, user, userAgent);
+
+    }
+
+    private LogMetaData getLogMetaData(EditUserForm newAccount, Account oldAccount) {
         LogMetaData metaData = new LogMetaData();
 
         if (!oldAccount.getFullName().equals(newAccount.getFullName())) {
@@ -142,9 +150,13 @@ public class AdminService {
             map.put("new", newAccount.getEmail());
         }
 
-        String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount, null, null, null, metaData, user, userAgent);
-
+        if(newAccount.isActive() && oldAccount.isActive() != newAccount.isActive()){
+            Map<String, Boolean> map = new HashMap<>();
+            metaData.setActive(map);
+            map.put("old", oldAccount.isActive());
+            map.put("new", newAccount.isActive());
+        }
+        return metaData;
     }
 
     public void deleteUser(String username, HttpServletRequest request) throws ApplicationException {

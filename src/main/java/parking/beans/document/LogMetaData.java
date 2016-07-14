@@ -7,6 +7,7 @@ public class LogMetaData {
     boolean passwordChanged;
     Map<String, String> email;
     Map<String, String[]> cars;
+    Map<String, Boolean> active;
 
     public Map<String, String> getFullName() {
         return fullName;
@@ -40,11 +41,11 @@ public class LogMetaData {
         this.cars = cars;
     }
 
-    //    public String[][] getCars() {
-//        return cars;
-//    }
-//
-//    public void setCars(String[][] cars) {
-//        this.cars = cars;
-//    }
+    public Map<String, Boolean> getActive() {
+        return active;
+    }
+
+    public void setActive(Map<String, Boolean> active) {
+        this.active = active;
+    }
 }

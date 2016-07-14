@@ -264,6 +264,10 @@ public class UserService {
         if (user != null) {
             if (accountRepository.changeConfirmationFlag(user.getUsername())) {
                 sendEmail(user, EmailMsgType.EMAIL_CONFIRMED, httpRequest);
+
+                String userAgent = httpRequest.getHeader("User-Agent");
+                Optional<Account> loggedUser = getLoggedUser();
+                logRepository.insertActionLog(ActionType.EMAIL_CONFIRMED, user, null, null, null, null, loggedUser, userAgent);
                 return true;
             }
         }
