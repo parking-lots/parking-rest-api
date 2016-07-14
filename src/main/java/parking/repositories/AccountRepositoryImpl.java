@@ -77,7 +77,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         //to avoid the whole document to be deleted in case nothing is updated
         if (updateFields.modifies("fullName") || updateFields.modifies("password") || updateFields.modifies("email")
-                || updateFields.modifies("carRegNoList") || updateFields.modifies("status")) {
+                || updateFields.modifies("carRegNoList") || updateFields.modifies("status") || updateFields.modifies("active")) {
             operations.updateFirst(searchQuery, updateFields, Account.class);
         } else {
             return;
