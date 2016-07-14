@@ -17,6 +17,7 @@ import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.service.AdminService;
+import parking.service.MailService;
 import parking.service.RegistrationService;
 import parking.utils.ParkingType;
 

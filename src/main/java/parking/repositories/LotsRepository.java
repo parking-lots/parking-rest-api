@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface LotsRepository extends MongoRepository<ParkingLot, String>, CustomLotsRepository {
     public ParkingLot findByNumber(Integer number);
+
     public ParkingLot findByUser(Account user);
 
     public List<ParkingLot> findAll();

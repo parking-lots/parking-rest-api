@@ -40,6 +40,8 @@ public class AdminServiceTest {
     private LogRepository logRepository;
     @Mock
     private LotsRepository lotsRepository;
+    @Mock
+    private MailService mailService;
 
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
@@ -74,7 +76,7 @@ public class AdminServiceTest {
         given(userService.getCurrentUser(request)).willReturn(mockedAccount);
         given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
         service.editUser(editUserForm, mockedAccount.getUsername(), request);
-        verify(accountRepository).editAccount(any(EditUserForm.class), any(Account.class), any(String.class));
+        verify(accountRepository).editAccount(any(EditUserForm.class), any(Account.class), any(String.class), any(HttpServletRequest.class));
     }
 
     @Test

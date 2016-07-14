@@ -1,5 +1,6 @@
 package parking.service;
 
+import com.sun.jersey.core.impl.provider.entity.XMLJAXBElementProvider;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,13 +67,13 @@ public class UserServiceTest {
     @Mock
     private ParkingService parkingService;
     @Mock
-    private UserService userService;
-    @Mock
     private HttpServletResponse response;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
     private RegistrationService registrationService;
+    @Mock
+    private MailService mailService;
     @Mock
     private ExceptionHandler exceptionHandler;
     @Mock
@@ -95,6 +96,7 @@ public class UserServiceTest {
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request)).thenReturn(new ApplicationException("message"));
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
         when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
         SecurityContextHolder.setContext(mockSecurityContext);
@@ -102,6 +104,8 @@ public class UserServiceTest {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
         mockedParking = new ParkingLot(161, -1);
         mockedUser.setParking(mockedParking);
+        mockedUser.setEmail("name.surname@swedbank.lt");
+        mockedUser.setActive(true);
         mockedRoles.put(Role.ROLE_USER, new Role(Role.ROLE_USER));
 
         mockedAdmin = new Account("Admin admin", MOCKED_ADMIN_USERNAME, "*****");
@@ -109,6 +113,7 @@ public class UserServiceTest {
 
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(mockedUser);
     }
+
 
 
     @Test
@@ -129,11 +134,21 @@ public class UserServiceTest {
     }
 
     @Test
+    public void whenCreateUserWithParkingShouldCallAttachParkingMethod() throws ApplicationException, MessagingException {
+
+        given(service.getUserByUsername(mockedUser.getUsername())).willReturn(null);
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
+
+        service.createUser(mockedUser, mockedParking.getNumber(), request);
+        verify(accountRepository).attachParking(mockedParking.getNumber(), mockedUser.getUsername(), request);
+    }
+
+    @Test
     public void whenCreateUserWithNotExistUserNameShouldCallRepository() throws ApplicationException, MessagingException {
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
-        given(userService.getCurrentUser(request)).willReturn(mockedUser);
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -151,7 +166,7 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(accountRepository.insert(mockedUser)).willReturn(mockedUser);
-        given(userService.getCurrentUser(request)).willReturn(mockedUser);
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         Account newAccount = service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -164,6 +179,8 @@ public class UserServiceTest {
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
+
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
         ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
@@ -174,11 +191,11 @@ public class UserServiceTest {
 
     @Test
     public void whenCreateUserWithoutParkingShouldAssignUserRole() throws ApplicationException, MessagingException {
-        given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -192,11 +209,11 @@ public class UserServiceTest {
     @Test
     public void whenCreateUserWithCapitals() throws ApplicationException, MessagingException {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
-        given(service.getCurrentUser(request)).willReturn(mockedAdmin);
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
         given(roleRepository.findByName(Role.ROLE_USER)).willReturn(mockedRoles.get(Role.ROLE_USER));
+        given(lotsRepository.findByNumber(mockedParking.getNumber())).willReturn(mockedParking);
 
         service.createUser(mockedUser, mockedParking.getNumber(), request);
 
@@ -221,6 +238,12 @@ public class UserServiceTest {
         given(request.getSession()).willReturn(mock(HttpSession.class));
 
         service.login(loginForm.getUsername(), loginForm.getPassword(), loginForm.getRemember(), request);
+    }
+
+    @Test(expected = ApplicationException.class)
+    public void whenInactiveAccountShouldRaiseException() throws ApplicationException {
+        mockedUser.setActive(false);
+        service.rememberMeLogin(mockedUser.getUsername(), mockedUser.getPassword(), request);
     }
 
     @Test
@@ -288,5 +311,20 @@ public class UserServiceTest {
         List<Integer> a = captor.getAllValues();
 
         assertEquals(a.get(0), new Integer(604800));
+    }
+
+    @Test
+    public void whenKeyChangedShouldReturnTrue() throws ApplicationException {
+        mockedUser.setConfirmationKey("aaa333");
+        given(accountRepository.findByConfirmationKey(mockedUser.getConfirmationKey())).willReturn(mockedUser);
+        given(accountRepository.changeConfirmationFlag(mockedUser.getUsername())).willReturn(true);
+        service.confirmEmail(mockedUser.getConfirmationKey(), request);
+        assertTrue(service.confirmEmail(mockedUser.getConfirmationKey(), request) == true);
+    }
+
+    @Test
+    public void whenKeyNotChangedShouldReturnFalse() throws ApplicationException {
+        given(accountRepository.changeConfirmationFlag(mockedUser.getUsername())).willReturn(false);
+        assertTrue(service.confirmEmail(mockedUser.getConfirmationKey(), request) == false);
     }
 }

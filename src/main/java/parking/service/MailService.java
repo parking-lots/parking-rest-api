@@ -1,29 +1,34 @@
 package parking.service;
 
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.Session;
-import java.util.Properties;
-import javax.mail.*;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.multipart.FormDataMultiPart;
+import org.springframework.stereotype.Component;
 
+import javax.ws.rs.core.MediaType;
+
+@Component
 public class MailService {
-    static Properties mailServerProperties;
-    static Session getMailSession;
-    static MimeMessage mailMessage;
 
-    public static void sendEmail(String email, String subject, String message) throws MessagingException {
-        mailServerProperties = System.getProperties();
-        mailServerProperties.put("mail.smtp.host", "localhost");
+    public final static HTTPBasicAuthFilter httpBasicAuthFilter = new HTTPBasicAuthFilter("api", "key-9b2644c1e5b2f81c9722b50c9b079433");
+    public final static String resourceDomain = "https://api.mailgun.net/v3/" + "parkinger.net" + "/messages";
 
-        getMailSession = Session.getDefaultInstance(mailServerProperties, null);
-        mailMessage = new MimeMessage(getMailSession);
-        mailMessage.setFrom(new InternetAddress("parkinger@gmail.com"));
-        mailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        mailMessage.setSubject(subject);
-        mailMessage.setText("the message text");
+    public ClientResponse sendEmail(String emailTo, String subject, String message) {
+        Client client = Client.create();
 
-        Transport.send(mailMessage);
+        client.addFilter(httpBasicAuthFilter);
+        WebResource webResource = client.resource(resourceDomain);
+
+        FormDataMultiPart formData = new FormDataMultiPart();
+        formData.field("from", "Parkinger team <info@parkinger.net>");
+        formData.field("to", emailTo);
+        formData.field("subject", subject);
+        formData.field("html", message);
+
+        return webResource.type(MediaType.MULTIPART_FORM_DATA_TYPE).
+                post(ClientResponse.class, formData);
     }
-
 }
 
