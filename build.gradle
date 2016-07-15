@@ -21,6 +21,11 @@ bootRun {
     systemProperties System.properties
 }
 
+jar {
+    baseName = 'gs-batch-processing'
+    version =  '0.1.0'
+}
+
 repositories {
     mavenCentral()
     maven { url "http://repo.spring.io/libs-snapshot" }
@@ -32,6 +37,7 @@ targetCompatibility = 1.8
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-batch")
 
     compile 'com.sun.mail:javax.mail:1.5.4'
 
