@@ -11,5 +11,6 @@ public enum ActionType {
     ATTACH_PARKING,
     DETACH_PARKING,
     LOG_IN,
-    LOG_OUT;
+    LOG_OUT,
+    EMAIL_CONFIRMED;
 }

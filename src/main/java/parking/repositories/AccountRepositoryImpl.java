@@ -14,6 +14,7 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.service.UserService;
+import parking.utils.ActionType;
 import parking.utils.EmailMsgType;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,9 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LogRepository logRepository;
 
     @Autowired
     public ExceptionHandler exceptionHandler;
@@ -68,7 +72,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         }
 
         if (oldAccount.isEmailConfirmed() == true) {
-            if (newAccount.isActive()) {
+            if (newAccount.isActive() && oldAccount.isActive() != newAccount.isActive()) {
                 updateFields.set("active", true);
                 List<Account> users = operations.find(searchQuery, Account.class);
                 userService.sendEmail(users.get(0), EmailMsgType.ACOUNT_ACTIVATED, httpRequest);
