@@ -11,7 +11,7 @@ public class User extends Response {
     private String username;
     private String email;
     private String number;
-    private List<String> carList = new ArrayList<>();
+    private List<String> carRegNoList = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
     private boolean active;
     private boolean emailConfirmed;
@@ -21,7 +21,7 @@ public class User extends Response {
         this.username = account.getUsername();
         this.email = account.getEmail();
         this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
-        this.carList = account.getCarRegNoList();
+        this.carRegNoList = account.getCarRegNoList();
 
         if (!account.getRoles().isEmpty()) {
             for (Role role : account.getRoles()) {
@@ -65,12 +65,12 @@ public class User extends Response {
         this.number = number;
     }
 
-    public List<String> getCarList() {
-        return carList;
+    public List<String> getCarRegNoList() {
+        return carRegNoList;
     }
 
-    public void setCarList(List<String> carList) {
-        this.carList = carList;
+    public void setCarRegNoList(List<String> carRegNoList) {
+        this.carRegNoList = carRegNoList;
     }
 
     public List<String> getRoles() {

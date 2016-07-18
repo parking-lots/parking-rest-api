@@ -74,7 +74,6 @@ public class AdminService {
 
         Optional<Account> user = userService.getLoggedUser();
         LogMetaData metaData = getLogMetaData(newAccount, oldAccount);
-
         String userAgent = request.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.EDIT_USER, oldAccount, null, null, null, metaData, user, userAgent);
 
@@ -94,21 +93,14 @@ public class AdminService {
             metaData.setPasswordChanged(true);
         }
 
-        if (oldAccount.getCarRegNoList() != null) {
-            Collections.sort(oldAccount.getCarRegNoList());
-        }
-        if (newAccount.getCarRegNoList() != null) {
-            Collections.sort(newAccount.getCarRegNoList());
-        }
+        Collections.sort(oldAccount.getCarRegNoList());
+        Collections.sort(newAccount.getCarRegNoList());
 
-        checkCars:
-        if (oldAccount.getCarRegNoList() == null && newAccount.getCarRegNoList() == null) {
-            break checkCars;
-        } else if ((oldAccount.getCarRegNoList() == null ^ newAccount.getCarRegNoList() == null) || !(oldAccount.getCarRegNoList().equals(newAccount.getCarRegNoList()))) {
-            Map<String, String[]> carMap = new HashMap<>();
-            String[] oldCarArr;
-            String[] newCarArr;
+        Map<String, String[]> carMap = new HashMap<>();
+        String[] oldCarArr;
+        String[] newCarArr;
 
+        if (!oldAccount.getCarRegNoList().equals(newAccount.getCarRegNoList())) {
             if (oldAccount.getCarRegNoList().size() == 0) {
                 carMap.put("old", null);
             } else {
@@ -122,7 +114,7 @@ public class AdminService {
                 }
             }
 
-            if (newAccount.getCarRegNoList() == null || newAccount.getCarRegNoList().size() == 0) {
+            if (newAccount.getCarRegNoList().size() == 0) {
                 carMap.put("new", null);
             } else {
                 newCarArr = new String[newAccount.getCarRegNoList().size()];
@@ -134,7 +126,6 @@ public class AdminService {
                     }
                 }
             }
-
             metaData.setCars(carMap);
         }
 
@@ -150,7 +141,7 @@ public class AdminService {
             map.put("new", newAccount.getEmail());
         }
 
-        if(newAccount.isActive() && oldAccount.isActive() != newAccount.isActive()){
+        if (newAccount.isActive() && oldAccount.isActive() != newAccount.isActive()) {
             Map<String, Boolean> map = new HashMap<>();
             metaData.setActive(map);
             map.put("old", oldAccount.isActive());
