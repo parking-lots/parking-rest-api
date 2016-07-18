@@ -12,5 +12,6 @@ public enum ActionType {
     DETACH_PARKING,
     LOG_IN,
     LOG_OUT,
-    EMAIL_CONFIRMED;
+    EMAIL_CONFIRMED,
+    PASSWORD_RESET;
 }

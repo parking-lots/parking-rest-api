@@ -289,6 +289,10 @@ public class UserService {
 
         accountRepository.resetPassword(account.getUsername(), newPassword);
 
+        Account targetUser = accountRepository.findByUsername(account.getUsername());
+        String userAgent = httpRequest.getHeader("User-Agent");
+        logRepository.insertActionLog(ActionType.PASSWORD_RESET, targetUser, null, null, null, null, null, userAgent);
+
         sendEmail(account, EmailMsgType.RESET_PASSWORD, httpRequest);
     }
 
