@@ -88,6 +88,13 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
         }
     }
 
+    public void resetPassword(String username, String newPassword) {
+        Query searchQuery = new Query(Criteria.where("username").is(username));
+        Update updateFields = new Update();
+        updateFields.set("password", (ProfileHelper.encryptPassword(newPassword)));
+        operations.updateFirst(searchQuery, updateFields, Account.class);
+    }
+
     public boolean changeConfirmationFlag(String username) {
         Query searchQuery = new Query(Criteria.where("username").is(username));
         Update updateFields = new Update();

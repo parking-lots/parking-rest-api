@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.LoginForm;
+import parking.beans.request.ResetPassword;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
@@ -46,6 +47,8 @@ public class UserControllerTest {
     @Mock
     private LoginForm mockedLoginForm;
     @Mock
+    private ResetPassword mockedResetPassword;
+    @Mock
     private UserService userService;
     @Mock
     private ExceptionHandler exceptionHandler;
@@ -65,6 +68,8 @@ public class UserControllerTest {
         mockedLoginForm.setUsername("username");
         mockedLoginForm.setPassword("password");
         mockedLoginForm.setRemember(true);
+
+        mockedResetPassword.setEmail("name.surname@swedbank.lt");
 
         mockedEditUserForm.setFullName("Full Name");
         mockedEditUserForm.setPassword("password");
@@ -118,5 +123,10 @@ public class UserControllerTest {
     @Test
     public void whenConfirmEmail() throws ApplicationException {
         controller.confirmEmail("erwerewr3232", servletRequest);
+    }
+
+    @Test public void whenResetPasswordShouldCallServiceMethod() throws MessagingException, ApplicationException {
+        controller.resetPassword(mockedResetPassword, servletRequest);
+        verify(userService, times(1)).resetPassword(mockedUser.getEmail(), servletRequest);
     }
 }

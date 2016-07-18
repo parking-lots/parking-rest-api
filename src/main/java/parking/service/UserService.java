@@ -13,12 +13,16 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
+import parking.Application;
 import parking.beans.document.*;
+import parking.beans.request.EditUserForm;
 import parking.beans.response.Profile;
+import parking.beans.response.Response;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
+import parking.helper.PasswordSimulator;
 import parking.helper.ProfileHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
@@ -209,10 +213,7 @@ public class UserService {
 
         newAccount.setUsername(newAccount.getUsername().toLowerCase());
 
-        String email = newAccount.getEmail();
-        if (email != null && !email.substring(email.indexOf("@") + 1).equals(EmailDomain.SWEDBANK_LT.getDomain())) {
-            throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request);
-        }
+        validateEmail(newAccount.getEmail(), request);
 
         if (getUserByUsername(newAccount.getUsername()).isPresent()) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request);
@@ -274,6 +275,29 @@ public class UserService {
         return false;
     }
 
+    public void resetPassword(String email, HttpServletRequest httpRequest) throws ApplicationException, MessagingException {
+
+        validateEmail(email, httpRequest);
+        Account account = accountRepository.findByEmail(email);
+        if (account == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, httpRequest);
+        }
+
+        String newPassword = PasswordSimulator.getPassword();
+        //for user to see the new password address in the message
+        account.setPassword(newPassword);
+
+        accountRepository.resetPassword(account.getUsername(), newPassword);
+
+        sendEmail(account, EmailMsgType.RESET_PASSWORD, httpRequest);
+    }
+
+    public void validateEmail(String email, HttpServletRequest httpRequest) throws ApplicationException {
+        if (email == null || !email.substring(email.indexOf("@") + 1).equals(EmailDomain.SWEDBANK_LT.getDomain())) {
+            throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, httpRequest);
+        }
+    }
+
     public void sendEmail(Account user, EmailMsgType messageType, HttpServletRequest request) throws ApplicationException {
         String subject = "";
         String message = "<p>We are sending you this e-mail without any reason. Don't pay attention</p>";
@@ -281,7 +305,7 @@ public class UserService {
         switch (messageType) {
             case CONFIRM_EMAIL_REQUEST:
                 subject = "Email confirmation";
-                message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/user/" + user.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
+                message = "<p>Thank you for registering to Parkinger!</p><p><a href=\"http://www.parkinger.net/confirmation/" + user.getConfirmationKey() + "\">Click here to confirm your email address</a></p>" +
                         "<p>Once your email is confirmed, administrator will register your car numbers and activate your account.</p>";
                 break;
             case EMAIL_CONFIRMED:
@@ -293,7 +317,13 @@ public class UserService {
                 subject = "Your account is activated";
                 message = "<p>Hello " + user.getFullName() + ",</p>" + "<p>We want to inform you that your account is now active and you can login to Parkinger.</p>" +
                         "<p><a href=\"http://www.parkinger.net\">Click here to log in</a></p>";
+                break;
+            case RESET_PASSWORD:
+                subject = "Your password is reset";
+                message = "<p>Hello " + user.getFullName() + ",</p>" + "<p>Your new password is: " + user.getPassword() + "</p>";
+                break;
         }
+
         try {
             mailService.sendEmail(user.getEmail(), subject, message);
         } catch (Exception e) {

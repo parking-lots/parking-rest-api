@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface AccountRepository extends MongoRepository<Account, String>, CustomAccountRepository {
     public Account findByUsername(String username);
 
+    public Account findByEmail(String email);
+
     public Account findByConfirmationKey(String confirmationKey);
 
     public List<Account> findAll();
