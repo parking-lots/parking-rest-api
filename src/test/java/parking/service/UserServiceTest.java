@@ -93,10 +93,13 @@ public class UserServiceTest {
 
         when(authentication.getName()).thenReturn(MOCKED_USER_NAME);
         when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
+
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_LOGGED, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.USER_ALREADY_EXIST, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.NO_COOKIE_DATA, request)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.USER_INACTIVE, request)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, request)).thenReturn(new ApplicationException("message"));
+
         when(request.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
         when(request.getHeader("User-Agent")).thenReturn("Opera Windows");
         SecurityContextHolder.setContext(mockSecurityContext);
@@ -113,7 +116,6 @@ public class UserServiceTest {
 
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(mockedUser);
     }
-
 
 
     @Test
@@ -209,6 +211,7 @@ public class UserServiceTest {
     @Test
     public void whenCreateUserWithCapitals() throws ApplicationException, MessagingException {
         mockedUser = new Account("Name Surname", MOCKED_USER_NAME, "****");
+        mockedUser.setEmail("name.surname@swedbank.lt");
         given(authentication.getName()).willReturn(MOCKED_ADMIN_USERNAME);
         given(accountRepository.findByUsername(MOCKED_USER_NAME)).willReturn(null);
         given(accountRepository.findByUsername(MOCKED_ADMIN_USERNAME)).willReturn(mockedAdmin);
@@ -326,5 +329,16 @@ public class UserServiceTest {
     public void whenKeyNotChangedShouldReturnFalse() throws ApplicationException {
         given(accountRepository.changeConfirmationFlag(mockedUser.getUsername())).willReturn(false);
         assertTrue(service.confirmEmail(mockedUser.getConfirmationKey(), request) == false);
+    }
+
+    @Test(expected = ApplicationException.class)
+    public void whenResetPasswordWithInvalidEmailShouldRaiseException() throws MessagingException, ApplicationException {
+        service.resetPassword("name.surname@gmail.com", request);
+    }
+
+    @Test
+    public void whenResetPasswordWithValidEmailShouldSucceed() throws MessagingException, ApplicationException{
+        given(accountRepository.findByEmail("name.surname@swedbank.lt")).willReturn(mockedUser);
+        service.resetPassword("name.surname@swedbank.lt", request);
     }
 }

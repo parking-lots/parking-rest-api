@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.Account;
 import parking.beans.request.*;
+import parking.beans.response.ConfirmationResponse;
 import parking.beans.response.Profile;
+import parking.beans.response.Response;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
@@ -84,12 +86,17 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{confirmationKey}", method = RequestMethod.POST)
-    public String confirmEmail(@PathVariable(value = "confirmationKey") String confirmationKey, HttpServletRequest request) throws ApplicationException {
+    public ConfirmationResponse confirmEmail(@PathVariable(value = "confirmationKey") String confirmationKey, HttpServletRequest request) throws ApplicationException {
         if (userService.confirmEmail(confirmationKey, request)) {
-            return "Email is confirmed";
+            return new ConfirmationResponse("Email is confirmed");
         } else {
-            return "Email could not be confirmed. Please contact the administrator";
+            throw exceptionHandler.handleException(ExceptionMessage.CONFIRMATION_FAILED, request);
         }
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
+    public void resetPassword(@Valid @RequestBody ResetPassword resetPassword, HttpServletRequest httpRequest) throws MessagingException, ApplicationException {
+        userService.resetPassword(resetPassword.getEmail(), httpRequest);
     }
 
 }

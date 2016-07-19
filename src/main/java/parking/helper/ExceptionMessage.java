@@ -21,7 +21,8 @@ public enum ExceptionMessage {
     EMPTY_CAR_REG_NO("empty_car_reg_no"),
     COULD_NOT_SEND_EMAIL("could_not_send_email"),
     USER_INACTIVE("user_inactive"),
-    INVALID_EMAIL("invalid_email");
+    INVALID_EMAIL("invalid_email"),
+    CONFIRMATION_FAILED("confirmation_failed");
 
     private String msg;
 
