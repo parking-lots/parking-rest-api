@@ -1,6 +1,6 @@
 package parking.beans.document;
 
-import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import parking.utils.ActionType;
 
@@ -11,15 +11,16 @@ import java.util.Date;
 public class Log {
     @NotNull
     private ActionType actionType;
-    private ObjectId targetUser;
+    @DBRef
+    private Account targetUser;
     private Integer lotNumber;
     private Date from;
     private Date to;
     private LogMetaData metaData;
-    private ObjectId user;
+    @DBRef
+    private Account user;
     private String userAgent;
     private Date timestamp;
-
 
     public ActionType getActionType() {
         return actionType;
@@ -29,11 +30,11 @@ public class Log {
         this.actionType = actionType;
     }
 
-    public ObjectId getTargetUser() {
+    public Account getTargetUser() {
         return targetUser;
     }
 
-    public void setTargetUser(ObjectId targetUser) {
+    public void setTargetUser(Account targetUser) {
         this.targetUser = targetUser;
     }
 
@@ -61,22 +62,6 @@ public class Log {
         this.to = to;
     }
 
-    public ObjectId getUser() {
-        return user;
-    }
-
-    public void setUser(ObjectId user) {
-        this.user = user;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public LogMetaData getMetaData() {
         return metaData;
     }
@@ -85,11 +70,27 @@ public class Log {
         this.metaData = metaData;
     }
 
+    public Account getUser() {
+        return user;
+    }
+
+    public void setUser(Account user) {
+        this.user = user;
+    }
+
     public String getUserAgent() {
         return userAgent;
     }
 
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 }
