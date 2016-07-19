@@ -97,4 +97,18 @@ public class LogResponse extends Response {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
+
+    @Override
+    public String toString() {
+        return "LogResponse{" +
+                "actionType=" + actionType +
+                ", targetUser='" + targetUser + '\'' +
+                ", lotNumber=" + lotNumber +
+                ", from=" + from +
+                ", to=" + to +
+                ", user='" + user + '\'' +
+                ", userAgent='" + userAgent + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }

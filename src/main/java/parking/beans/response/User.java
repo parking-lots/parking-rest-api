@@ -96,4 +96,18 @@ public class User extends Response {
     public void setEmailConfirmed(boolean emailConfirmed) {
         this.emailConfirmed = emailConfirmed;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "fullName='" + fullName + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", number='" + number + '\'' +
+                ", carRegNoList=" + carRegNoList +
+                ", roles=" + roles +
+                ", active=" + active +
+                ", emailConfirmed=" + emailConfirmed +
+                '}';
+    }
 }
