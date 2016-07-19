@@ -1,9 +1,9 @@
 package parking.repositories;
 
-import com.mongodb.BasicDBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import parking.beans.document.Account;
+import parking.beans.document.Log;
 import parking.beans.document.LogMetaData;
 import parking.utils.ActionType;
 
@@ -20,33 +20,34 @@ public class LogRepositoryImpl implements CustomLogRepository {
     }
 
     public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Optional<Account> user, String userAgent) {
-        BasicDBObject dbObject = new BasicDBObject();
+        Log log = new Log();
 
-        dbObject.put("actionType", actionType);
+        if (actionType != null)
+            log.setActionType(actionType);
 
-        if (targetUser != null) {
-            dbObject.put("targetUser", targetUser);
-        }
-        if (lotNumber != null) {
-            dbObject.put("lotNumber", lotNumber);
-        }
-        if (from != null) {
-            dbObject.put("from", from);
-        }
-        if (to != null) {
-            dbObject.put("to", to);
-        }
+        if (targetUser != null)
+            log.setTargetUser(targetUser);
 
-        if (metaData != null) {
-            dbObject.put("metadata", metaData);
-        }
+        if (lotNumber != null)
+            log.setLotNumber(lotNumber);
 
-        dbObject.put("user", user);
-        dbObject.put("userAgent", userAgent);
-        dbObject.put("timestamp", new Date());
+        if (from != null)
+            log.setFrom(from);
 
-        operations.insert(dbObject, "log");
+        if (to != null)
+            log.setTo(to);
+
+        if (metaData != null)
+            log.setMetaData(metaData);
+
+        if (userAgent != null)
+            log.setUserAgent(userAgent);
+
+        if (user.isPresent())
+            log.setUser(user.get());
+
+        log.setTimestamp(new Date());
+
+        operations.insert(log);
     }
-
-    ;
 }
