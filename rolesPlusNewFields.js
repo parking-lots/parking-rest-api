@@ -9,14 +9,14 @@ db.users.find({"emailConfirmed":{$ne:true}}).forEach( function (doc) {db.users.u
 db.users.find().forEach( function (doc){
     doc.email = doc.fullName;
     doc.email = doc.email.replace(" ", ".").toLowerCase().concat("@swedbank.lt");
-    doc.email = doc.email.replace("ą", "a");
-    doc.email = doc.email.replace("č", "c");
-    doc.email = doc.email.replace("ę", "e");
-    doc.email = doc.email.replace("ė", "e");
-    doc.email = doc.email.replace("į", "i");
-    doc.email = doc.email.replace("š", "s");
-    doc.email = doc.email.replace("ų", "u");
-    doc.email = doc.email.replace("ū", "u");
-    doc.email = doc.email.replace("ž", "z");
+    doc.email = doc.email.replace(/ą/gi, "a");
+    doc.email = doc.email.replace(/č/gi, "c");
+    doc.email = doc.email.replace(/ę/gi, "e");
+    doc.email = doc.email.replace(/ė/gi, "e");
+    doc.email = doc.email.replace(/į/gi, "i");
+    doc.email = doc.email.replace(/š/gi, "s");
+    doc.email = doc.email.replace(/ų/gi, "u");
+    doc.email = doc.email.replace(/ū/gi, "u");
+    doc.email = doc.email.replace(/ž/gi, "z");
     db.users.save(doc);
 })
