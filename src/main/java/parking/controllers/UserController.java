@@ -90,7 +90,7 @@ public class UserController {
         if (userService.confirmEmail(confirmationKey, request)) {
             return new ConfirmationResponse("Email is confirmed");
         } else {
-            return new ConfirmationResponse("Email could not be confirmed. Please contact the administrator");
+            throw exceptionHandler.handleException(ExceptionMessage.CONFIRMATION_FAILED, request);
         }
     }
 
