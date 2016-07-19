@@ -6,9 +6,8 @@ db.users.find({"active":{$ne:true}}).forEach( function (doc) {db.users.update({"
 
 db.users.find({"emailConfirmed":{$ne:true}}).forEach( function (doc) {db.users.update({"username":doc.username},{$set:{emailConfirmed:true}})});
 
-db.users.find({"email":{$eq:null}}).forEach( function (doc) {db.users.update({"username":doc.username},{$set:{email:doc.fullName}})});
-
-db.users.find({"email":{$ne:null}}).forEach( function (doc){
+db.users.find().forEach( function (doc){
+    doc.email = "";
     doc.email = doc.email.replace(" ", ".").toLowerCase().concat("@swedbank.lt");
     doc.email = doc.email.replace("ą", "a");
     doc.email = doc.email.replace("č", "c");
