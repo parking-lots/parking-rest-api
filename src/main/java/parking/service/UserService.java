@@ -13,11 +13,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
-import parking.Application;
-import parking.beans.document.*;
-import parking.beans.request.EditUserForm;
+import parking.beans.document.Account;
+import parking.beans.document.ParkingLot;
+import parking.beans.document.Permission;
+import parking.beans.document.Role;
 import parking.beans.response.Profile;
-import parking.beans.response.Response;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
 import parking.helper.ExceptionHandler;
@@ -337,7 +337,7 @@ public class UserService {
 
     public void deleteCookies(String username, String password) {
 
-        if (username != "" && password != "") {
+        if (!username.isEmpty() && !password.isEmpty()) {
             Cookie cookie = new Cookie("username", username);
             cookie.setPath("/");
             cookie.setValue(" ");
