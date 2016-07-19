@@ -7,16 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import parking.beans.document.Account;
+import parking.beans.document.Log;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
+import parking.beans.response.LogResponse;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
+import parking.utils.ActionType;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +49,9 @@ public class AdminServiceTest {
 
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
+    private Log mockedLog;
     private List<Account> mockedAccountList = new ArrayList<>();
+    private List<Log> mockedLogList = new ArrayList<>();
     private HttpServletRequest request = mock(HttpServletRequest.class);
 
 
@@ -63,12 +69,28 @@ public class AdminServiceTest {
         mockedAccount.setEmail("name@mail.com");
         mockedAccountList.add(mockedAccount);
 
+        mockedLog = new Log();
+        mockedLog.setActionType(ActionType.SHARE);
+        mockedLog.setTargetUser(mockedAccount);
+        mockedLog.setLotNumber(101);
+        mockedLog.setFrom(new Date());
+        mockedLog.setTo(new Date());
+        mockedLog.setUser(mockedAccount);
+        mockedLog.setTimestamp(new Date());
+        mockedLogList.add(mockedLog);
+
         given(accountRepository.findAll()).willReturn(mockedAccountList);
+        given(logRepository.findAll()).willReturn(mockedLogList);
     }
 
     @Test
     public void whenGettingAllUsers() {
         assertEquals(mockedAccountList.get(0).getUsername(), service.getUsers().get(0).getUsername());
+    }
+
+    @Test
+    public void whenGettingLog() {
+        assertEquals(new LogResponse(mockedLogList.get(0)).toString(), service.getLog().get(0).toString());
     }
 
     @Test
