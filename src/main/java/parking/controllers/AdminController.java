@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.request.AttachParking;
 import parking.beans.request.EditUserForm;
-import parking.beans.request.LoginForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.response.FreeParkingLot;
+import parking.beans.response.LogResponse;
 import parking.beans.response.Profile;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
@@ -67,5 +67,10 @@ public class AdminController {
     @RequestMapping(value = "/users/{username:.+}/parking/detach", method = RequestMethod.POST)
     public void detachParking(@PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException {
         adminService.detachParking(username, httpRequest);
+    }
+
+    @RequestMapping(value = "/log", method = RequestMethod.GET)
+    public List<LogResponse> displayLog(HttpServletRequest request) throws ApplicationException {
+        return adminService.getLog();
     }
 }

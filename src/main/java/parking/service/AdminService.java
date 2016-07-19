@@ -7,6 +7,7 @@ import parking.beans.document.LogMetaData;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.response.FreeParkingLot;
+import parking.beans.response.LogResponse;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -51,6 +52,12 @@ public class AdminService {
                 .map(User::new)
                 .collect(Collectors.toList());
 
+    }
+
+    public List<LogResponse> getLog() {
+        return logRepository.findAll().stream()
+                .map(LogResponse::new)
+                .collect(Collectors.toList());
     }
 
     public void editUser(EditUserForm newAccount, String username, HttpServletRequest request) throws ApplicationException, MessagingException {
