@@ -17,8 +17,8 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @RequestMapping(value = "/notice", method = RequestMethod.GET)
-    public void displayUsers(HttpServletRequest request) throws ApplicationException {
+    @RequestMapping(value = "/notice", method = RequestMethod.POST)
+    public void notify(HttpServletRequest request) throws ApplicationException {
         taskService.notifyAboutNewUsers(request);
     }
 }

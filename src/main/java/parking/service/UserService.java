@@ -329,7 +329,7 @@ public class UserService {
         }
 
         try {
-            mailService.sendEmail(user.getEmail(), subject, message);
+            mailService.sendEmail(/*user.getEmail()*/"lina.po@outlook.com", subject, message);
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }

@@ -2,13 +2,17 @@ package parking.repositories;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import parking.beans.document.Account;
 import parking.beans.document.Log;
 import parking.beans.document.LogMetaData;
+import parking.beans.document.ParkingLot;
+import parking.helper.ToolHelper;
 import parking.utils.ActionType;
+import parking.utils.EliminateDateTimestamp;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 public class LogRepositoryImpl implements CustomLogRepository {
     private final MongoOperations operations;
@@ -49,5 +53,17 @@ public class LogRepositoryImpl implements CustomLogRepository {
         log.setTimestamp(new Date());
 
         operations.insert(log);
+    }
+    public List<Log> findDailyConfirmations(ActionType actionType, Date date){
+
+        Query searchQuery = new Query();
+        searchQuery.addCriteria(Criteria.where("actionType").is(actionType.toString()));
+
+        Calendar startOfDay = new EliminateDateTimestamp().formatDateForDatabase(date);
+
+        //due to limitations of Mongodb only one criteria with timestamp can be added
+        searchQuery.addCriteria(Criteria.where("timestamp").gte(startOfDay.getTime()));
+
+        return operations.find(searchQuery, Log.class);
     }
 }
