@@ -11,6 +11,7 @@ import parking.beans.document.Log;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.response.LogResponse;
+import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
@@ -85,7 +86,7 @@ public class AdminServiceTest {
 
     @Test
     public void whenGettingAllUsers() {
-        assertEquals(mockedAccountList.get(0).getUsername(), service.getUsers().get(0).getUsername());
+        assertEquals(new User(mockedAccountList.get(0)).toString(), service.getUsers().get(0).toString());
     }
 
     @Test
