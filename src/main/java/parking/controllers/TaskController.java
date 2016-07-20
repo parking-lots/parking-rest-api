@@ -18,7 +18,7 @@ public class TaskController {
     private TaskService taskService;
 
     @RequestMapping(value = "/notice", method = RequestMethod.POST)
-    public void notify(HttpServletRequest request) throws ApplicationException {
+    public void notifyAdmin(HttpServletRequest request) throws ApplicationException {
         taskService.notifyAboutNewUsers(request);
     }
 }

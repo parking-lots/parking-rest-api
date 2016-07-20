@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 public class PasswordSimulator {
-    public static String getPassword(){
+    public static String getPassword() {
         List<String> predefinedPasswords = new ArrayList<>();
         predefinedPasswords.add("vejaS05");
         predefinedPasswords.add("zaiBas10");

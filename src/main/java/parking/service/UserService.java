@@ -291,7 +291,8 @@ public class UserService {
 
         Account targetUser = accountRepository.findByUsername(account.getUsername());
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.PASSWORD_RESET, targetUser, null, null, null, null, null, userAgent);
+        Optional<Account> user = getLoggedUser();
+        logRepository.insertActionLog(ActionType.PASSWORD_RESET, targetUser, null, null, null, null, user, userAgent);
 
         sendEmail(account, EmailMsgType.RESET_PASSWORD, httpRequest);
     }
@@ -314,7 +315,7 @@ public class UserService {
                 break;
             case EMAIL_CONFIRMED:
                 subject = "Your email confirmed";
-                message = "<p>We are happy to inform you that your e-mail has been successfully verified.</p>" +
+                message = "<p>Your e-mail has been successfully verified.</p>" +
                         "<p>We will inform you when administrator will register your car numbers and activate your account.";
                 break;
             case ACOUNT_ACTIVATED:
@@ -329,7 +330,7 @@ public class UserService {
         }
 
         try {
-            mailService.sendEmail(/*user.getEmail()*/"lina.po@outlook.com", subject, message);
+            mailService.sendEmail(user.getEmail(), subject, message);
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, request);
         }

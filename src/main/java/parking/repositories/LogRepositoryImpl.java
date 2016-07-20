@@ -54,7 +54,8 @@ public class LogRepositoryImpl implements CustomLogRepository {
 
         operations.insert(log);
     }
-    public List<Log> findDailyConfirmations(ActionType actionType, Date date){
+
+    public List<Log> findDailyConfirmations(ActionType actionType, Date date) {
 
         Query searchQuery = new Query();
         searchQuery.addCriteria(Criteria.where("actionType").is(actionType.toString()));

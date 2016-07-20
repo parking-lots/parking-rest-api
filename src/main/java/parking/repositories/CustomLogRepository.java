@@ -12,5 +12,6 @@ import java.util.Optional;
 
 public interface CustomLogRepository {
     public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Optional<Account> user, String channel);
+
     public List<Log> findDailyConfirmations(ActionType actionType, Date date);
 }
