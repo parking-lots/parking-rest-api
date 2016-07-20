@@ -54,7 +54,7 @@ public class AdminService {
 
     }
 
-    public List<LogResponse> getLog() {
+    public List<LogResponse> getLog()  {
         return logRepository.findAll().stream()
                 .map(LogResponse::new)
                 .collect(Collectors.toList());

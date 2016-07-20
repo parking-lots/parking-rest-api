@@ -3,6 +3,7 @@ package parking.beans.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import parking.beans.document.Log;
+import parking.beans.document.LogMetaData;
 import parking.utils.ActionType;
 
 import java.util.Date;
@@ -21,17 +22,22 @@ public class LogResponse extends Response {
     private String user;
     private String userAgent;
     private Date timestamp;
+    private LogMetaData metaData;
 
     public LogResponse(Log log) {
         this.actionType = log.getActionType();
-        if (log.getTargetUser() != null)
-            this.targetUser = log.getTargetUser().getUsername();
         this.lotNumber = log.getLotNumber();
         this.from = log.getFrom();
         this.to = log.getTo();
-        this.user = log.getUser().getUsername();
         this.userAgent = log.getUserAgent();
         this.timestamp = log.getTimestamp();
+
+        if (log.getTargetUser() != null)
+            this.targetUser = log.getTargetUser().getUsername();
+        if (log.getUser() != null)
+            this.user = log.getUser().getUsername();
+        if (log.getMetaData() != null)
+            this.metaData = log.getMetaData();
     }
 
     public ActionType getActionType() {
@@ -96,6 +102,14 @@ public class LogResponse extends Response {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public LogMetaData getMetaData() {
+        return metaData;
+    }
+
+    public void setMetaData(LogMetaData metaData) {
+        this.metaData = metaData;
     }
 
     @Override
