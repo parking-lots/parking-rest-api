@@ -14,7 +14,6 @@ import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.helper.ProfileHelper;
 import parking.service.UserService;
-import parking.utils.ActionType;
 import parking.utils.EmailMsgType;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +50,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         Update updateFields = new Update();
 
-        if (!newAccount.getFullName().equals(oldAccount.getFullName())) {
+        if (newAccount.getFullName() != null && !newAccount.getFullName().equals(oldAccount.getFullName())) {
             updateFields.set("fullName", newAccount.getFullName());
         }
         //if password received is not null - means it is changed
