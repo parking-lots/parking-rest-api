@@ -70,7 +70,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/log", method = RequestMethod.GET)
-    public List<LogResponse> displayLog(HttpServletRequest request) throws ApplicationException {
+    public List<LogResponse> displayLog() throws ApplicationException {
         return adminService.getLog();
     }
 }
