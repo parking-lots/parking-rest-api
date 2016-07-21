@@ -59,15 +59,11 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
             updateFields.set("password", (ProfileHelper.encryptPassword(newAccount.getPassword())));
         }
 
-        if (newAccount.getEmail() == null) {
-            updateFields.set("email", null);
-        } else if (!newAccount.getEmail().equals(oldAccount.getEmail())) {
+        if (newAccount.getEmail() != null && !newAccount.getEmail().equals(oldAccount.getEmail())) {
             updateFields.set("email", newAccount.getEmail());
         }
 
-        if (newAccount.getCarRegNoList() == null || newAccount.getCarRegNoList().size() == 0) {
-            updateFields.unset("carRegNoList");
-        } else if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
+        if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
@@ -84,7 +80,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
                 || updateFields.modifies("carRegNoList") || updateFields.modifies("status") || updateFields.modifies("active")) {
             operations.updateFirst(searchQuery, updateFields, Account.class);
         } else {
-            return;
+            throw exceptionHandler.handleException(ExceptionMessage.NOTHING_CHANGED, httpRequest);
         }
     }
 
