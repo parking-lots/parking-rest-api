@@ -13,10 +13,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
-import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
-import parking.beans.document.Permission;
-import parking.beans.document.Role;
+import parking.beans.document.*;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
@@ -246,12 +243,21 @@ public class UserService {
             accountRepository.attachParking(lotNumber, newAccount.getUsername(), request);
         }
 
-        Account currentUser = getCurrentUser(request);
+        Optional<Account> loggedUser = getLoggedUser();
+        Account currentUser = null;
+
+        //if admin is registering loggedUser will not be null
+        if (loggedUser.isPresent()) {
+            currentUser = loggedUser.get();
+        } else {
+            currentUser = newAccount;
+        }
+
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, currentUser, userAgent);
+        LogMetaData logMetaData = getLogMetaData(newAccount);
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, logMetaData, currentUser, userAgent);
 
         //if admin is creating user, no email should be sent and email should be instantly verified
-        Optional<Account> loggedUser = getLoggedUser();
         if (loggedUser.isPresent()) {
             accountRepository.changeConfirmationFlag(newAccount.getUsername());
         } else {
@@ -301,6 +307,32 @@ public class UserService {
         if (email == null || !email.substring(email.indexOf("@") + 1).equals(EmailDomain.SWEDBANK_LT.getDomain())) {
             throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, httpRequest);
         }
+    }
+
+    private LogMetaData getLogMetaData(Account newAccount) {
+
+        LogMetaData metaData = new LogMetaData();
+        Map<String, String> mapFullName = new HashMap<>();
+        mapFullName.put("new", newAccount.getFullName());
+        metaData.setFullName(mapFullName);
+
+        Map<String, String> mapUsername = new HashMap<>();
+        mapUsername.put("new", newAccount.getUsername());
+        metaData.setUserName(mapUsername);
+
+        Map<String, String> mapEmail = new HashMap<>();
+        mapEmail.put("new", newAccount.getEmail());
+        metaData.setEmail(mapEmail);
+
+        Map<String, String[]> carMap = new HashMap<>();
+        String[] newCarArr = new String[newAccount.getCarRegNoList().size()];
+        for (int i = 0; i < newAccount.getCarRegNoList().size(); i++) {
+            newCarArr[i] = newAccount.getCarRegNoList().get(i);
+        }
+        carMap.put("new", newCarArr);
+        metaData.setCars(carMap);
+
+        return metaData;
     }
 
     public void sendEmail(Account user, EmailMsgType messageType, HttpServletRequest request) throws ApplicationException {

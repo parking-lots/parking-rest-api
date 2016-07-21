@@ -3,11 +3,20 @@ package parking.beans.document;
 import java.util.Map;
 
 public class LogMetaData {
+    Map<String, String> userName;
     Map<String, String> fullName;
     String passwordStatus;
     Map<String, String> email;
     Map<String, String[]> cars;
     Map<String, Boolean> active;
+
+    public Map<String, String> getUserName() {
+        return userName;
+    }
+
+    public void setUserName(Map<String, String> userName) {
+        this.userName = userName;
+    }
 
     public Map<String, String> getFullName() {
         return fullName;
