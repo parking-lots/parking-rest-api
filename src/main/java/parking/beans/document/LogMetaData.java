@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class LogMetaData {
     Map<String, String> fullName;
-    boolean passwordChanged;
+    String passwordStatus;
     Map<String, String> email;
     Map<String, String[]> cars;
     Map<String, Boolean> active;
@@ -17,12 +17,12 @@ public class LogMetaData {
         this.fullName = fullName;
     }
 
-    public boolean isPasswordChanged() {
-        return passwordChanged;
+    public String isPasswordChanged() {
+        return passwordStatus;
     }
 
-    public void setPasswordChanged(boolean passwordChanged) {
-        this.passwordChanged = passwordChanged;
+    public void setPasswordStatus(String passwordStatus) {
+        this.passwordStatus = passwordStatus;
     }
 
     public Map<String, String> getEmail() {

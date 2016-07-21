@@ -66,7 +66,7 @@ public class UserController {
 
         userService.deleteCookies(username, password);
 
-        Optional<Account> user = userService.getLoggedUser();
+        Account user = userService.getCurrentUser(request);
         session.invalidate();
 
         String userAgent = request.getHeader("User-Agent");

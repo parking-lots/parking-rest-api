@@ -103,7 +103,7 @@ public class UserService {
         rememberMeLogin(username.toLowerCase(), password, request);
 
         String userAgent = request.getHeader("User-Agent");
-        Optional<Account> user = getLoggedUser();
+        Account user = getCurrentUser(request);
         logRepository.insertActionLog(ActionType.LOG_IN, null, null, null, null, null, user, userAgent);
 
         if (remember) {
@@ -246,11 +246,12 @@ public class UserService {
             accountRepository.attachParking(lotNumber, newAccount.getUsername(), request);
         }
 
-        Optional<Account> loggedUser = getLoggedUser();
+        Account currentUser = getCurrentUser(request);
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, currentUser, userAgent);
 
         //if admin is creating user, no email should be sent and email should be instantly verified
+        Optional<Account> loggedUser = getLoggedUser();
         if (loggedUser.isPresent()) {
             accountRepository.changeConfirmationFlag(newAccount.getUsername());
         } else {
@@ -268,7 +269,7 @@ public class UserService {
 
                 String userAgent = httpRequest.getHeader("User-Agent");
                 Optional<Account> loggedUser = getLoggedUser();
-                logRepository.insertActionLog(ActionType.EMAIL_CONFIRMED, user, null, null, null, null, loggedUser, userAgent);
+                logRepository.insertActionLog(ActionType.EMAIL_CONFIRMED, user, null, null, null, null, user, userAgent);
                 return true;
             }
         }
@@ -289,9 +290,9 @@ public class UserService {
 
         accountRepository.resetPassword(account.getUsername(), newPassword);
 
-        Account targetUser = accountRepository.findByUsername(account.getUsername());
+        Account user = accountRepository.findByUsername(account.getUsername());
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.PASSWORD_RESET, targetUser, null, null, null, null, null, userAgent);
+        logRepository.insertActionLog(ActionType.PASSWORD_RESET, user, null, null, null, null, user, userAgent);
 
         sendEmail(account, EmailMsgType.RESET_PASSWORD, httpRequest);
     }

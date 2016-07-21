@@ -51,11 +51,11 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         Update updateFields = new Update();
 
-        if (!newAccount.getFullName().equals(oldAccount.getFullName())) {
+        if (newAccount.getFullName() != null && !newAccount.getFullName().equals(oldAccount.getFullName())) {
             updateFields.set("fullName", newAccount.getFullName());
         }
         //if password received is not null - means it is changed
-        if (newAccount.getPassword() != null) {
+        if (newAccount.getPassword() != null && !ProfileHelper.checkPassword(newAccount.getPassword(), oldAccount.getPassword())) {
             updateFields.set("password", (ProfileHelper.encryptPassword(newAccount.getPassword())));
         }
 
