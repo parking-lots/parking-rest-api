@@ -81,7 +81,7 @@ public class AdminServiceTest {
         mockedLogList.add(mockedLog);
 
         given(accountRepository.findAll()).willReturn(mockedAccountList);
-        given(logRepository.findAll()).willReturn(mockedLogList);
+        given(logRepository.findAllByOrderByTimestampDesc()).willReturn(mockedLogList);
     }
 
     @Test
