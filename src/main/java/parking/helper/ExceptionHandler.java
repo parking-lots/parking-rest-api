@@ -39,6 +39,7 @@ public class ExceptionHandler {
             case USER_INACTIVE:
             case INVALID_EMAIL:
             case CONFIRMATION_FAILED:
+            case NOTHING_CHANGED:
                 return new UserException(getMessage(message.getMsg(), request));
             case PARKING_ALREADY_EXISTS:
             case PARKING_DOES_NOT_EXIST:

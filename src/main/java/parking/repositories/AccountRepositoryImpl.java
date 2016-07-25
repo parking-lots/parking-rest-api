@@ -51,23 +51,19 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
 
         Update updateFields = new Update();
 
-        if (!newAccount.getFullName().equals(oldAccount.getFullName())) {
+        if (newAccount.getFullName() != null && !newAccount.getFullName().equals(oldAccount.getFullName())) {
             updateFields.set("fullName", newAccount.getFullName());
         }
         //if password received is not null - means it is changed
-        if (newAccount.getPassword() != null) {
+        if (newAccount.getPassword() != null && !ProfileHelper.checkPassword(newAccount.getPassword(), oldAccount.getPassword())) {
             updateFields.set("password", (ProfileHelper.encryptPassword(newAccount.getPassword())));
         }
 
-        if (newAccount.getEmail() == null) {
-            updateFields.set("email", null);
-        } else if (!newAccount.getEmail().equals(oldAccount.getEmail())) {
+        if (newAccount.getEmail() != null && !newAccount.getEmail().equals(oldAccount.getEmail())) {
             updateFields.set("email", newAccount.getEmail());
         }
 
-        if (newAccount.getCarRegNoList() == null || newAccount.getCarRegNoList().size() == 0) {
-            updateFields.unset("carRegNoList");
-        } else if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
+        if (!oldAccount.getCarRegNoList().containsAll(newAccount.getCarRegNoList()) || !(newAccount.getCarRegNoList().containsAll(oldAccount.getCarRegNoList()))) {
             updateFields.set("carRegNoList", newAccount.getCarRegNoList());
         }
 
@@ -84,7 +80,7 @@ public class AccountRepositoryImpl implements CustomAccountRepository {
                 || updateFields.modifies("carRegNoList") || updateFields.modifies("status") || updateFields.modifies("active")) {
             operations.updateFirst(searchQuery, updateFields, Account.class);
         } else {
-            return;
+            throw exceptionHandler.handleException(ExceptionMessage.NOTHING_CHANGED, httpRequest);
         }
     }
 

@@ -13,10 +13,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
-import parking.beans.document.Account;
-import parking.beans.document.ParkingLot;
-import parking.beans.document.Permission;
-import parking.beans.document.Role;
+import parking.beans.document.*;
 import parking.beans.response.Profile;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.UserException;
@@ -103,7 +100,7 @@ public class UserService {
         rememberMeLogin(username.toLowerCase(), password, request);
 
         String userAgent = request.getHeader("User-Agent");
-        Optional<Account> user = getLoggedUser();
+        Account user = getCurrentUser(request);
         logRepository.insertActionLog(ActionType.LOG_IN, null, null, null, null, null, user, userAgent);
 
         if (remember) {
@@ -247,8 +244,18 @@ public class UserService {
         }
 
         Optional<Account> loggedUser = getLoggedUser();
+        Account currentUser = null;
+
+        //if admin is registering loggedUser will not be null
+        if (loggedUser.isPresent()) {
+            currentUser = loggedUser.get();
+        } else {
+            currentUser = newAccount;
+        }
+
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, null, loggedUser, userAgent);
+        LogMetaData logMetaData = getLogMetaData(newAccount);
+        logRepository.insertActionLog(ActionType.REGISTER_USER, newAccount, null, null, null, logMetaData, currentUser, userAgent);
 
         //if admin is creating user, no email should be sent and email should be instantly verified
         if (loggedUser.isPresent()) {
@@ -268,7 +275,7 @@ public class UserService {
 
                 String userAgent = httpRequest.getHeader("User-Agent");
                 Optional<Account> loggedUser = getLoggedUser();
-                logRepository.insertActionLog(ActionType.EMAIL_CONFIRMED, user, null, null, null, null, loggedUser, userAgent);
+                logRepository.insertActionLog(ActionType.EMAIL_CONFIRMED, user, null, null, null, null, user, userAgent);
                 return true;
             }
         }
@@ -289,9 +296,9 @@ public class UserService {
 
         accountRepository.resetPassword(account.getUsername(), newPassword);
 
-        Account targetUser = accountRepository.findByUsername(account.getUsername());
+        Account user = accountRepository.findByUsername(account.getUsername());
         String userAgent = httpRequest.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.PASSWORD_RESET, targetUser, null, null, null, null, null, userAgent);
+        logRepository.insertActionLog(ActionType.PASSWORD_RESET, user, null, null, null, null, user, userAgent);
 
         sendEmail(account, EmailMsgType.RESET_PASSWORD, httpRequest);
     }
@@ -300,6 +307,32 @@ public class UserService {
         if (email == null || !email.substring(email.indexOf("@") + 1).equals(EmailDomain.SWEDBANK_LT.getDomain())) {
             throw exceptionHandler.handleException(ExceptionMessage.INVALID_EMAIL, httpRequest);
         }
+    }
+
+    private LogMetaData getLogMetaData(Account newAccount) {
+
+        LogMetaData metaData = new LogMetaData();
+        Map<String, String> mapFullName = new HashMap<>();
+        mapFullName.put("new", newAccount.getFullName());
+        metaData.setFullName(mapFullName);
+
+        Map<String, String> mapUsername = new HashMap<>();
+        mapUsername.put("new", newAccount.getUsername());
+        metaData.setUserName(mapUsername);
+
+        Map<String, String> mapEmail = new HashMap<>();
+        mapEmail.put("new", newAccount.getEmail());
+        metaData.setEmail(mapEmail);
+
+        Map<String, String[]> carMap = new HashMap<>();
+        String[] newCarArr = new String[newAccount.getCarRegNoList().size()];
+        for (int i = 0; i < newAccount.getCarRegNoList().size(); i++) {
+            newCarArr[i] = newAccount.getCarRegNoList().get(i);
+        }
+        carMap.put("new", newCarArr);
+        metaData.setCars(carMap);
+
+        return metaData;
     }
 
     public void sendEmail(Account user, EmailMsgType messageType, HttpServletRequest request) throws ApplicationException {

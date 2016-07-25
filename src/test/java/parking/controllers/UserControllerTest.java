@@ -30,6 +30,7 @@ import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -122,6 +123,7 @@ public class UserControllerTest {
 
     @Test
     public void whenConfirmEmail() throws ApplicationException {
+        given(userService.confirmEmail("erwerewr3232", servletRequest)).willReturn(true);
         controller.confirmEmail("erwerewr3232", servletRequest);
     }
 

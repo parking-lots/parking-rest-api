@@ -22,7 +22,8 @@ public enum ExceptionMessage {
     COULD_NOT_SEND_EMAIL("could_not_send_email"),
     USER_INACTIVE("user_inactive"),
     INVALID_EMAIL("invalid_email"),
-    CONFIRMATION_FAILED("confirmation_failed");
+    CONFIRMATION_FAILED("confirmation_failed"),
+    NOTHING_CHANGED("nothing_changed");
 
     private String msg;
 
