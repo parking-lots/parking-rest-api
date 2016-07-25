@@ -24,18 +24,15 @@ public class TaskService {
     private LogRepository logRepository;
 
     public void notifyAboutNewUsers(HttpServletRequest httpRequest) throws ApplicationException {
-
         List<Log> logRecords = logRepository.findDailyConfirmations(ActionType.EMAIL_CONFIRMED, new Date());
 
         int numberOfUsers = logRecords.size();
-        if (numberOfUsers == 0) {
-            return;
-        }
-
         String subject;
         String message;
 
         switch (numberOfUsers) {
+            case 0:
+                return;
             case 1:
                 subject = "Today " + logRecords.size() + " new Parkinger user registered";
                 message = "<p>Hello,</p><p>There is " + logRecords.size() + " new user registered at Parkinger waiting for your approval.</p>" +
@@ -51,7 +48,7 @@ public class TaskService {
         }
 
         try {
-            mailService.sendEmail("lina.po@outlook.com", subject, message);
+            mailService.sendEmail("info@parkinger.net", subject, message);
         } catch (Exception e) {
             throw exceptionHandler.handleException(ExceptionMessage.COULD_NOT_SEND_EMAIL, httpRequest);
         }
