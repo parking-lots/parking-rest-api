@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
+import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
@@ -319,6 +320,20 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
 
         if (lots.size() == 0) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
+        }
+
+        boolean parkingAvailable = false;
+        for (ParkingLot lot : lots) {
+            for (AvailablePeriod availablePeriod : lot.getAvailablePeriods()) {
+                if (availablePeriod.getFreeFrom().compareTo(currentDate) <= 0 && availablePeriod.getFreeTill().compareTo(currentDate) >= 0) {
+                    parkingAvailable = true;
+                    break;
+                }
+            }
+        }
+
+        if (!parkingAvailable) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
         }
 
