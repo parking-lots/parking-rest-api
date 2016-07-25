@@ -161,7 +161,7 @@ public class ParkingServiceTest {
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(, dateList, httpRequest);
+        service.recallParking(mockedParkingLot, dateList, httpRequest);
 
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), dateList.get(0), httpRequest);
     }

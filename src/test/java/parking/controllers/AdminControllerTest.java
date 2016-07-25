@@ -11,6 +11,7 @@ import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
+import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.User;
 import parking.builders.AccountBuilder;
 import parking.builders.UserBuilder;
@@ -18,12 +19,16 @@ import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.service.AdminService;
 import parking.service.MailService;
+import parking.service.ParkingService;
 import parking.service.RegistrationService;
+import parking.utils.EliminateDateTimestamp;
 import parking.utils.ParkingType;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
@@ -42,6 +47,8 @@ public class AdminControllerTest {
     @Mock
     private AdminService adminService;
     @Mock
+    private ParkingService parkingService;
+    @Mock
     private RegistrationService registrationService;
     @Mock
     private HttpServletRequest httpRequest;
@@ -49,14 +56,26 @@ public class AdminControllerTest {
     private AccountRepository accountRepository;
     @Mock
     private Account mockedAccount;
+    @Mock
+    private ParkingLot mockedParkingLot;
 
     private List<User> mockedUserList = new ArrayList<>();
+
+    private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
+    private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+    private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
 
     @Before
     public void initMockData() {
         mockedAccount.setUsername("username");
         mockedAccount.setPassword("password");
+        mockedParkingLot.setNumber(111);
+        mockedAccount.setParking(mockedParkingLot);
         mockedUserList.add(new UserBuilder().build());
+
+        LinkedList<Date> dateList = new LinkedList<>();
+        dateList.add(today);
+        setUnusedRequest.setAvailableDates(dateList);
     }
 
     @Test
@@ -108,5 +127,12 @@ public class AdminControllerTest {
     public void whenGettingParkingsCallService() {
         adminController.getParkings(any(ParkingType.class));
         verify(adminService, times(1)).getParkings(any(ParkingType.class));
+    }
+
+    @Test
+    public void whenFreeUsersParkingShouldCallService() throws ApplicationException {
+        given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
+        adminController.freeUsersParking(setUnusedRequest, "username", httpRequest);
+        verify(parkingService).freeOwnersParking(mockedAccount, mockedAccount.getParking().getNumber(), today, today, httpRequest);
     }
 }
