@@ -15,7 +15,6 @@ import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.RecallParking;
-import parking.beans.request.SetUnusedRequest;
 import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -162,7 +161,7 @@ public class ParkingServiceTest {
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.recallParking(dateList, httpRequest);
+        service.recallParking(, dateList, httpRequest);
 
         verify(lotsRepository).recallParking(mockedAccount.getParking().getNumber(), dateList.get(0), httpRequest);
     }

@@ -91,12 +91,7 @@ public class ParkingService {
         lotsRepository.recallParking(parking.getNumber(), freeFrom, freeTill);
     }
 
-    public void recallParking(List<Date> availableDates, HttpServletRequest request) throws ApplicationException {
-
-        ParkingLot parking = getParkingNumberByUser();
-        if (parking == null) {
-            return;
-        }
+    public void recallParking(ParkingLot parking, List<Date> availableDates, HttpServletRequest request) throws ApplicationException {
 
         for (Date d : availableDates) {
             lotsRepository.checkRecallDate(parking.getNumber(), d, request);

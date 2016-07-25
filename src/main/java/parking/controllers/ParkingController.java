@@ -64,7 +64,11 @@ public class ParkingController {
 
     @RequestMapping(value = "/availability", method = RequestMethod.DELETE)
     public void recallParking(@Valid @RequestBody RecallParking recallParking, HttpServletRequest request) throws ApplicationException {
-        parkingService.recallParking(recallParking.getAvailableDates(), request);
+        ParkingLot parking = parkingService.getParkingNumberByUser();
+        if (parking == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, request);
+        }
+        parkingService.recallParking(parking, recallParking.getAvailableDates(), request);
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)

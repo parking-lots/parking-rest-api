@@ -1,6 +1,5 @@
 package parking.controllers;
 
-import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +15,6 @@ import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
-import parking.service.MailService;
 import parking.service.ParkingService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -111,8 +109,8 @@ public class ParkingControllerTest {
     public void whenRecallParkingShoulCallService() throws ApplicationException {
         List<Date> dateList = new ArrayList<>();
         dateList.add(new Date());
-        parkingService.recallParking(dateList, httpRequest);
-        verify(parkingService, times(1)).recallParking(dateList, httpRequest);
+        parkingService.recallParking(, dateList, httpRequest);
+        verify(parkingService, times(1)).recallParking(, dateList, httpRequest);
     }
 
     @Test
