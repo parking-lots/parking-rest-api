@@ -13,9 +13,11 @@ import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
+import parking.helper.AvailableDatesConverter;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
 import parking.service.ParkingService;
+import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -28,11 +30,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-
-import parking.helper.*;
-import parking.utils.EliminateDateTimestamp;
 
 
 @RunWith(MockitoJUnitRunner.class)
