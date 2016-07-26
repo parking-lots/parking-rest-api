@@ -109,8 +109,8 @@ public class ParkingControllerTest {
     public void whenRecallParkingShoulCallService() throws ApplicationException {
         List<Date> dateList = new ArrayList<>();
         dateList.add(new Date());
-        parkingService.recallParking(, dateList, httpRequest);
-        verify(parkingService, times(1)).recallParking(, dateList, httpRequest);
+        parkingService.recallParking(mockedParkingLot, dateList, httpRequest);
+        verify(parkingService, times(1)).recallParking(mockedParkingLot, dateList, httpRequest);
     }
 
     @Test
