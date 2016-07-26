@@ -84,6 +84,7 @@ public class UserControllerTest {
         when(servletRequest.getCookies()).thenReturn(new Cookie[]{ck1, ck2});
 
         when(exceptionHandler.handleException(ExceptionMessage.NOT_LOGGED, servletRequest)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.CONFIRMATION_FAILED, servletRequest)).thenReturn(new ApplicationException("message"));
     }
 
     @Test
@@ -123,11 +124,15 @@ public class UserControllerTest {
 
     @Test
     public void whenConfirmEmail() throws ApplicationException {
-        given(userService.confirmEmail("erwerewr3232", servletRequest)).willReturn(true);
-        controller.confirmEmail("erwerewr3232", servletRequest);
+        try {
+            controller.confirmEmail("erwerewr3232", servletRequest);
+        } catch (ApplicationException e) {
+        }
+        verify(userService).confirmEmail("erwerewr3232", servletRequest);
     }
 
-    @Test public void whenResetPasswordShouldCallServiceMethod() throws MessagingException, ApplicationException {
+    @Test
+    public void whenResetPasswordShouldCallServiceMethod() throws MessagingException, ApplicationException {
         controller.resetPassword(mockedResetPassword, servletRequest);
         verify(userService, times(1)).resetPassword(mockedUser.getEmail(), servletRequest);
     }
