@@ -7,6 +7,7 @@ import parking.beans.document.LogMetaData;
 import parking.utils.ActionType;
 
 import java.util.Date;
+import java.util.List;
 
 public interface CustomLogRepository {
     public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Account user, String channel);
