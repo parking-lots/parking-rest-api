@@ -12,6 +12,7 @@ import parking.helper.ToolHelper;
 import parking.utils.ActionType;
 import parking.utils.EliminateDateTimestamp;
 
+import java.util.Date;
 import java.util.*;
 
 public class LogRepositoryImpl implements CustomLogRepository {
@@ -23,7 +24,7 @@ public class LogRepositoryImpl implements CustomLogRepository {
         this.operations = operations;
     }
 
-    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Optional<Account> user, String userAgent) {
+    public void insertActionLog(ActionType actionType, Account targetUser, Integer lotNumber, Date from, Date to, LogMetaData metaData, Account user, String userAgent) {
         Log log = new Log();
 
         if (actionType != null)
@@ -47,8 +48,8 @@ public class LogRepositoryImpl implements CustomLogRepository {
         if (userAgent != null)
             log.setUserAgent(userAgent);
 
-        if (user.isPresent())
-            log.setUser(user.get());
+        if (user != null)
+            log.setUser(user);
 
         log.setTimestamp(new Date());
 

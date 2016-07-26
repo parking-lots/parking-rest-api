@@ -23,8 +23,10 @@ public class Account {
     private String username;
     @Size(min = 6, max = 10)
     private String password;
+    @NotNull
     @Email
     private String email;
+    @NotNull
     private List<String> carRegNoList = new ArrayList<>();
     @DBRef
     private List<Role> roles = new ArrayList<Role>();

@@ -7,6 +7,6 @@ import java.util.List;
 
 
 public interface LogRepository extends MongoRepository<Log, String>, CustomLogRepository {
-    public List<Log> findAll();
+    public List<Log> findAllByOrderByTimestampDesc();
 
 }

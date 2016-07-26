@@ -224,23 +224,15 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenLoginWithAnyRememberMeOptionShouldSucceed() throws ApplicationException {
+    public void whenLoginShouldCallRememberMeLogin() throws ApplicationException {
         String username = MOCKED_USER_NAME;
         String password = "****";
 
         given(authentication.getName()).willReturn(null);
-        LoginForm loginForm = new LoginForm();
-        loginForm.setUsername(username);
-        loginForm.setPassword(password);
-        loginForm.setRemember(true);
-
-        String realLoginName = "lina";
-        mockedUser = new Account("Lina Po", realLoginName, password);
-        given(accountRepository.findByUsername(realLoginName)).willReturn(mockedUser);
         given(request.getSession(true)).willReturn(mock(HttpSession.class));
         given(request.getSession()).willReturn(mock(HttpSession.class));
 
-        service.login(loginForm.getUsername(), loginForm.getPassword(), loginForm.getRemember(), request);
+        service.rememberMeLogin(username, password, request);
     }
 
     @Test(expected = ApplicationException.class)
@@ -337,7 +329,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenResetPasswordWithValidEmailShouldSucceed() throws MessagingException, ApplicationException{
+    public void whenResetPasswordWithValidEmailShouldSucceed() throws MessagingException, ApplicationException {
         given(accountRepository.findByEmail("name.surname@swedbank.lt")).willReturn(mockedUser);
         service.resetPassword("name.surname@swedbank.lt", request);
     }
