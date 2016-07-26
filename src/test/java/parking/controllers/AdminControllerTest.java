@@ -54,23 +54,20 @@ public class AdminControllerTest {
     private HttpServletRequest httpRequest;
     @Mock
     private AccountRepository accountRepository;
-    @Mock
-    private Account mockedAccount;
-    @Mock
-    private ParkingLot mockedParkingLot;
 
     private List<User> mockedUserList = new ArrayList<>();
-
     private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
     private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
+    private Account mockedAccount;
+    private ParkingLot mockedParkingLot;
 
     @Before
     public void initMockData() {
-        mockedAccount.setUsername("username");
-        mockedAccount.setPassword("password");
-        mockedParkingLot.setNumber(111);
+        mockedAccount = new Account("name", "username", "pass");
+        mockedParkingLot = new ParkingLot(111, -1);
         mockedAccount.setParking(mockedParkingLot);
+        mockedParkingLot.setOwner(mockedAccount);
         mockedUserList.add(new UserBuilder().build());
 
         LinkedList<Date> dateList = new LinkedList<>();
@@ -113,7 +110,8 @@ public class AdminControllerTest {
     @Test
     public void whenEditUserShouldCallService() throws ApplicationException, MessagingException {
         EditUserForm editUserForm = new EditUserForm();
-        adminController.editUser(editUserForm, "username", mock(HttpServletRequest.class));
+        adminController.editUser(editUserForm, "username", httpRequest);
+        verify(adminService).editUser(editUserForm, "username", httpRequest);
     }
 
     @Test
@@ -131,8 +129,8 @@ public class AdminControllerTest {
 
     @Test
     public void whenFreeUsersParkingShouldCallService() throws ApplicationException {
-        given(accountRepository.findByUsername("username")).willReturn(mockedAccount);
-        adminController.freeUsersParking(setUnusedRequest, "username", httpRequest);
+        given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
+        adminController.freeUsersParking(setUnusedRequest, mockedAccount.getUsername(), httpRequest);
         verify(parkingService).freeOwnersParking(mockedAccount, mockedAccount.getParking().getNumber(), today, today, httpRequest);
     }
 }
