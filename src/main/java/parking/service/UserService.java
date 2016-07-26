@@ -347,7 +347,7 @@ public class UserService {
                 break;
             case EMAIL_CONFIRMED:
                 subject = "Your email confirmed";
-                message = "<p>We are happy to inform you that your e-mail has been successfully verified.</p>" +
+                message = "<p>Your e-mail has been successfully verified.</p>" +
                         "<p>We will inform you when administrator will register your car numbers and activate your account.";
                 break;
             case ACOUNT_ACTIVATED:
