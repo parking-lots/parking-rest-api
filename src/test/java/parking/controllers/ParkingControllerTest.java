@@ -113,13 +113,13 @@ public class ParkingControllerTest {
 
     @Test
     public void whenReserveShouldCallService() throws ApplicationException {
-        parkingService.reserve(mockedParkingLot.getNumber(), httpRequest);
-        verify(parkingService, times(1)).reserve(mockedParkingLot.getNumber(), httpRequest);
+        parkingService.reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
+        verify(parkingService, times(1)).reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
     }
 
     @Test
     public void whenCancelReservationShouldRecallParking() throws ApplicationException {
-        parkingService.cancelReservation(httpRequest);
-        verify(parkingService, times(1)).cancelReservation(httpRequest);
+        parkingService.cancelReservation(mockedParkingLot, mockedAccount, httpRequest);
+        verify(parkingService, times(1)).cancelReservation(mockedParkingLot, mockedAccount, httpRequest);
     }
 }
