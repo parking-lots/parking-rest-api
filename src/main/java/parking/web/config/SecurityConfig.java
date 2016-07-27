@@ -51,7 +51,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/admin/users/{username:.+}/parking/availability").hasRole("CAN_CREATE_NEW_USER")
                 .antMatchers(HttpMethod.GET, "/admin/users").hasRole("CAN_CREATE_NEW_USER")
                 .antMatchers(HttpMethod.PUT, "/admin/users").hasRole("CAN_CREATE_NEW_USER")
-                .antMatchers(HttpMethod.GET, "/admin/log").hasRole("CAN_CREATE_NEW_USER");
+                .antMatchers(HttpMethod.GET, "/admin/log").hasRole("CAN_CREATE_NEW_USER")
+                .antMatchers(HttpMethod.PUT, "/admin/reservation").hasRole("CAN_CREATE_NEW_USER")
+                .antMatchers(HttpMethod.DELETE, "/admin/reservation").hasRole("CAN_CREATE_NEW_USER")
+        ;
 
     }
 
