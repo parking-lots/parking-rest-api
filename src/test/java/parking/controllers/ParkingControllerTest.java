@@ -60,13 +60,14 @@ public class ParkingControllerTest {
     private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
     private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
+    private LinkedList<Date> dateList = new LinkedList<>();
+
 
     @Before
     public void initMockData() {
         mockedAccount.setUsername("username");
         mockedAccount.setParking(mockedParkingLot);
 
-        LinkedList<Date> dateList = new LinkedList<>();
         dateList.add(today);
         setUnusedRequest.setAvailableDates(dateList);
 
@@ -99,8 +100,7 @@ public class ParkingControllerTest {
 
         when(parkingService.getParkingNumberByUser()).thenReturn(mockedParkingLot);
         controller.freeOwnersParking(setUnusedRequest, httpRequest);
-        verify(parkingService).validatePeriod(mockedParkingLot.getNumber(), today, today, httpRequest);
-        verify(parkingService).freeOwnersParking(mockedAccount, mockedParkingLot.getNumber(), today, today, httpRequest);
+        verify(parkingService).freeOwnersParking(mockedAccount, mockedParkingLot.getNumber(), dateList, httpRequest);
     }
 
     @Test

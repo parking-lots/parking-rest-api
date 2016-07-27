@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.Account;
 import parking.beans.document.AvailablePeriod;
-import parking.beans.document.ParkingLot;
 import parking.beans.request.*;
 import parking.beans.response.FreeParkingLot;
 import parking.beans.response.LogResponse;
@@ -90,30 +89,10 @@ public class AdminController {
         if (owner == null) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, httpRequest);
         }
-
         if (owner.getParking() == null) {
             throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest);
         }
-
-        if (ToolHelper.hasDuplicates(request.getAvailableDates())) {
-            throw exceptionHandler.handleException(ExceptionMessage.DUBLICATE_DATES, httpRequest);
-        }
-
-        AvailableDatesConverter converter = new AvailableDatesConverter();
-        List<AvailablePeriod> availablePeriods;
-
-        if (request.getAvailableDates().size() > 0) {
-
-            availablePeriods = converter.convertToInterval(request.getAvailableDates());
-
-            for (AvailablePeriod p : availablePeriods) {
-                parkingService.validatePeriod(owner.getParking().getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
-            }
-
-            for (AvailablePeriod p : availablePeriods) {
-                parkingService.freeOwnersParking(owner.getParking().getOwner(), owner.getParking().getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
-            }
-        }
+        parkingService.freeOwnersParking(owner, owner.getParking().getNumber(), request.getAvailableDates(), httpRequest);
     }
 
     @RequestMapping(value = "/users/{username:.+}/parking/availability", method = RequestMethod.DELETE)
@@ -121,10 +100,6 @@ public class AdminController {
         Account owner = accountRepository.findByUsername(username);
         if (owner == null) {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
-        }
-
-        if (owner.getParking() == null) {
-            throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, request);
         }
 
         parkingService.recallParking(owner.getParking(), recallParking.getAvailableDates(), request);

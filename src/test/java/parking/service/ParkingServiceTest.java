@@ -1,5 +1,6 @@
 package parking.service;
 
+import com.sun.tools.corba.se.idl.toJavaPortable.Helper;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import parking.builders.LotsBuilder;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
 import parking.helper.ExceptionMessage;
+import parking.helper.ToolHelper;
 import parking.repositories.AccountRepository;
 import parking.repositories.LogRepository;
 import parking.repositories.LotsRepository;
@@ -64,6 +66,7 @@ public class ParkingServiceTest {
     private ParkingLot mockedParkingLot;
     private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
     private Date mockDate = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
+    private LinkedList<Date> dateList = new LinkedList<>();
 
     @Before
     public void initMock() throws ApplicationException {
@@ -72,6 +75,7 @@ public class ParkingServiceTest {
 
         when(exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest)).thenReturn(new ApplicationException("message"));
         when(exceptionHandler.handleException(ExceptionMessage.PARKING_ALREADY_EXISTS, httpRequest)).thenReturn(new ApplicationException("message"));
+        when(exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest)).thenReturn(new ApplicationException("message"));
 
         SecurityContextHolder.setContext(mockSecurityContext);
 
@@ -95,6 +99,8 @@ public class ParkingServiceTest {
         mockedParkingLot.setOwner(mockedAccount);
         mockedParkingLot.setAvailablePeriods(availablePeriods);
         mockedAccount.setParking(mockedParkingLot);
+
+        dateList.add(new Date());
     }
 
     @Test
@@ -116,11 +122,11 @@ public class ParkingServiceTest {
 
     @Test
     public void whenOwnerFreeUpParkingLot() throws ApplicationException {
-        Date from = new Date();
-        Date to = new Date();
+        Date from, to;
+        from = to = ToolHelper.formatDate(new Date());
 
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
-        service.freeOwnersParking(mockedParkingLot.getOwner(), mockedParkingLot.getNumber(), from, to, httpRequest);
+        service.freeOwnersParking(mockedParkingLot.getOwner(), mockedParkingLot.getNumber(), dateList, httpRequest);
 
         verify(lotsRepository).freeOwnersParking(
                 eq(mockedAccount.getParking().getNumber()),
@@ -129,12 +135,12 @@ public class ParkingServiceTest {
                 eq(httpRequest));
     }
 
-    @Test
+    @Test(expected = ApplicationException.class)
     public void whenCustomerDoesNotHaveParkingAssigned() throws ApplicationException {
         mockedAccount.setParking(null);
         given(accountRepository.findByUsername(CURRENT_USER_NAME)).willReturn(mockedAccount);
 
-        service.freeOwnersParking(null, mockedParkingLot.getNumber(), new Date(), new Date(), httpRequest);
+        service.freeOwnersParking(mockedAccount, mockedParkingLot.getNumber(), dateList, httpRequest);
         verify(lotsRepository, never()).freeOwnersParking(200, new Date(), new Date(), httpRequest);
     }
 

@@ -13,12 +13,10 @@ import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.User;
-import parking.builders.AccountBuilder;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
 import parking.service.AdminService;
-import parking.service.MailService;
 import parking.service.ParkingService;
 import parking.service.RegistrationService;
 import parking.utils.EliminateDateTimestamp;
@@ -61,6 +59,8 @@ public class AdminControllerTest {
     private Date today = eliminateDateTimestamp.formatDateForDatabase(new Date()).getTime();
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
+    private LinkedList<Date> dateList = new LinkedList<>();
+
 
     @Before
     public void initMockData() {
@@ -70,7 +70,6 @@ public class AdminControllerTest {
         mockedParkingLot.setOwner(mockedAccount);
         mockedUserList.add(new UserBuilder().build());
 
-        LinkedList<Date> dateList = new LinkedList<>();
         dateList.add(today);
         setUnusedRequest.setAvailableDates(dateList);
     }
@@ -131,6 +130,6 @@ public class AdminControllerTest {
     public void whenFreeUsersParkingShouldCallService() throws ApplicationException {
         given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
         adminController.freeUsersParking(setUnusedRequest, mockedAccount.getUsername(), httpRequest);
-        verify(parkingService).freeOwnersParking(mockedAccount, mockedAccount.getParking().getNumber(), today, today, httpRequest);
+        verify(parkingService).freeOwnersParking(mockedAccount, mockedAccount.getParking().getNumber(), dateList, httpRequest);
     }
 }

@@ -10,7 +10,7 @@ public class User extends Response {
     private String fullName;
     private String username;
     private String email;
-    private String number;
+    private Parking parking;
     private List<String> carRegNoList = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
     private boolean active;
@@ -20,8 +20,11 @@ public class User extends Response {
         this.fullName = account.getFullName();
         this.username = account.getUsername();
         this.email = account.getEmail();
-        this.number = (account.getParking() == null) ? "" : account.getParking().getNumber().toString();
         this.carRegNoList = account.getCarRegNoList();
+
+        if (account.getParking() != null) {
+            this.parking = new Parking(account.getParking(), true);
+        }
 
         if (!account.getRoles().isEmpty()) {
             for (Role role : account.getRoles()) {
@@ -57,12 +60,12 @@ public class User extends Response {
         this.email = email;
     }
 
-    public String getNumber() {
-        return number;
+    public Parking getParking() {
+        return parking;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setParking(Parking parking) {
+        this.parking = parking;
     }
 
     public List<String> getCarRegNoList() {
@@ -103,7 +106,7 @@ public class User extends Response {
                 "fullName='" + fullName + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", number='" + number + '\'' +
+                ", number='" + parking.getNumber() + '\'' +
                 ", carRegNoList=" + carRegNoList +
                 ", roles=" + roles +
                 ", active=" + active +

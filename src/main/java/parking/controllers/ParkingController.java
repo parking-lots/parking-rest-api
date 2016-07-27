@@ -38,37 +38,14 @@ public class ParkingController {
         ParkingLot parking = parkingService.getParkingNumberByUser();
 
         if (parking == null) {
-            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
+            throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest);
         }
-
-        if (ToolHelper.hasDuplicates(request.getAvailableDates())) {
-            throw exceptionHandler.handleException(ExceptionMessage.DUBLICATE_DATES, httpRequest);
-        }
-
-        AvailableDatesConverter converter = new AvailableDatesConverter();
-        List<AvailablePeriod> availablePeriods;
-
-        if (request.getAvailableDates().size() > 0) {
-
-            availablePeriods = converter.convertToInterval(request.getAvailableDates());
-
-            for (AvailablePeriod p : availablePeriods) {
-                parkingService.validatePeriod(parking.getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
-            }
-
-            for (AvailablePeriod p : availablePeriods) {
-                parkingService.freeOwnersParking(parking.getOwner(), parking.getNumber(), p.getFreeFrom(), p.getFreeTill(), httpRequest);
-            }
-        }
+        parkingService.freeOwnersParking(parking.getOwner(), parking.getNumber(), request.getAvailableDates(), httpRequest);
     }
 
     @RequestMapping(value = "/availability", method = RequestMethod.DELETE)
     public void recallParking(@Valid @RequestBody RecallParking recallParking, HttpServletRequest request) throws ApplicationException {
-        ParkingLot parking = parkingService.getParkingNumberByUser();
-        if (parking == null) {
-            throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, request);
-        }
-        parkingService.recallParking(parking, recallParking.getAvailableDates(), request);
+        parkingService.recallParking(parkingService.getParkingNumberByUser(), recallParking.getAvailableDates(), request);
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)
