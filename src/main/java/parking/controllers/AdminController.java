@@ -2,14 +2,18 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import parking.beans.request.AttachParking;
-import parking.beans.request.EditUserForm;
-import parking.beans.request.RegistrationForm;
+import parking.beans.document.Account;
+import parking.beans.document.AvailablePeriod;
+import parking.beans.request.*;
 import parking.beans.response.FreeParkingLot;
 import parking.beans.response.LogResponse;
 import parking.beans.response.Profile;
 import parking.beans.response.User;
 import parking.exceptions.ApplicationException;
+import parking.helper.*;
+import parking.helper.ExceptionHandler;
+import parking.repositories.AccountRepository;
+import parking.repositories.LotsRepository;
 import parking.service.AdminService;
 import parking.service.ParkingService;
 import parking.service.RegistrationService;
@@ -28,9 +32,14 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
-
     @Autowired
     private ParkingService parkingService;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private LotsRepository lotsRepository;
+    @Autowired
+    private ExceptionHandler exceptionHandler;
 
     @RequestMapping(value = "/users", method = RequestMethod.PUT)
     public Profile createUser(@Valid @RequestBody RegistrationForm form, HttpServletRequest request) throws ApplicationException, MessagingException {
@@ -72,5 +81,27 @@ public class AdminController {
     @RequestMapping(value = "/log", method = RequestMethod.GET)
     public List<LogResponse> displayLog() throws ApplicationException {
         return adminService.getLog();
+    }
+
+    @RequestMapping(value = "/users/{username:.+}/parking/availability", method = RequestMethod.PUT)
+    public void freeUsersParking(@Valid @RequestBody SetUnusedRequest request, @PathVariable(value = "username") String username, HttpServletRequest httpRequest) throws ApplicationException {
+        Account owner = accountRepository.findByUsername(username);
+        if (owner == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, httpRequest);
+        }
+        if (owner.getParking() == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest);
+        }
+        parkingService.freeOwnersParking(owner, owner.getParking().getNumber(), request.getAvailableDates(), httpRequest);
+    }
+
+    @RequestMapping(value = "/users/{username:.+}/parking/availability", method = RequestMethod.DELETE)
+    public void recallParking(@Valid @RequestBody RecallParking recallParking, @PathVariable(value = "username") String username, HttpServletRequest request) throws ApplicationException {
+        Account owner = accountRepository.findByUsername(username);
+        if (owner == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+        }
+
+        parkingService.recallParking(owner.getParking(), recallParking.getAvailableDates(), request);
     }
 }

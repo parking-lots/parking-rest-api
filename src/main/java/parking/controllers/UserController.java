@@ -88,7 +88,7 @@ public class UserController {
     @RequestMapping(value = "/{confirmationKey}", method = RequestMethod.POST)
     public ConfirmationResponse confirmEmail(@PathVariable(value = "confirmationKey") String confirmationKey, HttpServletRequest request) throws ApplicationException {
         if (userService.confirmEmail(confirmationKey, request)) {
-            return new ConfirmationResponse("Email is confirmed");
+            return new ConfirmationResponse("Your e-mail has been successfully verified. We will inform you when administrator will register your car numbers and activate your account.");
         } else {
             throw exceptionHandler.handleException(ExceptionMessage.CONFIRMATION_FAILED, request);
         }
