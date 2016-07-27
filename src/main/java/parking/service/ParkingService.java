@@ -20,10 +20,7 @@ import parking.utils.ActionType;
 import parking.utils.EliminateDateTimestamp;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,18 +135,24 @@ public class ParkingService {
         }
     }
 
-    public void reserve(Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
+    public void reserve(Integer lotNumber, Account account, HttpServletRequest httpRequest) throws ApplicationException {
+
+        if (account == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, httpRequest);
+        }
+
         ParkingLot lot = lotsRepository.findByNumber(lotNumber);
 
         if (lot == null) {
             throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, httpRequest);
         } else {
-            lotsRepository.reserve(lotNumber, userService.getCurrentUser(httpRequest), httpRequest);
+            lotsRepository.reserve(lotNumber, account, httpRequest);
 
             Date currentDate = ToolHelper.getCurrentDate();
             Account user = userService.getCurrentUser(httpRequest);
             String userAgent = httpRequest.getHeader("User-Agent");
-            logRepository.insertActionLog(ActionType.RESERVE, lot.getOwner(), lot.getNumber(), currentDate, currentDate, null, user, userAgent);
+
+            logRepository.insertActionLog(ActionType.RESERVE, account, lot.getNumber(), currentDate, currentDate, null, user, userAgent);
         }
     }
 
@@ -175,15 +178,21 @@ public class ParkingService {
         return parkingLot.get();
     }
 
-    public void cancelReservation(HttpServletRequest request) throws ApplicationException {
-        ParkingLot lot = lotsRepository.findByUser(userService.getCurrentUser(request));
+    public void cancelReservation(ParkingLot parkingLot, Account account, HttpServletRequest request) throws ApplicationException {
 
-        lotsRepository.cancelReservation(userService.getCurrentUser(request));
+        if (account == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+        }
+        if (parkingLot == null) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_DOES_NOT_EXIST, request);
+        }
+
+        lotsRepository.cancelReservation(account);
 
         Date currentDate = ToolHelper.getCurrentDate();
         Account user = userService.getCurrentUser(request);
         String userAgent = request.getHeader("User-Agent");
-        logRepository.insertActionLog(ActionType.UNRESERVE, lot.getOwner(), lot.getNumber(), currentDate, currentDate, null, user, userAgent);
+        logRepository.insertActionLog(ActionType.UNRESERVE, account, parkingLot.getNumber(), currentDate, currentDate, null, user, userAgent);
     }
 
     public ParkingLot setOwner(Account account, ParkingLot parkingLot) {

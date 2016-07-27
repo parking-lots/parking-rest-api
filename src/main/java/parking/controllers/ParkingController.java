@@ -2,14 +2,16 @@ package parking.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import parking.beans.document.AvailablePeriod;
+import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.RecallParking;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.Parking;
 import parking.exceptions.ApplicationException;
 import parking.helper.*;
+import parking.repositories.LotsRepository;
 import parking.service.ParkingService;
+import parking.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -22,6 +24,10 @@ import java.util.stream.Collectors;
 public class ParkingController {
     @Autowired
     private ParkingService parkingService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private LotsRepository lotsRepository;
     @Autowired
     private parking.helper.ExceptionHandler exceptionHandler;
 
@@ -50,11 +56,14 @@ public class ParkingController {
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)
     public void reserveOwnersParking(@PathVariable(value = "lotNumber") Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
-        parkingService.reserve(lotNumber, httpRequest);
+        Account account = userService.getCurrentUser(httpRequest);
+        parkingService.reserve(lotNumber, account, httpRequest);
     }
 
     @RequestMapping(value = "/reservation", method = RequestMethod.DELETE)
     public void cancelReservation(HttpServletRequest request) throws ApplicationException {
-        parkingService.cancelReservation(request);
+        Account account = userService.getCurrentUser(request);
+        ParkingLot lot = lotsRepository.findByUser(account);
+        parkingService.cancelReservation(lot, account, request);
     }
 }

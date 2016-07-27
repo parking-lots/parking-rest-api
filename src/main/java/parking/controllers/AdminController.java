@@ -3,7 +3,7 @@ package parking.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import parking.beans.document.Account;
-import parking.beans.document.AvailablePeriod;
+import parking.beans.document.ParkingLot;
 import parking.beans.request.*;
 import parking.beans.response.FreeParkingLot;
 import parking.beans.response.LogResponse;
@@ -103,5 +103,18 @@ public class AdminController {
         }
 
         parkingService.recallParking(owner.getParking(), recallParking.getAvailableDates(), request);
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.PUT)
+    public void reserveOwnersParking(@Valid @RequestBody ReserveByAdmin reserveByAdmin, HttpServletRequest httpRequest) throws ApplicationException {
+        Account account = accountRepository.findByUsername(reserveByAdmin.getUsername());
+        parkingService.reserve(reserveByAdmin.getLotNumber(), account, httpRequest);
+    }
+
+    @RequestMapping(value = "/reservation", method = RequestMethod.DELETE)
+    public void cancelReservation(@Valid @RequestBody ReserveByAdmin reserveByAdmin, HttpServletRequest request) throws ApplicationException {
+        Account account = accountRepository.findByUsername(reserveByAdmin.getUsername());
+        ParkingLot parkingLot = lotsRepository.findByNumber(reserveByAdmin.getLotNumber());
+        parkingService.cancelReservation(parkingLot, account, request);
     }
 }

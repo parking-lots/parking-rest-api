@@ -11,11 +11,13 @@ import parking.beans.document.Account;
 import parking.beans.document.ParkingLot;
 import parking.beans.request.EditUserForm;
 import parking.beans.request.RegistrationForm;
+import parking.beans.request.ReserveByAdmin;
 import parking.beans.request.SetUnusedRequest;
 import parking.beans.response.User;
 import parking.builders.UserBuilder;
 import parking.exceptions.ApplicationException;
 import parking.repositories.AccountRepository;
+import parking.repositories.LotsRepository;
 import parking.service.AdminService;
 import parking.service.ParkingService;
 import parking.service.RegistrationService;
@@ -52,6 +54,8 @@ public class AdminControllerTest {
     private HttpServletRequest httpRequest;
     @Mock
     private AccountRepository accountRepository;
+    @Mock
+    private LotsRepository lotsRepository;
 
     private List<User> mockedUserList = new ArrayList<>();
     private SetUnusedRequest setUnusedRequest = new SetUnusedRequest();
@@ -60,6 +64,7 @@ public class AdminControllerTest {
     private Account mockedAccount;
     private ParkingLot mockedParkingLot;
     private LinkedList<Date> dateList = new LinkedList<>();
+    private ReserveByAdmin reserveByAdmin = new ReserveByAdmin();
 
 
     @Before
@@ -69,6 +74,9 @@ public class AdminControllerTest {
         mockedAccount.setParking(mockedParkingLot);
         mockedParkingLot.setOwner(mockedAccount);
         mockedUserList.add(new UserBuilder().build());
+
+        reserveByAdmin.setUsername(mockedAccount.getUsername());
+        reserveByAdmin.setLotNumber(111);
 
         dateList.add(today);
         setUnusedRequest.setAvailableDates(dateList);
@@ -131,5 +139,20 @@ public class AdminControllerTest {
         given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
         adminController.freeUsersParking(setUnusedRequest, mockedAccount.getUsername(), httpRequest);
         verify(parkingService).freeOwnersParking(mockedAccount, mockedAccount.getParking().getNumber(), dateList, httpRequest);
+    }
+
+    @Test
+    public void whenReserveShouldCallService() throws ApplicationException {
+        given(accountRepository.findByUsername(reserveByAdmin.getUsername())).willReturn(mockedAccount);
+        adminController.reserveOwnersParking(reserveByAdmin, httpRequest);
+        verify(parkingService).reserve(reserveByAdmin.getLotNumber(), mockedAccount, httpRequest);
+    }
+
+    @Test
+    public void whenCancelReservationShouldCallService() throws ApplicationException {
+        given(accountRepository.findByUsername(reserveByAdmin.getUsername())).willReturn(mockedAccount);
+        given(lotsRepository.findByNumber(reserveByAdmin.getLotNumber())).willReturn(mockedParkingLot);
+        adminController.cancelReservation(reserveByAdmin, httpRequest);
+        verify(parkingService).cancelReservation(mockedParkingLot, mockedAccount, httpRequest);
     }
 }

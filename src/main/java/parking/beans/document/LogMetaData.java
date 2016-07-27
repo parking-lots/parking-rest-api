@@ -57,4 +57,8 @@ public class LogMetaData {
     public void setActive(Map<String, Boolean> active) {
         this.active = active;
     }
+
+    public String getPasswordStatus() {
+        return passwordStatus;
+    }
 }

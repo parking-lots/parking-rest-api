@@ -1,6 +1,5 @@
 package parking.service;
 
-import com.sun.tools.corba.se.idl.toJavaPortable.Helper;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -187,7 +186,7 @@ public class ParkingServiceTest {
     public void whenUserReserveParkingLot() throws ApplicationException {
         given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(mockedParkingLot);
 
-        service.reserve(mockedParkingLot.getNumber(), httpRequest);
+        service.reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
         verify(lotsRepository).reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
     }
 
@@ -195,7 +194,7 @@ public class ParkingServiceTest {
     public void whenUserReserveNonExistingParkingLot() throws ApplicationException {
         given(lotsRepository.findByNumber(mockedParkingLot.getNumber())).willReturn(null);
 
-        service.reserve(mockedParkingLot.getNumber(), httpRequest);
+        service.reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
         verify(lotsRepository, never()).reserve(mockedParkingLot.getNumber(), mockedAccount, httpRequest);
     }
 
@@ -206,7 +205,7 @@ public class ParkingServiceTest {
         when(parkingService.getParkingByNumber(mockedParkingLot.getNumber(), httpRequest)).thenReturn(mockedParkingLot);
         given(accountRepository.findByUsername(mockedAccount.getUsername())).willReturn(mockedAccount);
 
-        service.cancelReservation(httpRequest);
+        service.cancelReservation(mockedParkingLot, mockedAccount, httpRequest);
         verify(lotsRepository).cancelReservation(mockedAccount);
     }
 
