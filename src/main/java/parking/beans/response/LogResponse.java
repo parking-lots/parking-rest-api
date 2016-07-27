@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class LogResponse extends Response {
     private ActionType actionType;
-    private String targetUser;
+    private User targetUser;
 
     private Integer lotNumber;
 
@@ -33,7 +33,7 @@ public class LogResponse extends Response {
         this.timestamp = log.getTimestamp();
 
         if (log.getTargetUser() != null)
-            this.targetUser = log.getTargetUser().getUsername();
+            this.targetUser = new User(log.getTargetUser());
         if (log.getUser() != null)
             this.user = log.getUser().getUsername();
         if (log.getMetaData() != null)
@@ -48,11 +48,11 @@ public class LogResponse extends Response {
         this.actionType = actionType;
     }
 
-    public String getTargetUser() {
+    public User getTargetUser() {
         return targetUser;
     }
 
-    public void setTargetUser(String targetUser) {
+    public void setTargetUser(User targetUser) {
         this.targetUser = targetUser;
     }
 
