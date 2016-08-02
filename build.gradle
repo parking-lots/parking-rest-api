@@ -37,7 +37,6 @@ targetCompatibility = 1.8
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-security")
-    compile("org.springframework.boot:spring-boot-starter-batch")
 
     compile 'com.sun.mail:javax.mail:1.5.4'
 
