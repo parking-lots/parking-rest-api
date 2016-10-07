@@ -1,7 +1,3 @@
 <jboss-web>
     <context-root>/</context-root>
-    <context-param>
-        <param-name>spring.profiles.active</param-name>
-        <param-value>dev</param-value>
-    </context-param>
 </jboss-web>
