@@ -4,10 +4,7 @@ package parking.helper;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ToolHelper {
 
@@ -22,6 +19,7 @@ public class ToolHelper {
 
     private static Date format(Date date) {
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         try {
             date = formatter.parse(formatter.format(date));
