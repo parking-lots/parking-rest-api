@@ -88,10 +88,10 @@ public class UserService {
         }
     }
 
-    public Account getCurrentUser(HttpServletRequest request) throws ApplicationException {
+    public Account getCurrentUser() throws ApplicationException {
         Optional<Account> currentUser = getLoggedUser();
         if (!currentUser.isPresent()) {
-            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
+            throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND);
         }
         return getLoggedUser().get();
     }
@@ -100,7 +100,7 @@ public class UserService {
         rememberMeLogin(username.toLowerCase(), password, request);
 
         String userAgent = request.getHeader("User-Agent");
-        Account user = getCurrentUser(request);
+        Account user = getCurrentUser();
         logRepository.insertActionLog(ActionType.LOG_IN, null, null, null, null, null, user, userAgent);
 
         if (remember) {

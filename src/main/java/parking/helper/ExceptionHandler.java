@@ -3,8 +3,10 @@ package parking.helper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import parking.Application;
 import parking.exceptions.ApplicationException;
 import parking.exceptions.ParkingException;
 import parking.exceptions.UserException;
@@ -14,16 +16,20 @@ import java.util.Locale;
 
 @Component
 public class ExceptionHandler {
+
     @Autowired
     private MessageSource messageSource;
 
-
-    private String getMessage(String message, HttpServletRequest request) {
-        return messageSource.getMessage(message, new Object[0], getLocale(request));
+    private String getMessage(String message) {
+        return messageSource.getMessage(message, new Object[0], getLocale());
     }
 
-    private Locale getLocale(HttpServletRequest request) {
-        return new SessionLocaleResolver().resolveLocale(request);
+    private Locale getLocale() {
+        return  LocaleContextHolder.getLocale();
+    }
+
+    public ApplicationException handleException(ExceptionMessage message) {
+        return handleException(message, null);
     }
 
     public ApplicationException handleException(ExceptionMessage message, HttpServletRequest request) {
@@ -40,7 +46,7 @@ public class ExceptionHandler {
             case INVALID_EMAIL:
             case CONFIRMATION_FAILED:
             case NOTHING_CHANGED:
-                return new UserException(getMessage(message.getMsg(), request));
+                return new UserException(getMessage(message.getMsg()));
             case PARKING_ALREADY_EXISTS:
             case PARKING_DOES_NOT_EXIST:
             case PARKING_OWNED_BY_ANOTHER:
@@ -53,7 +59,7 @@ public class ExceptionHandler {
             case DUBLICATE_DATES:
             case DOES_NOT_HAVE_PARKING:
             case EMPTY_CAR_REG_NO:
-                return new ParkingException(getMessage(message.getMsg(), request));
+                return new ParkingException(getMessage(message.getMsg()));
             default:
                 return (ApplicationException) new Exception(message.getMsg());
         }

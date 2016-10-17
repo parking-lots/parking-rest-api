@@ -30,7 +30,7 @@ public class ParkingLot {
     private Boolean current;
 
 
-    private Date reserved;
+    private LocalDate reserved;
     @DBRef
     private Account user;
     @DBRef
@@ -92,11 +92,11 @@ public class ParkingLot {
         this.user = user;
     }
 
-    public Date getReserved() {
+    public LocalDate getReserved() {
         return reserved;
     }
 
-    public void setReserved(Date reserved) {
+    public void setReserved(LocalDate reserved) {
         this.reserved = reserved;
     }
 

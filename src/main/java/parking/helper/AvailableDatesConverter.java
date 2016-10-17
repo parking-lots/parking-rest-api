@@ -7,9 +7,14 @@ import java.time.Period;
 import java.util.*;
 
 public class AvailableDatesConverter {
-    public static LinkedList<AvailablePeriod> convertToInterval(LinkedList<LocalDate> availableDates) {
+    public static List<AvailablePeriod> convertToInterval(LinkedList<LocalDate> availableDates) {
         AvailablePeriod availablePeriod = null;
-        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
+        ArrayList<AvailablePeriod> availablePeriods = new ArrayList<>();
+
+
+        if (!Optional.ofNullable(availableDates).isPresent()) {
+            return null;
+        }
 
         Collections.sort(availableDates);
 
@@ -26,7 +31,9 @@ public class AvailableDatesConverter {
                 availablePeriod = new AvailablePeriod(date, date);
             }
         }
-        availablePeriods.add(availablePeriod);
+        if (Optional.ofNullable(availableDates).isPresent()) {
+            availablePeriods.add(availablePeriod);
+        }
 
         return availablePeriods;
     }

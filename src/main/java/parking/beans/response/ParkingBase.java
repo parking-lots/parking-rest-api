@@ -1,25 +1,25 @@
 package parking.beans.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.helper.AvailableDatesConverter;
 
-import javax.validation.constraints.Digits;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
-public class Parking extends Response {
+public class ParkingBase extends Response {
     private Integer number;
     private Profile owner;
     private Integer floor;
     private Profile user;
+    private List<AvailablePeriod> availablePeriods;
 
-    public Parking(ParkingLot lot, Boolean owner) {
+    public ParkingBase(ParkingLot lot) {
         this.number = lot.getNumber();
         this.floor = lot.getFloor();
-        this.owner = (lot.getOwner() != null) ? new Profile(lot.getOwner(), false) : null;
         this.user = (Optional.ofNullable(lot.getUser())).isPresent() ? new Profile(lot.getUser(), false): null;
+        this.availablePeriods = AvailableDatesConverter.convertToInterval(lot.getDates());
     }
 
     public Integer getNumber() {
@@ -52,5 +52,13 @@ public class Parking extends Response {
 
     public void setUser(Profile user) {
         this.user = user;
+    }
+
+    public List<AvailablePeriod> getAvailablePeriods() {
+        return availablePeriods;
+    }
+
+    public void setAvailablePeriods(List<AvailablePeriod> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 }

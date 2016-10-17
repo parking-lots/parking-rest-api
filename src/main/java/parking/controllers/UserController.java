@@ -66,7 +66,7 @@ public class UserController {
 
         userService.deleteCookies(username, password);
 
-        Account user = userService.getCurrentUser(request);
+        Account user = userService.getCurrentUser();
         session.invalidate();
 
         String userAgent = request.getHeader("User-Agent");
@@ -80,7 +80,7 @@ public class UserController {
 
     @RequestMapping(value = "/profile", method = RequestMethod.POST)
     public void editUser(@Valid @RequestBody EditUserForm form, HttpServletRequest request) throws ApplicationException, MessagingException {
-        String username = userService.getCurrentUser(request).getUsername();
+        String username = userService.getCurrentUser().getUsername();
         adminService.editUser(form, username, request);
 
     }

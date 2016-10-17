@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import parking.beans.document.Account;
-import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
 import parking.exceptions.ApplicationException;
 import parking.helper.ExceptionHandler;
@@ -71,63 +70,31 @@ public class LotsRepositoryImpl implements CustomLotsRepository {
         operations.save(lot);
     }
 
-
-
-
-    public void checkRecallDate(Integer lotNumber, LocalDate availableDate, HttpServletRequest httpRequest) throws ApplicationException {
-        Query searchQuery = new Query(Criteria.where("number").is(lotNumber));
-
-        if (availableDate != null) {
-
-            List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-
-            boolean dateExists = false;
-
-            if (lots.size() > 0) {
-                for (AvailablePeriod period : lots.get(0).getAvailablePeriods()) {
-                    if (period.getFreeFrom().compareTo(availableDate) <= 0 && period.getFreeTill().compareTo(availableDate) >= 0)
-                        dateExists = true;
-                }
-                if (dateExists == false)
-                    throw exceptionHandler.handleException(ExceptionMessage.DATE_DOES_NOT_EXIST, httpRequest);
-            }
-        }
-    }
-
     @Override
     public void reserve(Integer lotNumber, Account user, HttpServletRequest httpRequest) throws ApplicationException {
-//        Query searchQuery = new Query();
-//        Date currentDate = ToolHelper.getCurrentDate();
-//        searchQuery.addCriteria(new Criteria()
-//                .andOperator(
-//                        Criteria.where("number").is(lotNumber),
-//                        Criteria.where("reserved").is(null)
-//                ));
-//
-//        List<ParkingLot> lots = operations.find(searchQuery, ParkingLot.class);
-//
-//        if (lots.size() == 0) {
-//            throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
-//        }
-//
-//        boolean parkingAvailable = false;
-//        for (ParkingLot lot : lots) {
-//            for (AvailablePeriod availablePeriod : lot.getAvailablePeriods()) {
-//                if (availablePeriod.getFreeFrom().compareTo(currentDate) <= 0 && availablePeriod.getFreeTill().compareTo(currentDate) >= 0) {
-//                    parkingAvailable = true;
-//                    break;
-//                }
-//            }
-//        }
-//
-//        if (!parkingAvailable) {
-//            throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
-//        }
-//
-//        Update updateFields = new Update();
-//        updateFields.set("user", user);
-//        updateFields.set("reserved", currentDate);
-//        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
+        Query searchQuery = new Query();
+        LocalDate currentDate = LocalDate.now();
+
+        searchQuery.addCriteria(new Criteria()
+                .andOperator(
+                        Criteria.where("number").is(lotNumber),
+                        Criteria.where("reserved").is(null)
+                ));
+
+        ParkingLot lot = operations.findOne(searchQuery, ParkingLot.class);
+
+        if (!Optional.ofNullable(lot).isPresent()) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
+        }
+
+        if (!lot.getDates().contains(currentDate)) {
+            throw exceptionHandler.handleException(ExceptionMessage.PARKING_NOT_AVAILABLE, httpRequest);
+        }
+
+        Update updateFields = new Update();
+        updateFields.set("user", user);
+        updateFields.set("reserved", currentDate);
+        operations.updateFirst(searchQuery, updateFields, ParkingLot.class);
     }
 
     @Override

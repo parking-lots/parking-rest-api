@@ -57,13 +57,13 @@ public class ParkingController {
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)
     public void reserveOwnersParking(@PathVariable(value = "lotNumber") Integer lotNumber, HttpServletRequest httpRequest) throws ApplicationException {
-        Account account = userService.getCurrentUser(httpRequest);
+        Account account = userService.getCurrentUser();
         parkingService.reserve(lotNumber, account, httpRequest);
     }
 
     @RequestMapping(value = "/reservation", method = RequestMethod.DELETE)
     public void cancelReservation(HttpServletRequest request) throws ApplicationException {
-        Account account = userService.getCurrentUser(request);
+        Account account = userService.getCurrentUser();
         ParkingLot lot = lotsRepository.findByUser(account);
         parkingService.cancelReservation(lot, account, request);
     }

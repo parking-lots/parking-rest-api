@@ -37,7 +37,7 @@ public class ParkingService {
 
     public List<ParkingLot> getAvailable(HttpServletRequest request) throws ApplicationException {
 
-        Account currentUser = userService.getCurrentUser(request);
+        Account currentUser = userService.getCurrentUser();
         List<ParkingLot> parkingLots = lotsRepository.searchAllFields(currentUser);
 
         List<ParkingLot> filteredLots = parkingLots.stream()
@@ -72,7 +72,7 @@ public class ParkingService {
             lotsRepository.reserve(lotNumber, account, httpRequest);
 
             Date currentDate = ToolHelper.getCurrentDate();
-            Account user = userService.getCurrentUser(httpRequest);
+            Account user = userService.getCurrentUser();
             String userAgent = httpRequest.getHeader("User-Agent");
 
             logRepository.insertActionLog(ActionType.RESERVE, account, lot.getNumber(), currentDate, currentDate, null, user, userAgent);
@@ -113,7 +113,7 @@ public class ParkingService {
         lotsRepository.cancelReservation(account);
 
         Date currentDate = ToolHelper.getCurrentDate();
-        Account user = userService.getCurrentUser(request);
+        Account user = userService.getCurrentUser();
         String userAgent = request.getHeader("User-Agent");
         logRepository.insertActionLog(ActionType.UNRESERVE, account, parkingLot.getNumber(), currentDate, currentDate, null, user, userAgent);
     }

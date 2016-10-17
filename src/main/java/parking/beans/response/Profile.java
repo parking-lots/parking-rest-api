@@ -7,8 +7,7 @@ public class Profile extends Response {
 
     private String fullName;
     private String username;
-    private Profile owner;
-    private Parking parking;
+    private ParkingBase parking;
 
     public Profile(Account account) {
         fullName = account.getFullName();
@@ -20,7 +19,7 @@ public class Profile extends Response {
         fullName = account.getFullName();
         username = account.getUsername();
         if (parkingLot) {
-            parking = (account.getParking() != null) ? new Parking(account.getParking(), false) : null;
+            parking = (account.getParking() != null) ? new ParkingBase(account.getParking()) : null;
         }
     }
 
@@ -40,11 +39,11 @@ public class Profile extends Response {
         this.username = username;
     }
 
-    public Parking getParking() {
+    public ParkingBase getParking() {
         return parking;
     }
 
-    public void setParking(Parking parking) {
+    public void setParking(ParkingBase parking) {
         this.parking = parking;
     }
 
