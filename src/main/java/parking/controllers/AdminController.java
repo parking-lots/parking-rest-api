@@ -92,7 +92,7 @@ public class AdminController {
         if (owner.getParking() == null) {
             throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest);
         }
-        parkingService.freeOwnersParking(owner, owner.getParking().getNumber(), request.getAvailableDates(), httpRequest);
+//        parkingService.freeOwnersParking(owner, owner.getParking().getNumber(), request.getAvailableDates(), httpRequest);
     }
 
     @RequestMapping(value = "/users/{username:.+}/parking/availability", method = RequestMethod.DELETE)
@@ -102,7 +102,7 @@ public class AdminController {
             throw exceptionHandler.handleException(ExceptionMessage.USER_NOT_FOUND, request);
         }
 
-        parkingService.recallParking(owner.getParking(), recallParking.getAvailableDates(), request);
+//        parkingService.recallParking(owner.getParking(), recallParking.getAvailableDates(), request);
     }
 
     @RequestMapping(value = "/reservation", method = RequestMethod.PUT)

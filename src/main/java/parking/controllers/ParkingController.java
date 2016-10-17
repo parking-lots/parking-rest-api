@@ -46,12 +46,13 @@ public class ParkingController {
         if (parking == null) {
             throw exceptionHandler.handleException(ExceptionMessage.DOES_NOT_HAVE_PARKING, httpRequest);
         }
-        parkingService.freeOwnersParking(parking.getOwner(), parking.getNumber(), request.getAvailableDates(), httpRequest);
+        parkingService.shareParking(parking.getOwner(), request.getAvailableDates());
     }
 
     @RequestMapping(value = "/availability", method = RequestMethod.DELETE)
     public void recallParking(@Valid @RequestBody RecallParking recallParking, HttpServletRequest request) throws ApplicationException {
-        parkingService.recallParking(parkingService.getParkingNumberByUser(), recallParking.getAvailableDates(), request);
+        ParkingLot parking = parkingService.getParkingNumberByUser();
+        parkingService.unshareParking(parking.getOwner(), recallParking.getAvailableDates());
     }
 
     @RequestMapping(value = "/{lotNumber}/reservation", method = RequestMethod.PUT)

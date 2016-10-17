@@ -1,41 +1,31 @@
 package parking.beans.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import parking.utils.EliminateDateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-/**
- * Created by Lina on 07/04/16.
- */
 public class AvailablePeriod {
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
-    private Date freeFrom;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Vilnius")
-    private Date freeTill;
+    private LocalDate freeFrom;
+    private LocalDate freeTill;
 
-    public AvailablePeriod(Date freeFrom, Date freeTill) {
-        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-        this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();
-        this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();
+    public AvailablePeriod(LocalDate freeFrom, LocalDate freeTill) {
+        this.freeFrom = freeFrom;
+        this.freeTill = freeTill;
     }
 
-    public Date getFreeFrom() {
-
+    public LocalDate getFreeFrom() {
         return freeFrom;
     }
 
-    public void setFreeFrom(Date freeFrom) {
-        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-        this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();
+    public void setFreeFrom(LocalDate freeFrom) {
+        this.freeFrom = freeFrom;
     }
 
-    public Date getFreeTill() {
+    public LocalDate getFreeTill() {
         return freeTill;
     }
 
-    public void setFreeTill(Date freeTill) {
-        EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
-        this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();
+    public void setFreeTill(LocalDate freeTill) {
+        this.freeTill = freeTill;
     }
 }

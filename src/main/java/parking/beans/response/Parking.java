@@ -3,7 +3,9 @@ package parking.beans.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import parking.beans.document.AvailablePeriod;
 import parking.beans.document.ParkingLot;
+import parking.helper.AvailableDatesConverter;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -19,7 +21,7 @@ public class Parking extends Response {
     public Parking(ParkingLot lot, Boolean owner) {
         this.number = lot.getNumber();
         this.floor = lot.getFloor();
-        this.availablePeriods = lot.getAvailablePeriods();
+        this.availablePeriods = AvailableDatesConverter.convertToInterval(lot.getDates());
         this.reserved = lot.getReserved();
         this.user = (lot.getUser() != null) ? new Profile(lot.getUser(), false) : null;
         if (owner) {

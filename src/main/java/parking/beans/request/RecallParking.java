@@ -3,43 +3,40 @@ package parking.beans.request;
 import org.springframework.format.annotation.DateTimeFormat;
 import parking.utils.EliminateDateTimestamp;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RecallParking {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private List<Date> availableDates;
+    private List<LocalDate> availableDates;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date freeFrom;
+    private LocalDate freeFrom;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date freeTill;
-    private EliminateDateTimestamp eliminateDateTimestamp = new EliminateDateTimestamp();
+    private LocalDate freeTill;
 
-    public Date getFreeFrom() {
+    public LocalDate getFreeFrom() {
         return freeFrom;
     }
 
-    public void setFreeFrom(Date freeFrom) {
-        this.freeFrom = eliminateDateTimestamp.formatDateForDatabase(freeFrom).getTime();
+    public void setFreeFrom(LocalDate freeFrom) {
+        this.freeFrom = freeFrom;
     }
 
-    public Date getFreeTill() {
+    public LocalDate getFreeTill() {
         return freeTill;
     }
 
-    public void setFreeTill(Date freeTill) {
-        this.freeTill = eliminateDateTimestamp.formatDateForDatabase(freeTill).getTime();
+    public void setFreeTill(LocalDate freeTill) {
+        this.freeTill = freeTill;
     }
 
-    public List<Date> getAvailableDates() {
+    public List<LocalDate> getAvailableDates() {
         return availableDates;
     }
 
-    public void setAvailableDates(List<Date> availableDates) {
-        for (Date d : availableDates) {
-            d = eliminateDateTimestamp.formatDateForDatabase(d).getTime();
-        }
+    public void setAvailableDates(List<LocalDate> availableDates) {
         this.availableDates = availableDates;
     }
 }

@@ -8,8 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 @Document(collection = "lots")
 public class ParkingLot {
@@ -23,6 +26,7 @@ public class ParkingLot {
     @Min(-2)
     private Integer floor;
     private LinkedList<AvailablePeriod> availablePeriods;
+    private LinkedList<LocalDate> dates;
     private Boolean current;
 
 
@@ -102,5 +106,13 @@ public class ParkingLot {
 
     public void setAvailablePeriods(LinkedList<AvailablePeriod> availablePeriods) {
         this.availablePeriods = availablePeriods;
+    }
+
+    public LinkedList<LocalDate> getDates() {
+        return dates;
+    }
+
+    public void setDates(LinkedList<LocalDate> dates) {
+        this.dates = dates;
     }
 }

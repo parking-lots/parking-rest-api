@@ -2,31 +2,28 @@ package parking.helper;
 
 import parking.beans.document.AvailablePeriod;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 public class AvailableDatesConverter {
-    public static List<AvailablePeriod> convertToInterval(List<Date> availableDates) {
+    public static LinkedList<AvailablePeriod> convertToInterval(LinkedList<LocalDate> availableDates) {
         AvailablePeriod availablePeriod = null;
-        List<AvailablePeriod> availablePeriods = new ArrayList<>();
-
-        if (availableDates.contains(null)) {
-            availablePeriod = new AvailablePeriod(new Date(), new Date());
-            availablePeriods.add(availablePeriod);
-            return availablePeriods;
-        }
+        LinkedList<AvailablePeriod> availablePeriods = new LinkedList<>();
 
         Collections.sort(availableDates);
 
-        for (Date d : availableDates) {
+        for (LocalDate date : availableDates) {
             if (availablePeriod == null) {
-                availablePeriod = new AvailablePeriod(d, d);
+                availablePeriod = new AvailablePeriod(date, date);
                 continue;
             }
-            if ((int) ((d.getTime() - availablePeriod.getFreeTill().getTime()) / (1000 * 60 * 60 * 24)) == 1) {
-                availablePeriod.setFreeTill(d);
+
+            if (Period.between(availablePeriod.getFreeTill(), date).getDays() == 1) {
+                availablePeriod.setFreeTill(date);
             } else {
                 availablePeriods.add(availablePeriod);
-                availablePeriod = new AvailablePeriod(d, d);
+                availablePeriod = new AvailablePeriod(date, date);
             }
         }
         availablePeriods.add(availablePeriod);
